@@ -1,6 +1,7 @@
 // India Map Screen — interactive map showing all explorable cities
 import { useState } from 'react'
 import { INDIAN_CITIES, INDIA_REGIONS, type IndianLocation } from '../../data/indianCities'
+import { POWERFUL_TEMPLES, TEMPLE_ERAS, type PowerfulTemple } from '../../data/powerfulTemples'
 
 // Map dimensions and city pin positions (approximate India-shaped layout)
 // These are SVG coordinates mapped to a 500x580 viewBox of India
@@ -12,20 +13,49 @@ function getPinPosition(lat: number, lon: number): { x: number; y: number } {
   return { x: Math.max(30, Math.min(470, x)), y: Math.max(10, Math.min(570, y)) }
 }
 
+// Merge cities and temples into one combined list for the map
+const ALL_DESTINATIONS = [
+  ...INDIAN_CITIES.map(c => ({ ...c, type: 'city' as const, destinationId: c.id })),
+  ...POWERFUL_TEMPLES.map(t => ({ 
+    id: t.id,
+    name: t.name,
+    state: t.state,
+    lat: t.lat,
+    lon: t.lon,
+    description: `${t.century} · ${t.dynasty} · ${t.location}`,
+    emoji: t.emoji,
+    highlights: t.highlights,
+    type: 'temple' as const,
+    destinationId: t.id,
+  })),
+]
+
 interface IndiaMapScreenProps {
-  onSelectCity: (city: IndianLocation) => void
+  onSelectCity: (city: IndianLocation | PowerfulTemple) => void
   currentCity?: string
 }
 
 export function IndiaMapScreen({ onSelectCity, currentCity }: IndiaMapScreenProps) {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null)
-  const [hoveredCity, setHoveredCity] = useState<string | null>(null)
+  const [showTemples, setShowTemples] = useState(true)
+  const [hoveredDest, setHoveredDest] = useState<string | null>(null)
+  const [selectedEra, setSelectedEra] = useState<string | null>(null)
 
-  const filteredCities = selectedRegion
-    ? INDIA_REGIONS.find(r => r.name === selectedRegion)?.cities.map(id => INDIAN_CITIES.find(c => c.id === id)).filter(Boolean) as IndianLocation[]
-    : INDIAN_CITIES
+  // Filter destinations
+  const visibleDestinations = ALL_DESTINATIONS.filter(d => {
+    if (!showTemples && d.type === 'temple') return false
+    if (selectedRegion) {
+      const region = INDIA_REGIONS.find(r => r.name === selectedRegion)
+      if (region && d.type === 'city' && !region.cities.includes(d.id)) return false
+    }
+    if (selectedEra && d.type === 'temple') {
+      const era = TEMPLE_ERAS.find(e => e.name === selectedEra)
+      if (era && !era.temples.includes(d.destinationId)) return false
+    }
+    return true
+  })
 
-  const hovered = INDIAN_CITIES.find(c => c.id === hoveredCity)
+  const hovered = ALL_DESTINATIONS.find(d => d.id === hoveredDest)
 
   return (
     <div style={{

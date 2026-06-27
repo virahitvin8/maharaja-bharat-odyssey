@@ -5,6 +5,7 @@ import { LoadingScreen, StartScreen, PauseMenu, GameOverScreen } from './compone
 import { IndiaMapScreen } from './components/ui/IndiaMapScreen'
 import { GameCanvas } from './pages/GameCanvas'
 import type { IndianLocation } from './data/indianCities'
+import { INDIAN_CITIES } from './data/indianCities'
 
 export default function App() {
   const phase = useGameStore(s => s.phase)
@@ -12,7 +13,7 @@ export default function App() {
   const setPhase = useGameStore(s => s.setPhase)
   
   // Track the selected city for exploration
-  const [selectedCity, setSelectedCity] = useState<IndianLocation | null>(null)
+  const [selectedCity, setSelectedCity] = useState<IndianLocation>(INDIAN_CITIES[0])
 
   // Simulate loading progress
   useEffect(() => {
@@ -59,8 +60,10 @@ export default function App() {
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: '#050510' }}>
       {/* Overlays */}
+      {/* Overlays */}
       {phase === 'loading'  && <LoadingScreen />}
-      {phase === 'start'    && <StartScreen onExplore={() => setPhase('map')} />}
+      {phase === 'start'    && <StartScreen onExplore={() => {}} />}
+      {phase === 'gameover' && <GameOverScreen />}
       {phase === 'gameover' && <GameOverScreen />}
 
       {/* India Map — shown when player is choosing a city */}
@@ -71,10 +74,10 @@ export default function App() {
         />
       )}
 
-      {/* 3D Canvas — mount when playing with a selected city */}
-      {showCanvas && selectedCity && (
+      {/* 3D Canvas — mount when playing, paused, or starting */}
+      {(phase === 'start' || ((phase === 'playing' || phase === 'paused') && selectedCity)) && (
         <div style={{ position: 'absolute', inset: 0 }}>
-          <GameCanvas city={selectedCity} />
+          <GameCanvas city={selectedCity!} />
         </div>
       )}
 

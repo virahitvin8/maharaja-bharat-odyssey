@@ -44,33 +44,17 @@ export function LoadingScreen() {
 export function StartScreen({ onExplore }: { onExplore: () => void }) {
   return (
     <div style={{
-      position: 'fixed', inset: 0, zIndex: 100,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a30 30%, #0a0015 70%, #0a0a1a 100%)',
+      position: 'fixed', inset: 0, zIndex: 100, pointerEvents: 'none',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start',
       color: '#fff', fontFamily: "'Cinzel', serif",
-      overflow: 'hidden',
+      paddingTop: '10vh'
     }}>
-      {/* Starfield background */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        backgroundImage: 'radial-gradient(1px 1px at 10% 20%, #FFD700, transparent), radial-gradient(1px 1px at 30% 50%, rgba(255,255,255,0.3), transparent), radial-gradient(1px 1px at 50% 80%, #FF9933, transparent), radial-gradient(1px 1px at 70% 30%, rgba(255,255,255,0.3), transparent), radial-gradient(1px 1px at 90% 60%, #FFD700, transparent), radial-gradient(1px 1px at 15% 70%, rgba(255,255,255,0.3), transparent), radial-gradient(1px 1px at 60% 15%, #FFD700, transparent)',
-        backgroundSize: '150px 150px',
-        opacity: 0.4,
-      }} />
-
-      <div style={{
-        fontSize: 70, marginBottom: 20,
-        animation: 'float 3s ease-in-out infinite',
-        filter: 'drop-shadow(0 0 30px rgba(255,215,0,0.3))',
-      }}>
-        👑
-      </div>
-
       <h1 style={{
         fontSize: 'clamp(2rem, 6vw, 3.5rem)', fontWeight: 900,
         background: 'linear-gradient(135deg, #FF9933, #FFD700, #FF9933)',
         WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
         textAlign: 'center', lineHeight: 1.2, padding: '0 20px', marginBottom: 6,
+        filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.8))'
       }}>
         Maharaja's
       </h1>
@@ -79,46 +63,27 @@ export function StartScreen({ onExplore }: { onExplore: () => void }) {
         background: 'linear-gradient(135deg, #FFD700, #FF9933)',
         WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
         textAlign: 'center', marginBottom: 8,
+        filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.8))'
       }}>
         Bharat Odyssey
       </h2>
-      <p style={{
-        fontSize: 'clamp(0.8rem, 2vw, 1rem)', color: '#FFD700',
-        opacity: 0.6, marginBottom: 36, fontFamily: "'Inter', sans-serif",
-        letterSpacing: 2,
+      <div style={{
+        marginTop: 'auto', marginBottom: '15vh',
+        background: 'rgba(0,0,0,0.6)', padding: '16px 32px', borderRadius: 30,
+        border: '1px solid rgba(255,215,0,0.3)',
+        animation: 'float 3s ease-in-out infinite',
       }}>
-        Explore All of India — From OpenStreetMap
-      </p>
-
-      <button onClick={onExplore}
-        style={{
-          padding: '16px 56px', fontSize: 16, fontWeight: 700,
-          background: 'linear-gradient(135deg, #FF9933, #e07800)',
-          border: 'none', borderRadius: 12, cursor: 'pointer', color: '#fff',
-          fontFamily: "'Cinzel', serif", letterSpacing: 1,
-          boxShadow: '0 4px 25px rgba(255,153,51,0.4)',
-          transition: 'all 0.2s',
-          marginBottom: 12,
-        }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = '0 6px 35px rgba(255,153,51,0.6)' }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 25px rgba(255,153,51,0.4)' }}
-      >
-        🗺️ Explore India
-      </button>
-
-      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', maxWidth: 350, textAlign: 'center', lineHeight: 1.6, fontFamily: "'Inter', sans-serif" }}>
-        19 cities · Real streets · Temples · Monuments · Rivers · All from free OSM data
-      </p>
-      <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.12)', marginTop: 4, fontFamily: "'Inter', sans-serif" }}>
-        Press M in-game to open India Map
-      </p>
-
-      <p style={{ position: 'absolute', bottom: 20, fontSize: 11, color: 'rgba(255,255,255,0.15)', fontFamily: "'Inter', sans-serif" }}>
-        Created by Akshit 🇮🇳 · Powered by OpenStreetMap
-      </p>
+        <p style={{
+          fontSize: 'clamp(1rem, 2vw, 1.2rem)', color: '#FFD700',
+          margin: 0, fontFamily: "'Inter', sans-serif", letterSpacing: 1,
+        }}>
+          🏃 Walk up and jump into the painting to begin!
+        </p>
+      </div>
     </div>
   )
 }
+
 
 // ============== PAUSE MENU ==============
 export function PauseMenu() {

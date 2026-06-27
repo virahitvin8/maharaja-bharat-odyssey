@@ -15,6 +15,7 @@ import { EffectComposer, N8AO, Bloom, SMAA, Vignette, ToneMapping } from '@react
 import type { IndianLocation } from '../data/indianCities'
 import type { Tile } from '../services/TileManager'
 import type { OSMData } from '../services/osmData'
+import { IntroRoom } from '../components/3d/IntroRoom'
 import { GameHUD, TouchControls } from '../components/ui/Screens'
 
 // Loading overlay
@@ -42,6 +43,8 @@ function GameScene({ inputRef, osmData }: {
   inputRef: React.MutableRefObject<any>
   osmData: OSMData | null
 }) {
+  const phase = useGameStore(s => s.phase)
+
   return (
     <>
       <EffectComposer multisampling={4} autoClear={false}>
@@ -74,8 +77,14 @@ function GameScene({ inputRef, osmData }: {
 
       <DynamicSky />
       <Physics gravity={[0, -30, 0]} debug={false}>
-        <DynamicWorld data={osmData} />
-        <Collectibles />
+        {phase === 'start' ? (
+          <IntroRoom />
+        ) : (
+          <>
+            <DynamicWorld data={osmData} />
+            <Collectibles />
+          </>
+        )}
         <MaharajaCharacter input={inputRef} />
       </Physics>
     </>
