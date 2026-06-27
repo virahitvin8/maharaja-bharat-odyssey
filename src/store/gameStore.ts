@@ -19,15 +19,31 @@ export interface Landmark {
   discovered: boolean
 }
 
+export interface Inventory {
+  wood: number
+  stone: number
+  food: number
+}
+
 export interface GameState {
   // Core game flow
   phase: 'loading' | 'start' | 'map' | 'playing' | 'paused' | 'gameover'
   loadingProgress: number
 
-  // Player stats
-  lives: number
+  // Survival Mechanics
+  health: number
+  maxHealth: number
   stamina: number
   maxStamina: number
+  inventory: Inventory
+  equippedWeapon: string | null
+
+  // World Interaction
+  playerPos: [number, number, number]
+  isAttacking: boolean
+
+  // Player stats
+  lives: number
   coins: number
   gems: { ruby: number; diamond: number; emerald: number; sapphire: number }
   lotus: number
@@ -58,6 +74,9 @@ export interface GameState {
   addItem: (item: keyof Inventory, amount: number) => void
   removeItem: (item: keyof Inventory, amount: number) => boolean
   equipWeapon: (weapon: string | null) => void
+  
+  setPlayerPos: (pos: [number, number, number]) => void
+  setIsAttacking: (attacking: boolean) => void
 
   setStamina: (s: number | ((prev: number) => number)) => void
   addLife: () => void
@@ -142,6 +161,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   maxStamina: 100,
   inventory: { wood: 0, stone: 0, food: 0 },
   equippedWeapon: null,
+  playerPos: [0, 0, 0],
+  isAttacking: false,
   lives: 3,
   coins: 0,
   gems: { ruby: 0, diamond: 0, emerald: 0, sapphire: 0 },
@@ -158,6 +179,35 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   setPhase: (phase) => set({ phase }),
   setLoadingProgress: (loadingProgress) => set({ loadingProgress }),
+  setCity: (currentCity) => set({ currentCity }),
+
+  // Survival Implementations
+  takeDamage: (amount) => set(s => ({ health: Math.max(0, s.health - amount) })),
+  heal: (amount) => set(s => ({ health: Math.min(s.maxHealth, s.health + amount) })),
+  consumeStamina: (amount) => {
+    const s = get()
+    if (s.stamina >= amount) {
+      set({ stamina: s.stamina - amount })
+      return true
+    }
+    return false
+  },
+  restoreStamina: (amount) => set(s => ({ stamina: Math.min(s.maxStamina, s.stamina + amount) })),
+  addItem: (item, amount) => set(s => ({
+    inventory: { ...s.inventory, [item]: s.inventory[item] + amount }
+  })),
+  removeItem: (item, amount) => {
+    const s = get()
+    if (s.inventory[item] >= amount) {
+      set({ inventory: { ...s.inventory, [item]: s.inventory[item] - amount } })
+      return true
+    }
+    return false
+  },
+  equipWeapon: (weapon) => set({ equippedWeapon: weapon }),
+  setPlayerPos: (pos) => set({ playerPos: pos }),
+  setIsAttacking: (attacking) => set({ isAttacking: attacking }),
+
 
   setStamina: (s) =>
     set((state) => ({

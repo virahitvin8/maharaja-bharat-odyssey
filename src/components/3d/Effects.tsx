@@ -1,6 +1,8 @@
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useState, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { RigidBody } from '@react-three/rapier'
 import * as THREE from 'three'
+import { useGameStore } from '../../store/gameStore'
 
 // ---- Atmospheric Dust Particles ----
 export function AtmosphereParticles({ count = 150, spread = 120, height = 15 }: { count?: number; spread?: number; height?: number }) {
@@ -73,22 +75,74 @@ export function IncenseParticles({ position }: { position: [number, number, numb
   )
 }
 
-// ---- Optimized Simple Tree ----
+// ---- Destructible Simple Tree ----
 export function SimpleTree({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
   const s = scale * (0.8 + Math.random() * 0.4)
-  return (
-    <group position={[position[0], 0, position[2]]}>
-      {/* Trunk */}
-      <mesh castShadow receiveShadow position={[0, 1 * s, 0]}>
-        <cylinderGeometry args={[0.2 * s, 0.3 * s, 2 * s, 4]} />
+  const [hp, setHp] = useState(3)
+  const [dead, setDead] = useState(false)
+  const hitCooldown = useRef(0)
+  const groupRef = useRef<THREE.Group>(null)
+
+  useFrame((_, delta) => {
+    if (dead) return
+    if (hitCooldown.current > 0) hitCooldown.current -= delta
+    
+    const store = useGameStore.getState()
+    if (store.isAttacking && hitCooldown.current <= 0) {
+      const p1 = new THREE.Vector3(position[0], position[1], position[2])
+      const p2 = new THREE.Vector3(store.playerPos[0], store.playerPos[1], store.playerPos[2])
+      
+      if (p1.distanceTo(p2) < 3.5) {
+        hitCooldown.current = 0.5 // Cooldown
+        setHp(h => h - 1)
+        
+        // Wobble effect
+        if (groupRef.current) {
+          groupRef.current.rotation.z = (Math.random() - 0.5) * 0.4
+          groupRef.current.rotation.x = (Math.random() - 0.5) * 0.4
+          setTimeout(() => {
+            if (groupRef.current) {
+              groupRef.current.rotation.z = 0
+              groupRef.current.rotation.x = 0
+            }
+          }, 150)
+        }
+      }
+    }
+  })
+
+  useEffect(() => {
+    if (hp <= 0 && !dead) {
+      setDead(true)
+      useGameStore.getState().addItem('wood', 1)
+      // Play a crunch sound ideally here
+    }
+  }, [hp, dead])
+
+  if (dead) {
+    return (
+      <mesh position={[position[0], 0.2 * s, position[2]]}>
+        <cylinderGeometry args={[0.2 * s, 0.2 * s, 0.4 * s, 4]} />
         <meshStandardMaterial color="#4a3020" roughness={0.9} />
       </mesh>
-      {/* Canopy */}
-      <mesh castShadow receiveShadow position={[0, 3 * s, 0]}>
-        <sphereGeometry args={[2 * s, 5, 4]} />
-        <meshStandardMaterial color="#2a7a2a" roughness={0.8} />
-      </mesh>
-    </group>
+    )
+  }
+
+  return (
+    <RigidBody type="fixed" colliders="cuboid">
+      <group position={[position[0], 0, position[2]]} ref={groupRef}>
+        {/* Trunk */}
+        <mesh castShadow receiveShadow position={[0, 1 * s, 0]}>
+          <cylinderGeometry args={[0.2 * s, 0.3 * s, 2 * s, 4]} />
+          <meshStandardMaterial color="#4a3020" roughness={0.9} />
+        </mesh>
+        {/* Canopy */}
+        <mesh castShadow receiveShadow position={[0, 3 * s, 0]}>
+          <sphereGeometry args={[2 * s, 5, 4]} />
+          <meshStandardMaterial color="#2a7a2a" roughness={0.8} />
+        </mesh>
+      </group>
+    </RigidBody>
   )
 }
 

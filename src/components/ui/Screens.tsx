@@ -194,6 +194,9 @@ export function GameHUD({ currentCity }: { currentCity?: string }) {
   const lives = useGameStore(s => s.lives)
   const stamina = useGameStore(s => s.stamina)
   const maxStamina = useGameStore(s => s.maxStamina)
+  const health = useGameStore(s => s.health)
+  const maxHealth = useGameStore(s => s.maxHealth)
+  const inventory = useGameStore(s => s.inventory)
   const timeOfDay = useGameStore(s => s.timeOfDay)
   const notification = useGameStore(s => s.notification)
   const clearNotification = useGameStore(s => s.clearNotification)
@@ -238,6 +241,22 @@ export function GameHUD({ currentCity }: { currentCity?: string }) {
         <span style={{ color: '#e63946' }}>{'❤️'.repeat(lives)}</span>
       </div>
 
+      {/* HEALTH BAR */}
+      <div style={{
+        position: 'absolute', bottom: 135, left: 12,
+        padding: '6px 10px', background: 'rgba(10,10,30,0.7)', backdropFilter: 'blur(8px)',
+        border: '1px solid rgba(255,50,50,0.2)', borderRadius: 8, pointerEvents: 'auto',
+        minWidth: 120,
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#888', marginBottom: 3 }}>
+          <span style={{ color: '#ff4d4d', fontWeight: 600 }}>❤️</span>
+          <span>{Math.round(health)}%</span>
+        </div>
+        <div style={{ width: '100%', height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 2 }}>
+          <div style={{ width: `${(health / maxHealth) * 100}%`, height: '100%', background: '#ff4d4d', borderRadius: 2, transition: 'width 0.2s' }} />
+        </div>
+      </div>
+
       {/* STAMINA BAR */}
       <div style={{
         position: 'absolute', bottom: 90, left: 12,
@@ -254,6 +273,25 @@ export function GameHUD({ currentCity }: { currentCity?: string }) {
             width: `${(stamina / maxStamina) * 100}%`, height: '100%',
             borderRadius: 2, transition: 'width 0.15s ease-out',
           }} />
+        </div>
+      </div>
+
+      {/* INVENTORY */}
+      <div style={{
+        position: 'absolute', bottom: 180, left: 12,
+        padding: '8px 12px', background: 'rgba(10,10,30,0.7)', backdropFilter: 'blur(8px)',
+        border: '1px solid rgba(255,153,51,0.2)', borderRadius: 8, pointerEvents: 'auto',
+        display: 'flex', flexDirection: 'column', gap: 6, minWidth: 80,
+      }}>
+        <span style={{ fontSize: 11, color: '#FFD700', fontWeight: 'bold' }}>Backpack</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#fff' }}>
+          <span>🪵 Wood</span> <span>{inventory.wood}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#fff' }}>
+          <span>🪨 Stone</span> <span>{inventory.stone}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#fff' }}>
+          <span>🍎 Food</span> <span>{inventory.food}</span>
         </div>
       </div>
 

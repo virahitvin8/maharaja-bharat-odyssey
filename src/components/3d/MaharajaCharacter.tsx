@@ -266,15 +266,22 @@ export function MaharajaCharacter({ input }: MaharajaProps) {
     // Sword attack
     if (attack && !prevAttack.current) {
       isAttacking.current = true
+      store.setIsAttacking(true)
       attackTimer.current = 0.4
       playAttackSound()
-      store.setStamina(s => s - 8)
+      store.consumeStamina(8)
     }
     prevAttack.current = attack
     if (attackTimer.current > 0) {
       attackTimer.current -= delta
-      if (attackTimer.current <= 0) isAttacking.current = false
+      if (attackTimer.current <= 0) {
+        isAttacking.current = false
+        store.setIsAttacking(false)
+      }
     }
+
+    // Sync player position for interactions
+    store.setPlayerPos([pos.x, pos.y, pos.z])
 
     // Clamp stamina
     store.setStamina(s => Math.max(0, s))
