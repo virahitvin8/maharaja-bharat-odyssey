@@ -150,6 +150,8 @@ export function PauseMenu() {
 export function GameOverScreen() {
   const score = useGameStore(s => s.score)
   const coins = useGameStore(s => s.coins)
+  const profile = useGameStore(s => s.profile)
+  const playerName = profile?.name || 'Maharaja'
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 200,
@@ -161,9 +163,12 @@ export function GameOverScreen() {
         padding: '36px 44px', textAlign: 'center', maxWidth: 380, width: '90%',
       }}>
         <div style={{ fontSize: 40, marginBottom: 8 }}>💀</div>
-        <h2 style={{ fontSize: 24, color: '#e63946', marginBottom: 16, fontWeight: 700 }}>
-          Journey Ends
+        <h2 style={{ fontSize: 24, color: '#e63946', marginBottom: 8, fontWeight: 700 }}>
+          {playerName}'s Journey Ends
         </h2>
+        <p style={{ color: 'rgba(255,215,0,0.5)', fontSize: 11, marginBottom: 16, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+          The temples will await your return...
+        </p>
         <div style={{ marginBottom: 20, color: '#FFD700', fontSize: 22 }}>
           ⭐ {score.toLocaleString()}
         </div>

@@ -1,5 +1,5 @@
 // Game Canvas — main 3D scene with dynamic OSM tile streaming across India
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { DynamicSky } from '../components/3d/DynamicSky'
@@ -27,6 +27,8 @@ import { KrishnaFlute, BrindhavanGrove, DwarakaGate, KrishnaStatue, LotusPond, F
 
 // Loading overlay
 function CanvasLoader({ progress, message }: { progress: number; message: string }) {
+  const profile = useGameStore(s => s.profile)
+  const playerName = profile?.name || 'Maharaja'
   return (
     <div style={{
       position: 'absolute', inset: 0, zIndex: 10,
@@ -35,7 +37,10 @@ function CanvasLoader({ progress, message }: { progress: number; message: string
       fontFamily: "'Cinzel', serif",
     }}>
       <div style={{ fontSize: 40, marginBottom: 16, animation: 'float 3s ease-in-out infinite' }}>🗺️</div>
-      <p style={{ color: '#FFD700', fontSize: 14, marginBottom: 20 }}>{message}</p>
+      <p style={{ color: '#FFD700', fontSize: 14, marginBottom: 8 }}>{message}</p>
+      <p style={{ color: 'rgba(255,215,0,0.4)', fontSize: 11, marginBottom: 20, fontStyle: 'italic' }}>
+        The sacred paths await you, {playerName}...
+      </p>
       <div style={{
         width: 250, height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden'
       }}>
@@ -55,12 +60,33 @@ function GameScene({ inputRef, osmData, temple }: {
   const profile = useGameStore(s => s.profile)
   const playerName = profile?.name || 'Maharaja'
   const [showSanctum, setShowSanctum] = useState(false)
+  const entryCooldown = useRef(0)
+  const entryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Temple position for sanctum
   const templePosition = temple ? (() => {
     const [tx, tz] = latLonToLocalWorld(temple.lat, temple.lon)
     return [tx, 0, tz] as [number, number, number]
   })() : null
+
+  // Proximity-based temple entry — polls player position every 300ms (avoids 60fps cleanup race)
+  useEffect(() => {
+    if (!templePosition || showSanctum) return
+    const interval = setInterval(() => {
+      const pos = useGameStore.getState().playerPos
+      if (!pos) return
+      const dx = pos[0] - templePosition[0]
+      const dz = pos[2] - templePosition[2]
+      if (dx * dx + dz * dz < 16 && Date.now() - entryCooldown.current > 2000) {
+        entryCooldown.current = Date.now()
+        entryTimeoutRef.current = setTimeout(() => setShowSanctum(true), 600)
+      }
+    }, 300)
+    return () => {
+      clearInterval(interval)
+      if (entryTimeoutRef.current) clearTimeout(entryTimeoutRef.current)
+    }
+  }, [templePosition, showSanctum])
 
   return (
     <>
@@ -154,10 +180,6 @@ function GameScene({ inputRef, osmData, temple }: {
             {temple && templePosition && (
               <group position={[templePosition[0], 0, templePosition[2]]}>
                 <PowerfulTempleModel temple={temple} scale={1.5} />
-                {/* Click to enter sanctum */}
-                <mesh position={[0, 1.5, 3]} onClick={() => setShowSanctum(true)} visible={false}>
-                  <boxGeometry args={[3, 4, 2]} />
-                </mesh>
               </group>
             )}
 

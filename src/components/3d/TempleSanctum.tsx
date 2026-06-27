@@ -136,43 +136,49 @@ export function TempleSanctum({ position, temple, onExit }: TempleSanctumProps) 
   const [blessingRevealed, setBlessingRevealed] = useState(false)
   const playerPos = useGameStore(s => s.playerPos)
   const showNotification = useGameStore(s => s.showNotification)
-  const profile = useGameStore(s => s.profile)
   const addBlessing = useGameStore(s => s.addBlessing)
 
   const superpower = getSuperpowerByTemple(temple.id)
   const ornamentReward = getOrnamentsForTemple(temple.id)
+  const ceremonyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Check if player is close enough to pray
-  const playerNear = useRef(false)
+  // Proximity triggers: prayer when close to deity, exit when walking away after darshan
+  const prayTriggered = useRef(false)
+  const exitCooldown = useRef(0)
+
   useFrame(() => {
-    if (hasDarshan || showCeremony) return
     const dist = Math.sqrt(
       (playerPos[0] - position[0]) ** 2 +
       (playerPos[2] - position[2]) ** 2
     )
-    playerNear.current = dist < 2.5
-  })
 
-  const handlePray = () => {
-    if (hasDarshan) return
-    setShowCeremony(true)
-    
-    // Unlock blessing after ceremony
-    setTimeout(() => {
-      setHasDarshan(true)
-      setBlessingRevealed(true)
-      
-      if (superpower) {
-        addBlessing(superpower.id)
-        showNotification(`✨ ${superpower.name} unlocked! ${superpower.description}`, 'blessing')
-      }
-      
-      if (ornamentReward.length > 0) {
-        const ornament = ornamentReward[0]
-        showNotification(`💎 ${ornament.name} obtained! Check your blessings!`, 'ornament')
-      }
-    }, 8000)
-  }
+    // Auto-prayer: walk within 2 units of deity to trigger darshan ceremony
+    if (!hasDarshan && !showCeremony && dist < 2 && !prayTriggered.current) {
+      prayTriggered.current = true
+      setShowCeremony(true)
+      // Unlock blessing after ceremony completes (8s ceremony length)
+      ceremonyTimeoutRef.current = setTimeout(() => {
+        setHasDarshan(true)
+        setBlessingRevealed(true)
+        if (superpower) {
+          addBlessing(superpower.id)
+          const bName = useGameStore.getState().profile?.name || 'Pilgrim'
+          showNotification(`✨ ${bName} received ${superpower.name}!`, 'blessing')
+        }
+        if (ornamentReward.length > 0) {
+          const oName = useGameStore.getState().profile?.name || 'Pilgrim'
+          showNotification(`💎 ${oName} obtained ${ornamentReward[0].name}!`, 'ornament')
+        }
+      }, 8000)
+    }
+
+    // Auto-exit: walk 3+ units away from deity after receiving blessing
+    if (hasDarshan && blessingRevealed && dist > 3 && Date.now() - exitCooldown.current > 1000) {
+      exitCooldown.current = Date.now()
+      if (ceremonyTimeoutRef.current) clearTimeout(ceremonyTimeoutRef.current)
+      onExit()
+    }
+  })
 
   return (
     <group position={position}>
@@ -235,33 +241,21 @@ export function TempleSanctum({ position, temple, onExit }: TempleSanctumProps) 
         <meshStandardMaterial color="#DAA520" emissive="#FFD700" emissiveIntensity={0.5} metalness={0.7} roughness={0.2} />
       </mesh>
 
-      {/* Prayer prompt */}
-      {playerNear.current && !hasDarshan && !showCeremony && (
-        <group position={[0, 3.5, 1]}>
-          <mesh>
-            <planeGeometry args={[2, 0.5]} />
-            <meshBasicMaterial color="#050510" transparent opacity={0.8} />
-          </mesh>
-          <sprite position={[0, 0.5, 0]} scale={[0.5, 0.5, 1]}>
-            <spriteMaterial color="#FFD700" />
-          </sprite>
-        </group>
+      {/* Prayer glow — attracts player to approach the deity */}
+      {!hasDarshan && !showCeremony && (
+        <pointLight color="#FFD700" intensity={2} distance={6} position={[0, 1.5, -1.5]} />
       )}
-
-      {/* Click to pray zone */}
-      <mesh position={[0, 1.5, 1.5]} onClick={handlePray} visible={false}>
-        <boxGeometry args={[3, 4, 2]} />
-      </mesh>
 
       {/* Blessing ceremony */}
       {showCeremony && !blessingRevealed && superpower && (
         <BlessingCeremony temple={temple} superpower={superpower} onComplete={() => {}} />
       )}
 
-      {/* Exit click zone */}
-      {hasDarshan && (
-        <mesh position={[0, 2, 2.8]} onClick={onExit} visible={false}>
-          <boxGeometry args={[2, 4, 1]} />
+      {/* Exit prompt after darshan - walk away from deity to leave */}
+      {hasDarshan && blessingRevealed && (
+        <mesh position={[0, 2, 2.5]}>
+          <torusGeometry args={[1.2, 0.08, 8, 12, Math.PI]} />
+          <meshStandardMaterial color="#DAA520" emissive="#FFD700" emissiveIntensity={0.6} metalness={0.7} roughness={0.2} transparent opacity={0.8} />
         </mesh>
       )}
     </group>

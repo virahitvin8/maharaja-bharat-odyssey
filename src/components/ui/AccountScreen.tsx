@@ -1,7 +1,7 @@
 // Account Screen — Create your Maharaja profile
 // Name + age determines character height, personalized game messages, Krishna flute theme
 import { useState } from 'react'
-import { useGameStore } from '../../store/gameStore'
+import { useGameStore, getCharacterHeightFromAge } from '../../store/gameStore'
 
 export function AccountScreen() {
   const setProfile = useGameStore(s => s.setProfile)
@@ -9,8 +9,8 @@ export function AccountScreen() {
   const [age, setAge] = useState<number>(16)
   const [step, setStep] = useState<'welcome' | 'name' | 'age'>('welcome')
 
-  // Age-based height calculation
-  const characterHeight = age < 10 ? 0.6 : age < 14 ? 0.75 : age < 18 ? 0.9 : age < 60 ? 1.0 : 0.85
+  // Age-based height calculation using shared utility
+  const characterHeight = getCharacterHeightFromAge(age)
   const heightLabel = characterHeight < 0.7 ? 'Young Explorer' : characterHeight < 0.85 ? 'Rising Warrior' : characterHeight < 0.95 ? 'Brave Youth' : characterHeight < 1.0 ? 'Seasoned Maharaja' : 'Wise Sage'
 
   const handleCreate = () => {

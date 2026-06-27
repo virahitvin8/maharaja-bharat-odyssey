@@ -5,6 +5,15 @@ import type { Superpower } from '../data/superpowers'
 import type { Ornament } from '../data/ornaments'
 import type { Mission, MissionProgress } from '../data/missions'
 
+// Shared character height derivation — used by AccountScreen and MaharajaCharacter
+export function getCharacterHeightFromAge(age: number): number {
+  if (age < 10) return 0.6  // Young Explorer
+  if (age < 14) return 0.75 // Rising Warrior
+  if (age < 18) return 0.9  // Brave Youth
+  if (age < 60) return 1.0  // Seasoned Maharaja
+  return 0.85                // Wise Sage
+}
+
 export type BiomeType = 'rajasthan' | 'himalaya' | 'kerala' | 'deccan' | 'gangetic' | 'coastal'
 
 export interface Collectible {

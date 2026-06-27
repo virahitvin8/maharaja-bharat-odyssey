@@ -93,7 +93,8 @@ export function CuttableTree({
       if (dist < 3) {
         setIsCut(true)
         addItem('wood', 2 + Math.floor(Math.random() * 3))
-        showNotification('🌳 Tree felled! +Wood', 'collect')
+        const name = useGameStore.getState().profile?.name || 'Maharaja'
+        showNotification(`🌳 ${name} felled a tree! +Wood`, 'collect')
       }
     }
   })
@@ -150,7 +151,8 @@ export function PickupStone({
       onClick={() => {
         setCollected(true)
         useGameStore.getState().addItem('stone', 1)
-        useGameStore.getState().showNotification('🪨 Stone collected!', 'collect')
+        const name = useGameStore.getState().profile?.name || 'Maharaja'
+        useGameStore.getState().showNotification(`🪨 ${name} found a stone!`, 'collect')
         onCollect?.()
       }}>
       <dodecahedronGeometry args={[0.15, 0]} />
@@ -179,7 +181,8 @@ export function RaftCrafting({
     }
     if (!building) {
       if (useGameStore.getState().inventory.wood < 8) {
-        showNotification('Need 8 wood to build a raft! Cut trees nearby', 'collect')
+        const name = useGameStore.getState().profile?.name || 'Maharaja'
+        showNotification(`${name} needs 8 wood to build a raft! Cut trees nearby`, 'collect')
         return
       }
       setBuilding(true)
@@ -191,7 +194,8 @@ export function RaftCrafting({
     if (!building) return
     const timer = setTimeout(() => {
       setRaftReady(true)
-      showNotification('🛶 Raft built! Use it to cross water', 'collect')
+      const name = useGameStore.getState().profile?.name || 'Maharaja'
+      showNotification(`🛶 ${name} built a raft! Cross water to continue`, 'collect')
       onRaftReady?.()
     }, 3000)
     return () => clearTimeout(timer)
@@ -246,18 +250,21 @@ export function TreeHouse({
   const handleBuild = () => {
     const s = useGameStore.getState()
     if (isBuilt) {
-      showNotification('🏠 Resting... ❤️', 'life')
+      const name = useGameStore.getState().profile?.name || 'Maharaja'
+      showNotification(`🏠 ${name} rests... ❤️`, 'life')
       s.heal(30)
       return
     }
     if (s.inventory.wood < 20 || s.inventory.stone < 10) {
-      showNotification('Need 20 wood + 10 stone to build a treehouse', 'collect')
+      const name = useGameStore.getState().profile?.name || 'Maharaja'
+      showNotification(`${name} needs 20 wood + 10 stone to build a treehouse`, 'collect')
       return
     }
     s.removeItem('wood', 20)
     s.removeItem('stone', 10)
     setIsBuilt(true)
-    showNotification('🏠 Treehouse built! Rest here to heal ❤️', 'life')
+    const name = useGameStore.getState().profile?.name || 'Maharaja'
+    showNotification(`🏠 ${name}'s treehouse built! Rest here to heal ❤️`, 'life')
   }
 
   return (
@@ -398,7 +405,8 @@ export function HostileAnimal({
         if (nh <= 0) {
           setIsDead(true)
           useGameStore.getState().addItem('food', type === 'boar' ? 3 : 1)
-          useGameStore.getState().showNotification(`🐗 ${type} defeated! +Food`, 'collect')
+          const name = useGameStore.getState().profile?.name || 'Maharaja'
+          useGameStore.getState().showNotification(`🐗 ${name} defeated a ${type}! +Food`, 'collect')
           onDefeated?.()
         }
         return nh
@@ -481,7 +489,8 @@ export function FruitTree({
     const s = useGameStore.getState()
     s.restoreStamina(20)
     s.addItem('food', 1)
-    s.showNotification(`🍎 ${fruitType} collected! +Energy`, 'collect')
+    const name = useGameStore.getState().profile?.name || 'Maharaja'
+    s.showNotification(`🍎 ${name} picked a ${fruitType}! +Energy`, 'collect')
   }
 
   return (

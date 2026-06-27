@@ -5,7 +5,7 @@ import { RigidBody, CapsuleCollider } from '@react-three/rapier'
 import * as THREE from 'three'
 import type { RapierRigidBody } from '@react-three/rapier'
 import type { InputState } from '../../hooks/useInput'
-import { useGameStore } from '../../store/gameStore'
+import { useGameStore, getCharacterHeightFromAge } from '../../store/gameStore'
 import { playJumpSound, playLandSound, playAttackSound } from '../../audio/sounds'
 
 interface MaharajaProps {
@@ -184,9 +184,9 @@ export function MaharajaCharacter({ input }: MaharajaProps) {
   // Use getState() in useFrame for actions that don't need reactivity
   const storeRef = useGameStore
   
-  // Calculate scale based on age
+  // Character scale based on age profile (matches AccountScreen preview)
   const profile = useGameStore(s => s.profile)
-  const scale = profile ? Math.min(1, Math.max(0.5, profile.age / 18)) : 1
+  const scale = profile ? getCharacterHeightFromAge(profile.age) : 1
 
   const lastBiomeRef = useRef<string>('gangetic')
 
@@ -309,14 +309,15 @@ export function MaharajaCharacter({ input }: MaharajaProps) {
       const cPos = new THREE.Vector3(...c.position)
       if (posVec.distanceTo(cPos) < 2.2) {
         store.collectItem(c.id)
-        if (c.type === 'coin')         { store.addCoins(1);           store.showNotification('🪙 Coin!', 'collect') }
-        if (c.type === 'gem_ruby')     { store.addGem('ruby');        store.showNotification('💎 Ruby Gem!', 'collect') }
-        if (c.type === 'gem_diamond')  { store.addGem('diamond');     store.showNotification('💎 Diamond!', 'collect') }
-        if (c.type === 'gem_emerald')  { store.addGem('emerald');     store.showNotification('💎 Emerald!', 'collect') }
-        if (c.type === 'gem_sapphire') { store.addGem('sapphire');    store.showNotification('💎 Sapphire!', 'collect') }
-        if (c.type === 'lotus')        { store.addLotus();            store.showNotification('🪷 Sacred Lotus!', 'collect') }
-        if (c.type === 'diya')         { store.addCoins(5);           store.showNotification('🪔 Diya Blessing! +5', 'collect') }
-        if (c.type === 'mango' || c.type === 'coconut') { store.addLife(); store.showNotification('❤️ Life Up!', 'life') }
+        const charName = store.profile?.name || 'Maharaja'
+        if (c.type === 'coin')         { store.addCoins(1);           store.showNotification(`🪙 ${charName} found a coin!`, 'collect') }
+        if (c.type === 'gem_ruby')     { store.addGem('ruby');        store.showNotification(`💎 ${charName} found a Ruby!`, 'collect') }
+        if (c.type === 'gem_diamond')  { store.addGem('diamond');     store.showNotification(`💎 ${charName} found a Diamond!`, 'collect') }
+        if (c.type === 'gem_emerald')  { store.addGem('emerald');     store.showNotification(`💎 ${charName} found an Emerald!`, 'collect') }
+        if (c.type === 'gem_sapphire') { store.addGem('sapphire');    store.showNotification(`💎 ${charName} found a Sapphire!`, 'collect') }
+        if (c.type === 'lotus')        { store.addLotus();            store.showNotification(`🪷 ${charName} found a Sacred Lotus!`, 'collect') }
+        if (c.type === 'diya')         { store.addCoins(5);           store.showNotification(`🪔 ${charName} received Diya Blessing! +5`, 'collect') }
+        if (c.type === 'mango' || c.type === 'coconut') { store.addLife(); store.showNotification(`❤️ ${charName}'s vitality restored!`, 'life') }
       }
     })
 
