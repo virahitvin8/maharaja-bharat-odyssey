@@ -2,9 +2,9 @@
 import { useEffect, useState } from 'react'
 import { useGameStore } from '../../store/gameStore'
 import {
-  CrownIcon, MapIcon, PauseIcon, PlayIcon, SkullIcon, StarIcon,
-  HeartIcon, SwordIcon, BackpackIcon, GearIcon, CoinIcon, GemIcon,
-  LightningIcon, MoonIcon, SunIcon, VillageIcon
+  CrownIcon, PauseIcon, SkullIcon, StarIcon,
+  SwordIcon, BackpackIcon, GearIcon, CoinIcon, GemIcon,
+  MoonIcon, SunIcon, VillageIcon
 } from './Icons'
 
 // ============== LOADING SCREEN ==============
@@ -174,8 +174,8 @@ export function GameOverScreen() {
         <p style={{ color: 'rgba(255,215,0,0.5)', fontSize: 11, marginBottom: 16, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
           The temples will await your return...
         </p>
-        <div style={{ marginBottom: 20, color: '#FFD700', fontSize: 22 }}>
-          ⭐ {score.toLocaleString()}
+        <div style={{ marginBottom: 20, color: '#FFD700', fontSize: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <StarIcon size={22} color="#FFD700" /> {score.toLocaleString()}
         </div>
         <p style={{ color: '#888', fontSize: 13, marginBottom: 20, fontFamily: "'Inter', sans-serif" }}>
           Coins collected: {coins}
@@ -272,8 +272,8 @@ export function GameHUD({ currentCity }: { currentCity?: string }) {
           <div style={{
             width: 40, height: 40, borderRadius: '50%', background: '#FFD700',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 20, border: '2px solid #fff'
-          }}>👑</div>
+            border: '2px solid #fff'
+          }}><CrownIcon size={20} color="#FFD700" /></div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ color: '#fff', fontSize: 14, fontWeight: 700 }}>{useGameStore.getState().profile?.name || 'Traveler'}</span>
             <span style={{ color: '#FFD700', fontSize: 11 }}>Adventure Rank {Math.floor(score / 1000) + 1}</span>
@@ -379,7 +379,7 @@ export function GameHUD({ currentCity }: { currentCity?: string }) {
         <span style={{ color: isNight ? '#aaccff' : '#FFD700', fontWeight: 600, fontFamily: "'Cinzel', serif", display: 'flex', alignItems: 'center', gap: 6 }}>
           <VillageIcon size={14} color={isNight ? '#aaccff' : '#FFD700'} /> {currentCity || 'India'}
         </span>
-        <span style={{ color: '#888', display: 'block', fontSize: 10, marginTop: 2, display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+        <span style={{ color: '#888', fontSize: 10, marginTop: 2, display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
           {timeStr} {isNight ? <MoonIcon size={10} color="#aaccff" /> : <SunIcon size={10} color="#FFD700" />}
         </span>
       </div>

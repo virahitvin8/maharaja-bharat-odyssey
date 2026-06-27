@@ -2,8 +2,7 @@ import { useRef, useEffect, useState, useCallback } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import {
   MountainIcon, TempleIcon, LightningIcon, ClimberIcon, WoodIcon, LotusIcon,
-  CoinIcon, GemIcon, StarIcon, CrownIcon, CompassIcon, PlayIcon, ArrowRightIcon,
-  MapIcon, SwordIcon, HeartIcon
+  PlayIcon, ArrowRightIcon
 } from './Icons'
 import './landing.css'
 
@@ -164,7 +163,7 @@ export default function LandingPage({ onPlay }: LandingPageProps) {
               <PlayIcon size={18} color="#000" />
               Play Now — Free
             </button>
-            <a href={apkUrl} download style={{ textDecoration: 'none' }}>
+            <a href={apkUrl} download="MaharajasBharatOdyssey-v1.0.apk" style={{ textDecoration: 'none' }}>
               <button className="lp-btn lp-btn-outline lp-btn-large">
                 <ArrowRightIcon size={16} color="rgba(255,255,255,0.7)" />
                 Download APK
@@ -320,7 +319,7 @@ export default function LandingPage({ onPlay }: LandingPageProps) {
               <PlayIcon size={18} color="#000" />
               Play in Browser
             </button>
-            <a href={apkUrl} download style={{ textDecoration: 'none' }}>
+            <a href={apkUrl} download="MaharajasBharatOdyssey-v1.0.apk" style={{ textDecoration: 'none' }}>
               <button className="lp-btn lp-btn-outline lp-btn-large">
                 <ArrowRightIcon size={16} color="rgba(255,255,255,0.7)" />
                 Download APK
