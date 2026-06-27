@@ -292,6 +292,18 @@ interface DynamicWorldProps {
 }
 
 export function DynamicWorld({ data }: DynamicWorldProps) {
+  // If no data yet, show an empty ground plane
+  if (!data) {
+    return (
+      <RigidBody type="fixed" colliders="trimesh" friction={0.8}>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+          <planeGeometry args={[3000, 3000, 1, 1]} />
+          <meshStandardMaterial color="#6a8a5a" roughness={0.95} metalness={0} />
+        </mesh>
+      </RigidBody>
+    )
+  }
+
   // Process buildings, roads, temples, etc.
   const { buildings, roads, temples, waterBodies, waterways, landuse, natural } = data
 

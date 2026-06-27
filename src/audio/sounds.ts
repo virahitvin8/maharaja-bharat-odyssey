@@ -77,62 +77,108 @@ export function playGameOverSound() {
   notes.forEach((f, i) => setTimeout(() => playTone(f, 0.4, 'triangle', 0.3), i * 150))
 }
 
-// Ambient drone per biome
-const biomeAmbientNodes: { osc: OscillatorNode; gain: GainNode } | null = null
+// Genshin-style Ambient Music Generator
+const biomeAmbientNodes: { osc1: OscillatorNode; osc2: OscillatorNode; gain: GainNode; interval?: NodeJS.Timeout } | null = null
 
 export function useBiomeAmbient() {
-  const ambientRef = useRef<{ osc1: OscillatorNode; osc2: OscillatorNode; gain: GainNode } | null>(null)
+  const ambientRef = useRef<{ osc1: OscillatorNode; osc2: OscillatorNode; gain: GainNode; interval?: NodeJS.Timeout } | null>(null)
 
   const setBiomeAmbient = useCallback((biome: BiomeType) => {
     try {
       const ctx = getCtx()
-      // Fade out old
+      
+      // Stop previous
       if (ambientRef.current) {
-        ambientRef.current.gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1)
+        ambientRef.current.gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2)
+        const currentRef = ambientRef.current
         setTimeout(() => {
-          if (ambientRef.current) {
-            ambientRef.current.osc1.stop()
-            ambientRef.current.osc2.stop()
-          }
-          ambientRef.current = null
-        }, 1100)
+          try {
+            currentRef.osc1.stop()
+            currentRef.osc2.stop()
+            if (currentRef.interval) clearInterval(currentRef.interval)
+          } catch {}
+        }, 2100)
+        ambientRef.current = null
       }
 
-      // Biome frequencies
-      const freqs: Record<BiomeType, [number, number]> = {
-        rajasthan: [80, 120],   // warm deep drone
-        himalaya: [55, 82],     // cold majestic
-        kerala: [110, 165],     // lush gentle
-        deccan: [65, 98],       // ancient stone
-        gangetic: [73, 110],    // spiritual
-        coastal: [96, 144],     // breezy bright
+      // Emotional chord root frequencies (A, C, D, E, G pentatonic inspired)
+      const roots: Record<BiomeType, number> = {
+        rajasthan: 146.83,   // D3 - Desert mysterious
+        himalaya: 220.00,    // A3 - High altitude ethereal
+        kerala: 164.81,      // E3 - Lush nature
+        deccan: 130.81,      // C3 - Ancient stone
+        gangetic: 196.00,    // G3 - Spiritual flowing
+        coastal: 261.63,     // C4 - Bright ocean
       }
-      const [f1, f2] = freqs[biome]
+      
+      const root = roots[biome]
+      // Minor pentatonic intervals: 1, b3, 4, 5, b7
+      const pentatonicRatios = [1, 1.1892, 1.3348, 1.4983, 1.7818, 2]
+
       const gain = ctx.createGain()
       gain.connect(ctx.destination)
       gain.gain.setValueAtTime(0.001, ctx.currentTime)
-      gain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 2)
+      gain.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 3) // Lush pad volume
 
+      // Pad Oscillators
       const osc1 = ctx.createOscillator()
       osc1.type = 'sine'
-      osc1.frequency.value = f1
+      osc1.frequency.value = root
       osc1.connect(gain)
       osc1.start()
 
       const osc2 = ctx.createOscillator()
-      osc2.type = 'sine'
-      osc2.frequency.value = f2
+      osc2.type = 'triangle'
+      osc2.frequency.value = root * 1.4983 // Perfect fifth
       osc2.connect(gain)
       osc2.start()
 
-      ambientRef.current = { osc1, osc2, gain }
+      // Procedural Bansuri (Flute) Melody
+      const playMelodyNote = () => {
+        if (!ambientRef.current) return
+        
+        // Random pentatonic note
+        const ratio = pentatonicRatios[Math.floor(Math.random() * pentatonicRatios.length)]
+        const octave = Math.random() > 0.5 ? 2 : 1 // Play in higher octaves
+        const freq = root * ratio * octave
+        
+        const melodyGain = ctx.createGain()
+        melodyGain.connect(ctx.destination)
+        
+        const melodyOsc = ctx.createOscillator()
+        melodyOsc.type = 'sine' // Flute-like
+        melodyOsc.frequency.value = freq
+        melodyOsc.connect(melodyGain)
+        
+        // Expressive ADSR envelope (Genshin style slow attack, long release)
+        const attack = 0.5 + Math.random() * 0.5
+        const release = 2.0 + Math.random() * 2.0
+        
+        melodyGain.gain.setValueAtTime(0.001, ctx.currentTime)
+        melodyGain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + attack)
+        melodyGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + attack + release)
+        
+        melodyOsc.start(ctx.currentTime)
+        melodyOsc.stop(ctx.currentTime + attack + release + 0.1)
+      }
+
+      // Play notes intermittently to create sparse, beautiful texture
+      const interval = setInterval(() => {
+        if (Math.random() > 0.4) playMelodyNote()
+      }, 3000)
+
+      ambientRef.current = { osc1, osc2, gain, interval }
     } catch {}
   }, [])
 
   useEffect(() => {
     return () => {
       if (ambientRef.current) {
-        try { ambientRef.current.osc1.stop(); ambientRef.current.osc2.stop() } catch {}
+        try { 
+          ambientRef.current.osc1.stop()
+          ambientRef.current.osc2.stop()
+          if (ambientRef.current.interval) clearInterval(ambientRef.current.interval)
+        } catch {}
       }
     }
   }, [])

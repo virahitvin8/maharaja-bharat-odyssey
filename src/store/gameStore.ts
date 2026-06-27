@@ -21,7 +21,7 @@ export interface Landmark {
 
 export interface GameState {
   // Core game flow
-  phase: 'loading' | 'start' | 'playing' | 'paused' | 'gameover'
+  phase: 'loading' | 'start' | 'map' | 'playing' | 'paused' | 'gameover'
   loadingProgress: number
 
   // Player stats
@@ -36,6 +36,7 @@ export interface GameState {
   // World state
   currentBiome: BiomeType
   discoveredBiomes: BiomeType[]
+  currentCity: string
   landmarks: Landmark[]
   collectibles: Collectible[]
   timeOfDay: number // 0–24
@@ -61,6 +62,7 @@ export interface GameState {
   showNotification: (msg: string, type: GameState['notification']['type']) => void
   clearNotification: () => void
   addScore: (n: number) => void
+  setCity: (city: string) => void
 }
 
 const INITIAL_COLLECTIBLES: Collectible[] = [
@@ -133,6 +135,7 @@ export const useGameStore = create<GameState>((set) => ({
   score: 0,
   currentBiome: 'gangetic',
   discoveredBiomes: ['gangetic'],
+  currentCity: 'kashi', // Default to Varanasi
   landmarks: INITIAL_LANDMARKS,
   collectibles: INITIAL_COLLECTIBLES,
   timeOfDay: 10,
@@ -186,4 +189,5 @@ export const useGameStore = create<GameState>((set) => ({
   clearNotification: () => set({ notification: null }),
 
   addScore: (n) => set((s) => ({ score: s.score + n })),
+  setCity: (city) => set({ currentCity: city }),
 }))

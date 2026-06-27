@@ -1,13 +1,18 @@
-// Main App — wires together game flow
-import React, { useEffect } from 'react'
+// Main App — wires together game flow with all-India map selection
+import React, { useEffect, useState } from 'react'
 import { useGameStore } from './store/gameStore'
 import { LoadingScreen, StartScreen, PauseMenu, GameOverScreen } from './components/ui/Screens'
+import { IndiaMapScreen } from './components/ui/IndiaMapScreen'
 import { GameCanvas } from './pages/GameCanvas'
+import type { IndianLocation } from './data/indianCities'
 
 export default function App() {
   const phase = useGameStore(s => s.phase)
   const setLoadingProgress = useGameStore(s => s.setLoadingProgress)
   const setPhase = useGameStore(s => s.setPhase)
+  
+  // Track the selected city for exploration
+  const [selectedCity, setSelectedCity] = useState<IndianLocation | null>(null)
 
   // Simulate loading progress
   useEffect(() => {
@@ -25,7 +30,13 @@ export default function App() {
     return () => clearInterval(interval)
   }, [phase])
 
-  // Pause on Escape
+  // Handle city selection from India Map
+  const handleCitySelect = (city: IndianLocation) => {
+    setSelectedCity(city)
+    setPhase('playing')
+  }
+
+  // Pause on Escape — also show India Map from playing
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -33,29 +44,42 @@ export default function App() {
         if (s.phase === 'playing') s.setPhase('paused')
         else if (s.phase === 'paused') s.setPhase('playing')
       }
+      // M key opens India Map
+      if (e.key === 'm' || e.key === 'M') {
+        const s = useGameStore.getState()
+        if (s.phase === 'playing') s.setPhase('map')
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  const showCanvas = phase === 'playing' || phase === 'paused'
+  const showCanvas = (phase === 'playing' || phase === 'paused') && selectedCity !== null
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: '#050510' }}>
       {/* Overlays */}
       {phase === 'loading'  && <LoadingScreen />}
-      {phase === 'start'    && <StartScreen />}
+      {phase === 'start'    && <StartScreen onExplore={() => setPhase('map')} />}
       {phase === 'gameover' && <GameOverScreen />}
 
-      {/* 3D Canvas — only mount when actually playing */}
-      {showCanvas && (
+      {/* India Map — shown when player is choosing a city */}
+      {phase === 'map' && (
+        <IndiaMapScreen
+          onSelectCity={handleCitySelect}
+          currentCity={selectedCity?.id}
+        />
+      )}
+
+      {/* 3D Canvas — mount when playing with a selected city */}
+      {showCanvas && selectedCity && (
         <div style={{ position: 'absolute', inset: 0 }}>
-          <GameCanvas />
+          <GameCanvas city={selectedCity} />
         </div>
       )}
 
       {/* Pause menu on top of canvas */}
-      {phase === 'paused' && <PauseMenu />}
+      {phase === 'paused' && selectedCity && <PauseMenu />}
     </div>
   )
 }

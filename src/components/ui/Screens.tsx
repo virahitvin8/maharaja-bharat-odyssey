@@ -41,9 +41,7 @@ export function LoadingScreen() {
 }
 
 // ============== START SCREEN ==============
-export function StartScreen() {
-  const setPhase = useGameStore(s => s.setPhase)
-
+export function StartScreen({ onExplore }: { onExplore: () => void }) {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 100,
@@ -65,7 +63,7 @@ export function StartScreen() {
         animation: 'float 3s ease-in-out infinite',
         filter: 'drop-shadow(0 0 30px rgba(255,215,0,0.3))',
       }}>
-        🛕
+        👑
       </div>
 
       <h1 style={{
@@ -74,17 +72,25 @@ export function StartScreen() {
         WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
         textAlign: 'center', lineHeight: 1.2, padding: '0 20px', marginBottom: 6,
       }}>
-        Maharaja's Kashi
+        Maharaja's
       </h1>
-      <p style={{
-        fontSize: 'clamp(0.8rem, 2vw, 1.1rem)', color: '#FFD700',
-        opacity: 0.6, marginBottom: 36, fontFamily: "'Inter', sans-serif",
-        letterSpacing: 1,
+      <h2 style={{
+        fontSize: 'clamp(1.5rem, 5vw, 3rem)', fontWeight: 700,
+        background: 'linear-gradient(135deg, #FFD700, #FF9933)',
+        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+        textAlign: 'center', marginBottom: 8,
       }}>
-        Varanasi — The Eternal City
+        Bharat Odyssey
+      </h2>
+      <p style={{
+        fontSize: 'clamp(0.8rem, 2vw, 1rem)', color: '#FFD700',
+        opacity: 0.6, marginBottom: 36, fontFamily: "'Inter', sans-serif",
+        letterSpacing: 2,
+      }}>
+        Explore All of India — From OpenStreetMap
       </p>
 
-      <button onClick={() => setPhase('playing')}
+      <button onClick={onExplore}
         style={{
           padding: '16px 56px', fontSize: 16, fontWeight: 700,
           background: 'linear-gradient(135deg, #FF9933, #e07800)',
@@ -92,20 +98,23 @@ export function StartScreen() {
           fontFamily: "'Cinzel', serif", letterSpacing: 1,
           boxShadow: '0 4px 25px rgba(255,153,51,0.4)',
           transition: 'all 0.2s',
-          marginBottom: 16,
+          marginBottom: 12,
         }}
         onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = '0 6px 35px rgba(255,153,51,0.6)' }}
         onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 25px rgba(255,153,51,0.4)' }}
       >
-        ▶ Explore Varanasi
+        🗺️ Explore India
       </button>
 
       <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', maxWidth: 350, textAlign: 'center', lineHeight: 1.6, fontFamily: "'Inter', sans-serif" }}>
-        Walk the real streets of Kashi · Enter temples · Discover the Ganges
+        19 cities · Real streets · Temples · Monuments · Rivers · All from free OSM data
+      </p>
+      <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.12)', marginTop: 4, fontFamily: "'Inter', sans-serif" }}>
+        Press M in-game to open India Map
       </p>
 
       <p style={{ position: 'absolute', bottom: 20, fontSize: 11, color: 'rgba(255,255,255,0.15)', fontFamily: "'Inter', sans-serif" }}>
-        Created by Akshit · Powered by OpenStreetMap
+        Created by Akshit 🇮🇳 · Powered by OpenStreetMap
       </p>
     </div>
   )
@@ -129,10 +138,10 @@ export function PauseMenu() {
           Paused
         </h2>
         <div style={{ marginBottom: 20, color: '#aaa', fontSize: 13, lineHeight: 1.8, fontFamily: "'Inter', sans-serif" }}>
-          <p>WASD / Arrows — Walk through Kashi</p>
+          <p>WASD / Arrows — Walk through streets</p>
           <p>Space — Jump (triple jump!)</p>
           <p>Shift — Run through the streets</p>
-          <p>Z / X — Sword flourish</p>
+          <p>M — Open India Map</p>
           <p>Escape — Pause</p>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -145,6 +154,16 @@ export function PauseMenu() {
             onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,153,51,0.25)' }}
             onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,153,51,0.1)' }}>
             ▶ Resume
+          </button>
+          <button onClick={() => { setPhase('map') }}
+            style={{
+              padding: '10px 0', border: '1px solid rgba(255,153,51,0.3)', borderRadius: 8,
+              background: 'rgba(255,153,51,0.05)', color: '#FFD700', fontSize: 13,
+              cursor: 'pointer', fontFamily: "'Cinzel', serif",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,153,51,0.15)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,153,51,0.05)' }}>
+            🗺️ India Map
           </button>
           <button onClick={() => { setPhase('start') }}
             style={{
@@ -203,7 +222,7 @@ export function GameOverScreen() {
 }
 
 // ============== GAME HUD ==============
-export function GameHUD() {
+export function GameHUD({ currentCity }: { currentCity?: string }) {
   // Individual selectors to prevent full re-renders
   const score = useGameStore(s => s.score)
   const coins = useGameStore(s => s.coins)
@@ -281,7 +300,7 @@ export function GameHUD() {
         fontSize: 11, textAlign: 'right',
       }}>
         <span style={{ color: isNight ? '#aaccff' : '#FFD700', fontWeight: 600, fontFamily: "'Cinzel', serif" }}>
-          🏛️ Varanasi
+          🏛️ {currentCity || 'India'}
         </span>
         <span style={{ color: '#888', display: 'block', fontSize: 10, marginTop: 2 }}>
           {timeStr} {isNight ? '🌙' : '☀️'}

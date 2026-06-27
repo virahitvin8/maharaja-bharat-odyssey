@@ -118,7 +118,29 @@ function parseResponse(json: any): OSMData {
   return data
 }
 
-// Fetch OSM data for a specific area from the public Overpass API
+// Fetch offline pre-packaged city data (Solves API limits and Android capacity)
+export async function fetchOfflineCity(cityName: string): Promise<OSMData> {
+  try {
+    const response = await fetch(`${import.meta.env.BASE_URL}data/${cityName}.json`)
+    if (!response.ok) throw new Error(`Failed to load ${cityName}.json`)
+    const json = await response.json()
+    const parsed = parseResponse(json)
+    
+    console.log(`[OSM] Loaded offline city ${cityName}:`, {
+      buildings: parsed.buildings.length,
+      roads: parsed.roads.length,
+      temples: parsed.temples.length,
+      waterBodies: parsed.waterBodies.length,
+    })
+    
+    return parsed
+  } catch (err) {
+    console.error(`[OSM] Error loading offline city ${cityName}:`, err)
+    throw err
+  }
+}
+
+// Fetch OSM data for a specific area from the public Overpass API (fallback)
 export async function fetchLocalData(lat: number, lon: number, radius = 500): Promise<OSMData> {
   const bbox = getBBoxStr(lat, lon, radius)
   const query = buildQuery(bbox)
@@ -188,7 +210,19 @@ export async function fetchMonumentData(bbox: string): Promise<OSMFeature[]> {
 // Cache for OSM data tiles to avoid re-fetching
 const tileCache: Map<string, OSMData> = new Map()
 
-export async function getMapData(lat: number, lon: number, radius = 500): Promise<OSMData> {
+export async function getMapData(cityName: string, lat: number, lon: number, radius = 500): Promise<OSMData> {
+  // Try to load offline pre-packaged city first
+  if (cityName && cityName !== 'dynamic') {
+    if (tileCache.has(cityName)) return tileCache.get(cityName)!
+    try {
+      const data = await fetchOfflineCity(cityName)
+      tileCache.set(cityName, data)
+      return data
+    } catch (err) {
+      console.warn(`Falling back to live API for ${cityName}`)
+    }
+  }
+
   // Simple spatial caching key (approximate grid)
   const gridX = Math.round(lat * 100) // ~1km grid
   const gridY = Math.round(lon * 100)
