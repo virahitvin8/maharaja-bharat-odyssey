@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'com.akshit.maharaja.bharat.odyssey',
-  appName: "Maharaja's Bharat Odyssey",
+  appName: "Mahabha",
   webDir: 'dist',
   server: {
     androidScheme: 'https',

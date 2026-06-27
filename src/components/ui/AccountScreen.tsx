@@ -22,17 +22,27 @@ export function AccountScreen() {
     <div style={{
       position: 'fixed', inset: 0, zIndex: 200,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a30 50%, #0a0a1a 100%)',
       fontFamily: "'Cinzel', serif",
       overflow: 'hidden',
     }}>
-      {/* Animated background particles */}
+      {/* Cinematic Hero Background */}
       <div style={{
-        position: 'absolute', inset: 0, opacity: 0.15,
-        background: `radial-gradient(circle at 30% 40%, #FFD700 0%, transparent 30%),
-                     radial-gradient(circle at 70% 60%, #FF9933 0%, transparent 30%),
-                     radial-gradient(circle at 50% 80%, #138808 0%, transparent 30%)`,
+        position: 'absolute', inset: -20, zIndex: 0,
+        backgroundImage: `url('${import.meta.env.BASE_URL}hero_bg.png')`,
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        animation: 'slow-pan 30s linear infinite alternate',
       }} />
+      <div style={{
+        position: 'absolute', inset: 0, zIndex: 0,
+        background: 'linear-gradient(to top, rgba(5,2,18,1) 0%, rgba(5,2,18,0.4) 50%, rgba(0,0,0,0.7) 100%)',
+      }} />
+
+      <style>{`
+        @keyframes slow-pan {
+          0% { transform: scale(1) translate(0, 0); }
+          100% { transform: scale(1.05) translate(-10px, -5px); }
+        }
+      `}</style>
 
       <div style={{
         position: 'relative', zIndex: 1,

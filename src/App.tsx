@@ -11,6 +11,7 @@ import type { IndianLocation } from './data/indianCities'
 import { INDIAN_CITIES } from './data/indianCities'
 import { POWERFUL_TEMPLES } from './data/powerfulTemples'
 import type { PowerfulTemple } from './data/powerfulTemples'
+import { Capacitor } from '@capacitor/core'
 
 export default function App() {
   const phase = useGameStore(s => s.phase)
@@ -18,15 +19,50 @@ export default function App() {
   const setPhase = useGameStore(s => s.setPhase)
   const profile = useGameStore(s => s.profile)
   const hasAccount = profile !== null
+  const [bgmMuted, setBgmMuted] = useState(false)
+  const audioRef = React.useRef<HTMLAudioElement>(null)
   
   // Track the selected destination (city or temple)
   const [selectedCity, setSelectedCity] = useState<IndianLocation>(INDIAN_CITIES[0])
   const [selectedTemple, setSelectedTemple] = useState<PowerfulTemple | null>(null)
 
   // Force landing page on initial load (override persisted state)
+  // If native mobile app, skip landing page entirely
   useEffect(() => {
-    setPhase('landing')
+    if (Capacitor.isNativePlatform()) {
+      const s = useGameStore.getState()
+      if (!s.profile) {
+        setPhase('profile')
+      } else {
+        setPhase('start')
+      }
+    } else {
+      setPhase('landing')
+    }
   }, [setPhase])
+
+  // Attempt auto-play music
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.3
+      const playPromise = audioRef.current.play()
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Auto-play prevented, user must interact first
+        })
+      }
+    }
+    
+    // Play on first click anywhere if it was blocked
+    const startAudio = () => {
+      if (audioRef.current && audioRef.current.paused && !bgmMuted) {
+        audioRef.current.play().catch(()=>{})
+      }
+    }
+    window.addEventListener('pointerdown', startAudio, { once: true })
+    return () => window.removeEventListener('pointerdown', startAudio)
+  }, [bgmMuted])
+
 
   // Simulate loading progress if phase is loading (bypass if coming from profile)
   useEffect(() => {
@@ -93,6 +129,36 @@ export default function App() {
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: '#050510' }}>
+      
+      {/* Background Audio */}
+      <audio ref={audioRef} src={`${import.meta.env.BASE_URL}bgm.mp3`} loop />
+      
+      {/* Audio Toggle Button */}
+      {phase !== 'landing' && (
+        <button
+          onClick={() => {
+            if (audioRef.current) {
+              if (bgmMuted) {
+                audioRef.current.play().catch(()=>{})
+                setBgmMuted(false)
+              } else {
+                audioRef.current.pause()
+                setBgmMuted(true)
+              }
+            }
+          }}
+          style={{
+            position: 'absolute', top: 20, left: 20, zIndex: 1000,
+            background: 'rgba(20,25,35,0.6)', backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.2)', borderRadius: '50%',
+            width: 40, height: 40, display: 'flex', alignItems: 'center',
+            justifyContent: 'center', cursor: 'pointer', color: '#FFD700', fontSize: 18
+          }}
+        >
+          {bgmMuted ? '🔇' : '🎵'}
+        </button>
+      )}
+
       {/* Landing Page — professional game website */}
       {phase === 'landing' && <LandingPage onPlay={() => {
         const s = useGameStore.getState()
