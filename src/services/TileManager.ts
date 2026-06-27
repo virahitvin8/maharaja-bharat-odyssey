@@ -135,6 +135,17 @@ async function processFetchQueue() {
     }
   } catch (err) {
     console.warn(`[TileManager] Failed to fetch tile ${job.key}:`, err)
+    if (!tileCache.has(job.key)) {
+      tileCache.set(job.key, {
+        key: job.key,
+        lat: job.lat,
+        lon: job.lon,
+        data: { buildings: [], roads: [], temples: [], waterBodies: [], waterways: [], landuse: [], natural: [] },
+        loadedAt: Date.now(),
+        lastAccessAt: Date.now(),
+      })
+      if (onTilesChanged) onTilesChanged(Array.from(tileCache.values()))
+    }
   }
   
   isFetching = false
