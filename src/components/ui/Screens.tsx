@@ -225,79 +225,143 @@ export function GameHUD({ currentCity }: { currentCity?: string }) {
   const isNight = timeOfDay < 6 || timeOfDay > 19
 
   return (
-    <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 50 }}>
-      {/* TOP BAR */}
+    <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 50, fontFamily: "'Inter', sans-serif" }}>
+      
+      {/* GENSHIN STYLE MINIMAP (Top Left) */}
       <div style={{
-        position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)',
-        display: 'flex', alignItems: 'center', gap: 10, padding: '6px 16px',
-        background: 'rgba(10,10,30,0.7)', backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255,153,51,0.25)', borderRadius: 10,
-        pointerEvents: 'auto', fontSize: 'clamp(10px, 1.3vw, 13px)',
+        position: 'absolute', top: 20, left: 20,
+        display: 'flex', gap: 15, alignItems: 'flex-start'
       }}>
-        <span style={{ color: '#FFD700', fontWeight: 700 }}>⭐ {score.toLocaleString()}</span>
-        <span style={{ color: 'rgba(255,255,255,0.2)' }}>|</span>
-        <span style={{ color: '#DAA520' }}>🪙 {coins}</span>
-        <span style={{ color: '#e63946' }}>🔴 {gems.ruby}</span>
-        <span style={{ color: '#a8dadc' }}>💎 {gems.diamond}</span>
-        <span style={{ color: '#2d9a4f' }}>🟢 {gems.emerald}</span>
-        <span style={{ color: '#3a7abd' }}>🔵 {gems.sapphire}</span>
-        <span style={{ color: '#ff69b4' }}>🪷 {lotus}</span>
-        <span style={{ color: 'rgba(255,255,255,0.2)' }}>|</span>
-        <span style={{ color: '#e63946' }}>{'❤️'.repeat(lives)}</span>
-      </div>
-
-      {/* HEALTH BAR */}
-      <div style={{
-        position: 'absolute', bottom: 135, left: 12,
-        padding: '6px 10px', background: 'rgba(10,10,30,0.7)', backdropFilter: 'blur(8px)',
-        border: '1px solid rgba(255,50,50,0.2)', borderRadius: 8, pointerEvents: 'auto',
-        minWidth: 120,
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#888', marginBottom: 3 }}>
-          <span style={{ color: '#ff4d4d', fontWeight: 600 }}>❤️</span>
-          <span>{Math.round(health)}%</span>
-        </div>
-        <div style={{ width: '100%', height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 2 }}>
-          <div style={{ width: `${(health / maxHealth) * 100}%`, height: '100%', background: '#ff4d4d', borderRadius: 2, transition: 'width 0.2s' }} />
+        <div style={{
+          width: 120, height: 120, borderRadius: '50%',
+          background: 'rgba(20, 25, 35, 0.6)', backdropFilter: 'blur(12px)',
+          border: '2px solid rgba(255, 215, 0, 0.4)',
+          boxShadow: '0 0 20px rgba(0,0,0,0.5), inset 0 0 15px rgba(255,215,0,0.1)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          color: '#fff', pointerEvents: 'auto', cursor: 'pointer'
+        }}
+        onClick={() => setPhase('map')}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,215,0,0.8)' }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,215,0,0.4)' }}
+        >
+          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 1 }}>{timeStr}</div>
+          <div style={{ fontSize: 14, fontWeight: 'bold', color: '#FFD700', marginTop: 4, textAlign: 'center', padding: '0 10px' }}>
+            {currentCity?.replace('_', ' ').toUpperCase() || 'MAP'}
+          </div>
         </div>
       </div>
 
-      {/* STAMINA BAR */}
+      {/* GENSHIN STYLE PROFILE & CURRENCY (Top Right) */}
       <div style={{
-        position: 'absolute', bottom: 90, left: 12,
-        padding: '6px 10px', background: 'rgba(10,10,30,0.7)', backdropFilter: 'blur(8px)',
-        border: '1px solid rgba(255,153,51,0.2)', borderRadius: 8, pointerEvents: 'auto',
-        minWidth: 120,
+        position: 'absolute', top: 20, right: 20,
+        display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#888', marginBottom: 3 }}>
-          <span style={{ color: '#FF9933', fontWeight: 600 }}>⚡</span>
-          <span>{Math.round(stamina)}%</span>
+        {/* Profile Badge */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 12,
+          background: 'rgba(20, 25, 35, 0.7)', backdropFilter: 'blur(12px)',
+          padding: '6px 16px 6px 6px', borderRadius: 30,
+          border: '1px solid rgba(255,255,255,0.1)',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.3)', pointerEvents: 'auto'
+        }}>
+          <div style={{
+            width: 40, height: 40, borderRadius: '50%', background: '#FFD700',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 20, border: '2px solid #fff'
+          }}>👑</div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ color: '#fff', fontSize: 14, fontWeight: 700 }}>{useGameStore.getState().profile?.name || 'Traveler'}</span>
+            <span style={{ color: '#FFD700', fontSize: 11 }}>Adventure Rank {Math.floor(score / 1000) + 1}</span>
+          </div>
         </div>
-        <div style={{ height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden' }}>
-          <div className="stamina-fill" style={{
-            width: `${(stamina / maxStamina) * 100}%`, height: '100%',
-            borderRadius: 2, transition: 'width 0.15s ease-out',
-          }} />
+
+        {/* Currencies (Coins & Gems) */}
+        <div style={{
+          display: 'flex', gap: 15, background: 'rgba(20, 25, 35, 0.6)',
+          backdropFilter: 'blur(8px)', padding: '8px 16px', borderRadius: 20,
+          border: '1px solid rgba(255,255,255,0.1)', pointerEvents: 'auto'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#e2d5a3', fontSize: 13, fontWeight: 600 }}>
+            <span style={{ fontSize: 16 }}>🪙</span> {coins}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#e2d5a3', fontSize: 13, fontWeight: 600 }}>
+            <span style={{ fontSize: 16 }}>💎</span> {gems.diamond + gems.ruby + gems.emerald + gems.sapphire}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#e2d5a3', fontSize: 13, fontWeight: 600 }}>
+            <span style={{ fontSize: 16 }}>✨</span> {useGameStore.getState().inventory.ornaments || 0}
+          </div>
         </div>
       </div>
 
-      {/* INVENTORY */}
+      {/* GENSHIN STYLE HEALTH & STAMINA (Bottom Center) */}
       <div style={{
-        position: 'absolute', bottom: 180, left: 12,
-        padding: '8px 12px', background: 'rgba(10,10,30,0.7)', backdropFilter: 'blur(8px)',
-        border: '1px solid rgba(255,153,51,0.2)', borderRadius: 8, pointerEvents: 'auto',
-        display: 'flex', flexDirection: 'column', gap: 6, minWidth: 80,
+        position: 'absolute', bottom: 30, left: '50%', transform: 'translateX(-50%)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+        width: '30%', minWidth: 250, maxWidth: 400
       }}>
-        <span style={{ fontSize: 11, color: '#FFD700', fontWeight: 'bold' }}>Backpack</span>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#fff' }}>
-          <span>🪵 Wood</span> <span>{inventory.wood}</span>
+        {/* Health */}
+        <div style={{ width: '100%', position: 'relative' }}>
+          <div style={{ position: 'absolute', top: -20, left: 0, color: '#97d163', fontSize: 12, fontWeight: 700, textShadow: '0 1px 2px #000' }}>
+            HP {Math.round(health)} / {maxHealth}
+          </div>
+          <div style={{
+            width: '100%', height: 6, background: 'rgba(0,0,0,0.5)', borderRadius: 3,
+            border: '1px solid rgba(255,255,255,0.2)', overflow: 'hidden'
+          }}>
+            <div style={{
+              width: `${(health / maxHealth) * 100}%`, height: '100%',
+              background: 'linear-gradient(90deg, #6cbf3d, #97d163)',
+              boxShadow: '0 0 10px #97d163', transition: 'width 0.2s'
+            }} />
+          </div>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#fff' }}>
-          <span>🪨 Stone</span> <span>{inventory.stone}</span>
+
+        {/* Stamina */}
+        <div style={{ width: '80%', position: 'relative' }}>
+          <div style={{
+            width: '100%', height: 4, background: 'rgba(0,0,0,0.5)', borderRadius: 2,
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              width: `${(stamina / maxStamina) * 100}%`, height: '100%',
+              background: 'linear-gradient(90deg, #d4a017, #ffd700)',
+              boxShadow: '0 0 10px #ffd700', transition: 'width 0.1s'
+            }} />
+          </div>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#fff' }}>
-          <span>🍎 Food</span> <span>{inventory.food}</span>
+      </div>
+
+      {/* INVENTORY / BACKPACK ICON (Right Edge Middle) */}
+      <div style={{
+        position: 'absolute', top: '50%', right: 20, transform: 'translateY(-50%)',
+        display: 'flex', flexDirection: 'column', gap: 15, pointerEvents: 'auto'
+      }}>
+        <div 
+          onClick={() => setShowMenu(!showMenu)}
+          style={{
+            width: 45, height: 45, borderRadius: '50%', background: 'rgba(20,25,35,0.6)',
+            backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
+            cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.3)', color: '#fff'
+          }}
+        >
+          🎒
         </div>
+        
+        {showMenu && (
+          <div style={{
+            position: 'absolute', right: 60, top: '50%', transform: 'translateY(-50%)',
+            background: 'rgba(20,25,35,0.8)', backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,215,0,0.2)', borderRadius: 12, padding: 15,
+            display: 'flex', flexDirection: 'column', gap: 10, width: 140,
+            boxShadow: '0 5px 20px rgba(0,0,0,0.5)', color: '#fff', fontSize: 13
+          }}>
+            <div style={{ color: '#FFD700', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 5 }}>Inventory</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>🪵 Wood</span> <span>{inventory.wood}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>🪨 Stone</span> <span>{inventory.stone}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>🍎 Food</span> <span>{inventory.food}</span></div>
+          </div>
+        )}
       </div>
 
       {/* TIME / LOCATION */}

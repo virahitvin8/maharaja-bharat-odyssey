@@ -17,89 +17,93 @@ export function ProfileScreen() {
     <div style={{
       position: 'fixed', inset: 0, zIndex: 100,
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a30 30%, #0a0015 70%, #0a0a1a 100%)',
-      color: '#fff', fontFamily: "'Cinzel', serif",
+      background: 'url(/logo.png) no-repeat center center / cover',
+      backgroundColor: '#f5f7fa',
+      color: '#333', fontFamily: "'Noto Serif', serif",
       overflow: 'hidden',
     }}>
-      {/* Starfield background */}
+      {/* Soft ethereal overlay */}
       <div style={{
         position: 'absolute', inset: 0,
-        backgroundImage: 'radial-gradient(1px 1px at 10% 20%, #FFD700, transparent), radial-gradient(1px 1px at 30% 50%, rgba(255,255,255,0.3), transparent), radial-gradient(1px 1px at 50% 80%, #FF9933, transparent), radial-gradient(1px 1px at 70% 30%, rgba(255,255,255,0.3), transparent), radial-gradient(1px 1px at 90% 60%, #FFD700, transparent), radial-gradient(1px 1px at 15% 70%, rgba(255,255,255,0.3), transparent), radial-gradient(1px 1px at 60% 15%, #FFD700, transparent)',
-        backgroundSize: '150px 150px',
-        opacity: 0.4,
+        background: 'radial-gradient(circle at center, rgba(255,255,255,0.7) 0%, rgba(200,210,230,0.9) 100%)',
+        backdropFilter: 'blur(10px)'
       }} />
 
       <h1 style={{
-        fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900,
-        background: 'linear-gradient(135deg, #FF9933, #FFD700, #FF9933)',
-        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-        textAlign: 'center', marginBottom: 20, zIndex: 2
+        fontSize: 'clamp(2rem, 5vw, 2.5rem)', fontWeight: 700,
+        color: '#4a5568', letterSpacing: 2,
+        textAlign: 'center', marginBottom: 10, zIndex: 2,
+        textShadow: '0 2px 4px rgba(255,255,255,0.8)'
       }}>
-        Create Your Account
+        MAHARAJA'S BHARAT ODYSSEY
       </h1>
       
       <p style={{
-        fontSize: 16, color: '#FFD700', opacity: 0.8, marginBottom: 40,
-        fontFamily: "'Inter', sans-serif", zIndex: 2, textAlign: 'center'
+        fontSize: 14, color: '#718096', marginBottom: 40,
+        fontFamily: "'Inter', sans-serif", zIndex: 2, textAlign: 'center', letterSpacing: 1
       }}>
-        Welcome to Maharaja's Bharat Odyssey.<br />
-        Enter your details to begin your journey.
+        A JOURNEY THROUGH ANCIENT INDIA
       </p>
 
       <form onSubmit={handleSubmit} style={{
-        display: 'flex', flexDirection: 'column', gap: 20, width: '100%', maxWidth: 320, zIndex: 2,
-        background: 'rgba(0,0,0,0.6)', padding: 30, borderRadius: 20,
-        border: '1px solid rgba(255,153,51,0.3)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
+        display: 'flex', flexDirection: 'column', gap: 24, width: '100%', maxWidth: 360, zIndex: 2,
+        background: 'rgba(255,255,255,0.8)', padding: 40, borderRadius: 16,
+        border: '1px solid rgba(255,255,255,0.9)',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.05), inset 0 0 20px rgba(255,255,255,0.5)',
+        alignItems: 'center'
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <label style={{ fontSize: 14, color: '#FF9933', fontWeight: 600, fontFamily: "'Inter', sans-serif" }}>Your Name</label>
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <input 
             type="text" 
             value={name} 
             onChange={e => setName(e.target.value)}
-            placeholder="e.g. Rahul, Priya..."
+            placeholder="Enter your name"
             required
             style={{
-              padding: 12, borderRadius: 8, border: '1px solid rgba(255,255,255,0.2)',
-              background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: 16,
-              fontFamily: "'Inter', sans-serif", outline: 'none'
+              padding: '16px 20px', borderRadius: 30, border: '1px solid #cbd5e0',
+              background: '#fff', color: '#4a5568', fontSize: 16, textAlign: 'center',
+              fontFamily: "'Inter', sans-serif", outline: 'none', transition: 'all 0.2s',
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
             }}
+            onFocus={e => e.currentTarget.style.borderColor = '#ecc94b'}
+            onBlur={e => e.currentTarget.style.borderColor = '#cbd5e0'}
           />
         </div>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <label style={{ fontSize: 14, color: '#FF9933', fontWeight: 600, fontFamily: "'Inter', sans-serif" }}>Your Age</label>
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <input 
             type="number" 
             value={age} 
             onChange={e => setAge(e.target.value === '' ? '' : Number(e.target.value))}
-            placeholder="e.g. 12, 25..."
+            placeholder="Enter your age"
             min={4}
             max={100}
             required
             style={{
-              padding: 12, borderRadius: 8, border: '1px solid rgba(255,255,255,0.2)',
-              background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: 16,
-              fontFamily: "'Inter', sans-serif", outline: 'none'
+              padding: '16px 20px', borderRadius: 30, border: '1px solid #cbd5e0',
+              background: '#fff', color: '#4a5568', fontSize: 16, textAlign: 'center',
+              fontFamily: "'Inter', sans-serif", outline: 'none', transition: 'all 0.2s',
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
             }}
+            onFocus={e => e.currentTarget.style.borderColor = '#ecc94b'}
+            onBlur={e => e.currentTarget.style.borderColor = '#cbd5e0'}
           />
         </div>
 
         <button 
           type="submit"
           style={{
-            padding: '14px 20px', fontSize: 16, fontWeight: 700,
-            background: 'linear-gradient(135deg, #FF9933, #e07800)',
-            border: 'none', borderRadius: 8, cursor: 'pointer', color: '#fff',
-            fontFamily: "'Cinzel', serif", letterSpacing: 1, marginTop: 10,
-            boxShadow: '0 4px 15px rgba(255,153,51,0.4)',
-            transition: 'all 0.2s',
+            padding: '16px 40px', fontSize: 16, fontWeight: 700,
+            background: '#ecc94b', color: '#fff',
+            border: 'none', borderRadius: 30, cursor: 'pointer',
+            fontFamily: "'Inter', sans-serif", letterSpacing: 1, marginTop: 10,
+            boxShadow: '0 4px 14px rgba(236,201,75,0.4)',
+            transition: 'all 0.2s', width: '100%'
           }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.02)' }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)' }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(236,201,75,0.6)' }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(236,201,75,0.4)' }}
         >
-          Begin Journey 👑
+          ENTER
         </button>
       </form>
     </div>

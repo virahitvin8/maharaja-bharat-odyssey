@@ -189,6 +189,12 @@ function GameScene({ inputRef, osmData, temple }: {
         <MaharajaCharacter input={inputRef} />
       </Physics>
 
+      {/* Genshin Style Post-Processing */}
+      <EffectComposer disableNormalPass>
+        <Bloom luminanceThreshold={0.7} luminanceSmoothing={0.9} height={300} intensity={1.5} />
+        <Vignette eskil={false} offset={0.1} darkness={0.9} />
+      </EffectComposer>
+
       {/* Temple Sanctum overlay (rendered in world space near temple) */}
       {showSanctum && temple && templePosition && (
         <TempleSanctum 
@@ -341,35 +347,6 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
         setAttack={setAttack}
       />
 
-      {/* City Selector */}
-      <div style={{
-        position: 'absolute', top: 20, right: 20, zIndex: 20,
-        background: 'rgba(10, 10, 20, 0.8)', padding: '10px',
-        borderRadius: '8px', border: '1px solid #FF9933',
-        fontFamily: "'Cinzel', serif"
-      }}>
-        <h3 style={{ color: '#FFD700', fontSize: 12, margin: '0 0 5px 0' }}>Travel 16th Century</h3>
-        <select 
-          value={currentCity}
-          onChange={(e) => {
-            setLoadingState('fetching')
-            setOsmData(null)
-            setCity(e.target.value)
-          }}
-          style={{
-            background: '#111', color: '#fff', border: '1px solid #FF9933',
-            padding: '5px', borderRadius: '4px', fontFamily: "'Cinzel', serif",
-            cursor: 'pointer', outline: 'none'
-          }}
-        >
-          <option value="kashi">Kashi (Varanasi)</option>
-          <option value="vijayanagara">Vijayanagara (Hampi)</option>
-          <option value="agra">Agra (Mughal Empire)</option>
-          <option value="pataliputra">Pataliputra (Patna)</option>
-          <option value="madurai">Madurai (Pandya)</option>
-          <option value="delhi">Delhi</option>
-        </select>
-      </div>
     </div>
   )
 }

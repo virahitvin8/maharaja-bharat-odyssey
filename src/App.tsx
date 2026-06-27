@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useGameStore } from './store/gameStore'
 import { LoadingScreen, StartScreen, PauseMenu, GameOverScreen } from './components/ui/Screens'
 import { AccountScreen } from './components/ui/AccountScreen'
+import LandingPage from './components/ui/LandingPage'
 
 import { IndiaMapScreen } from './components/ui/IndiaMapScreen'
 import { GameCanvas } from './pages/GameCanvas'
@@ -25,6 +26,8 @@ export default function App() {
   // Simulate loading progress if phase is loading (bypass if coming from profile)
   useEffect(() => {
     if (phase !== 'loading') return
+    // Also check if we're transitioning from landing — ensure scroll is reset
+    window.scrollTo(0, 0)
     let p = 0
     const interval = setInterval(() => {
       p += Math.random() * 8 + 3
@@ -85,12 +88,13 @@ export default function App() {
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: '#050510' }}>
-      {/* Overlays */}
+      {/* Landing Page — Genshin Impact-style website home */}
+      {phase === 'landing' && <LandingPage />}
+      
       {/* Overlays */}
       {phase === 'profile'  && <AccountScreen />}
       {phase === 'loading'  && <LoadingScreen />}
       {phase === 'start'    && <StartScreen onExplore={() => {}} />}
-      {phase === 'gameover' && <GameOverScreen />}
       {phase === 'gameover' && <GameOverScreen />}
 
       {/* India Map — shown when player is choosing a city */}

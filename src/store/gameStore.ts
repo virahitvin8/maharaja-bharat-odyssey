@@ -46,7 +46,7 @@ export interface PlayerProfile {
 
 export interface GameState {
   // Core game flow
-  phase: 'profile' | 'loading' | 'start' | 'map' | 'playing' | 'paused' | 'gameover'
+  phase: 'profile' | 'loading' | 'landing' | 'start' | 'map' | 'playing' | 'paused' | 'gameover'
   loadingProgress: number
 
   // Player Profile & Progress
@@ -181,7 +181,7 @@ const INITIAL_LANDMARKS: Landmark[] = [
 export const useGameStore = create<GameState>()(
   persist(
     (set, get) => ({
-      phase: 'loading',
+      phase: 'landing',
       loadingProgress: 0,
       
       profile: null,
