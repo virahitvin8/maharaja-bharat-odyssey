@@ -12,7 +12,11 @@ import { initializeTileManager, getMergedTileData, getLoadProgress, setTileCallb
 import { getMapData } from '../services/osmData'
 import { MAP_ORIGIN } from '../utils/projection'
 import { EffectComposer, N8AO, Bloom, SMAA, Vignette, ToneMapping } from '@react-three/postprocessing'
+import { Atmosphere, Sky as TakramSky, SunLight } from '@takram/three-atmosphere/r3f'
 import type { IndianLocation } from '../data/indianCities'
+import type { PowerfulTemple } from '../data/powerfulTemples'
+import { PowerfulTempleModel } from '../components/3d/PowerfulTemple'
+import { latLonToLocalWorld } from '../utils/projection'
 import type { Tile } from '../services/TileManager'
 import type { OSMData } from '../services/osmData'
 import { IntroRoom } from '../components/3d/IntroRoom'
@@ -39,9 +43,10 @@ function CanvasLoader({ progress, message }: { progress: number; message: string
 }
 
 // Scene component — renders all 3D content with cinematic post-processing
-function GameScene({ inputRef, osmData }: {
+function GameScene({ inputRef, osmData, temple }: {
   inputRef: React.MutableRefObject<any>
   osmData: OSMData | null
+  temple?: PowerfulTemple | null
 }) {
   const phase = useGameStore(s => s.phase)
 
@@ -75,6 +80,13 @@ function GameScene({ inputRef, osmData }: {
         <ToneMapping adaptive={true} resolution={256} middleGrey={0.6} />
       </EffectComposer>
 
+      {/* @takram photorealistic atmosphere with Rayleigh scattering */}
+      <Atmosphere date={Date.now()}>
+        <TakramSky />
+        <SunLight color="#fff5e0" />
+      </Atmosphere>
+
+      {/* DynamicSky provides weather effects (clouds, rain, snow, sandstorm) + time sync */}
       <DynamicSky />
       <Physics gravity={[0, -30, 0]} debug={false}>
         {phase === 'start' ? (
@@ -82,6 +94,15 @@ function GameScene({ inputRef, osmData }: {
         ) : (
           <>
             <DynamicWorld data={osmData} />
+            {/* Render powerful temple 3D model at its real GPS location */}
+            {temple && (() => {
+              const [tx, tz] = latLonToLocalWorld(temple.lat, temple.lon)
+              return (
+                <group position={[tx, 0, tz]}>
+                  <PowerfulTempleModel temple={temple} scale={1.5} />
+                </group>
+              )
+            })()}
             <Collectibles />
           </>
         )}
@@ -93,9 +114,10 @@ function GameScene({ inputRef, osmData }: {
 
 interface GameCanvasProps {
   city: IndianLocation
+  temple?: PowerfulTemple | null
 }
 
-export function GameCanvas({ city }: GameCanvasProps) {
+export function GameCanvas({ city, temple }: GameCanvasProps) {
   const { input, setForward, setBackward, setLeft, setRight, setJump, setRun, setAttack } = useInput()
   const setPhase = useGameStore(s => s.setPhase)
   const currentCity = useGameStore(s => s.currentCity)
@@ -213,7 +235,7 @@ export function GameCanvas({ city }: GameCanvasProps) {
           gl.toneMappingExposure = 1.0
         }}
       >
-        <GameScene inputRef={input} osmData={osmData} />
+        <GameScene inputRef={input} osmData={osmData} temple={temple} />
       </Canvas>
 
       {/* HUD overlay */}

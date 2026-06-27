@@ -6,14 +6,17 @@ import { IndiaMapScreen } from './components/ui/IndiaMapScreen'
 import { GameCanvas } from './pages/GameCanvas'
 import type { IndianLocation } from './data/indianCities'
 import { INDIAN_CITIES } from './data/indianCities'
+import { POWERFUL_TEMPLES } from './data/powerfulTemples'
+import type { PowerfulTemple } from './data/powerfulTemples'
 
 export default function App() {
   const phase = useGameStore(s => s.phase)
   const setLoadingProgress = useGameStore(s => s.setLoadingProgress)
   const setPhase = useGameStore(s => s.setPhase)
   
-  // Track the selected city for exploration
+  // Track the selected destination (city or temple)
   const [selectedCity, setSelectedCity] = useState<IndianLocation>(INDIAN_CITIES[0])
+  const [selectedTemple, setSelectedTemple] = useState<PowerfulTemple | null>(null)
 
   // Simulate loading progress
   useEffect(() => {
@@ -31,9 +34,21 @@ export default function App() {
     return () => clearInterval(interval)
   }, [phase])
 
-  // Handle city selection from India Map
-  const handleCitySelect = (city: IndianLocation) => {
-    setSelectedCity(city)
+  // Handle destination selection (city or temple)
+  const handleCitySelect = (dest: IndianLocation | PowerfulTemple) => {
+    if ('style' in dest) {
+      // It's a temple
+      setSelectedTemple(dest)
+      // Find nearest city for OSM data
+      const nearestCity = INDIAN_CITIES.reduce((best, city) => {
+        const dist = Math.sqrt((city.lat - dest.lat) ** 2 + (city.lon - dest.lon) ** 2)
+        return dist < best.dist ? { city, dist } : best
+      }, { city: INDIAN_CITIES[0], dist: Infinity }).city
+      setSelectedCity(nearestCity)
+    } else {
+      setSelectedCity(dest)
+      setSelectedTemple(null)
+    }
     setPhase('playing')
   }
 
@@ -77,7 +92,7 @@ export default function App() {
       {/* 3D Canvas — mount when playing, paused, or starting */}
       {(phase === 'start' || ((phase === 'playing' || phase === 'paused') && selectedCity)) && (
         <div style={{ position: 'absolute', inset: 0 }}>
-          <GameCanvas city={selectedCity!} />
+          <GameCanvas city={selectedCity!} temple={selectedTemple} />
         </div>
       )}
 

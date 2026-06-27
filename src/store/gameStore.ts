@@ -48,6 +48,17 @@ export interface GameState {
   // Actions
   setPhase: (phase: GameState['phase']) => void
   setLoadingProgress: (p: number) => void
+  setCity: (cityId: string) => void
+  
+  // Survival Actions
+  takeDamage: (amount: number) => void
+  heal: (amount: number) => void
+  consumeStamina: (amount: number) => boolean
+  restoreStamina: (amount: number) => void
+  addItem: (item: keyof Inventory, amount: number) => void
+  removeItem: (item: keyof Inventory, amount: number) => boolean
+  equipWeapon: (weapon: string | null) => void
+
   setStamina: (s: number | ((prev: number) => number)) => void
   addLife: () => void
   loseLife: () => void
@@ -62,7 +73,6 @@ export interface GameState {
   showNotification: (msg: string, type: GameState['notification']['type']) => void
   clearNotification: () => void
   addScore: (n: number) => void
-  setCity: (city: string) => void
 }
 
 const INITIAL_COLLECTIBLES: Collectible[] = [
@@ -123,19 +133,23 @@ const INITIAL_LANDMARKS: Landmark[] = [
   { id: 'ajanta',       name: 'Ajanta Caves',         description: 'Ancient Buddhist rock-cut cave monuments.',               position: [-15, 5, 20],  biome: 'deccan',    discovered: false },
 ]
 
-export const useGameStore = create<GameState>((set) => ({
+export const useGameStore = create<GameState>((set, get) => ({
   phase: 'loading',
   loadingProgress: 0,
-  lives: 3,
+  health: 100,
+  maxHealth: 100,
   stamina: 100,
   maxStamina: 100,
+  inventory: { wood: 0, stone: 0, food: 0 },
+  equippedWeapon: null,
+  lives: 3,
   coins: 0,
   gems: { ruby: 0, diamond: 0, emerald: 0, sapphire: 0 },
   lotus: 0,
   score: 0,
   currentBiome: 'gangetic',
   discoveredBiomes: ['gangetic'],
-  currentCity: 'kashi', // Default to Varanasi
+  currentCity: 'kashi',
   landmarks: INITIAL_LANDMARKS,
   collectibles: INITIAL_COLLECTIBLES,
   timeOfDay: 10,

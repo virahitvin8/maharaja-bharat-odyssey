@@ -14,19 +14,19 @@ function getPinPosition(lat: number, lon: number): { x: number; y: number } {
 }
 
 // Merge cities and temples into one combined list for the map
-const ALL_DESTINATIONS = [
+interface MapDest {
+  id: string; name: string; state: string; lat: number; lon: number;
+  description: string; emoji: string; highlights: string[];
+  type: 'city' | 'temple'; destinationId: string;
+}
+const ALL_DESTINATIONS: MapDest[] = [
   ...INDIAN_CITIES.map(c => ({ ...c, type: 'city' as const, destinationId: c.id })),
   ...POWERFUL_TEMPLES.map(t => ({ 
-    id: t.id,
-    name: t.name,
-    state: t.state,
-    lat: t.lat,
-    lon: t.lon,
+    id: t.id, name: t.name, state: t.state,
+    lat: t.lat, lon: t.lon,
     description: `${t.century} · ${t.dynasty} · ${t.location}`,
-    emoji: t.emoji,
-    highlights: t.highlights,
-    type: 'temple' as const,
-    destinationId: t.id,
+    emoji: t.emoji, highlights: t.highlights,
+    type: 'temple' as const, destinationId: t.id,
   })),
 ]
 
@@ -56,6 +56,7 @@ export function IndiaMapScreen({ onSelectCity, currentCity }: IndiaMapScreenProp
   })
 
   const hovered = ALL_DESTINATIONS.find(d => d.id === hoveredDest)
+  const hoveredTemple = hovered?.type === 'temple' ? POWERFUL_TEMPLES.find(t => t.id === hovered?.destinationId) : null
 
   return (
     <div style={{
@@ -84,46 +85,64 @@ export function IndiaMapScreen({ onSelectCity, currentCity }: IndiaMapScreenProp
       </div>
 
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        {/* Region sidebar */}
+        {/* Sidebar — Regions + Temples */}
         <div style={{
-          width: 140, padding: '12px 8px',
+          width: 150, padding: '12px 8px',
           borderRight: '1px solid rgba(255,153,51,0.1)',
           overflowY: 'auto', flexShrink: 0,
         }}>
           <button
-            onClick={() => setSelectedRegion(null)}
+            onClick={() => { setSelectedRegion(null); setSelectedEra(null) }}
             style={{
               display: 'block', width: '100%', padding: '8px 12px',
               marginBottom: 4, textAlign: 'left',
               border: 'none', borderRadius: 6, cursor: 'pointer',
-              background: !selectedRegion ? 'rgba(255,153,51,0.2)' : 'transparent',
-              color: !selectedRegion ? '#FFD700' : 'rgba(255,255,255,0.5)',
+              background: !selectedRegion && !selectedEra ? 'rgba(255,153,51,0.2)' : 'transparent',
+              color: !selectedRegion && !selectedEra ? '#FFD700' : 'rgba(255,255,255,0.5)',
               fontSize: 12, fontFamily: "'Cinzel', serif", fontWeight: 600,
-              transition: 'all 0.15s',
             }}
-            onMouseEnter={e => { if (selectedRegion) e.currentTarget.style.background = 'rgba(255,153,51,0.1)' }}
-            onMouseLeave={e => { if (selectedRegion) e.currentTarget.style.background = 'transparent' }}
           >
             🗺️ All India
           </button>
+
+          {/* Regions */}
+          <div style={{ color: 'rgba(255,255,255,0.15)', fontSize: 10, margin: '8px 12px 4px', letterSpacing: 1 }}>REGIONS</div>
           {INDIA_REGIONS.map(region => (
-            <button
-              key={region.name}
+            <button key={region.name}
               onClick={() => setSelectedRegion(selectedRegion === region.name ? null : region.name)}
               style={{
-                display: 'block', width: '100%', padding: '8px 12px',
-                marginBottom: 4, textAlign: 'left',
+                display: 'block', width: '100%', padding: '6px 12px', marginBottom: 2, textAlign: 'left',
                 border: 'none', borderRadius: 6, cursor: 'pointer',
                 background: selectedRegion === region.name ? 'rgba(255,153,51,0.2)' : 'transparent',
                 color: selectedRegion === region.name ? '#FFD700' : 'rgba(255,255,255,0.5)',
                 fontSize: 11, fontFamily: "'Inter', sans-serif",
-                transition: 'all 0.15s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,153,51,0.1)' }}
-              onMouseLeave={e => { if (selectedRegion !== region.name) e.currentTarget.style.background = 'transparent' }}
-            >
-              {region.name}
-            </button>
+            >{region.name}</button>
+          ))}
+
+          {/* Temple Eras */}
+          <div style={{ color: 'rgba(255,215,0,0.2)', fontSize: 10, margin: '8px 12px 4px', letterSpacing: 1 }}>🏛️ TEMPLES</div>
+          <button
+            onClick={() => setShowTemples(!showTemples)}
+            style={{
+              display: 'block', width: '100%', padding: '4px 12px', marginBottom: 4,
+              border: 'none', borderRadius: 4, cursor: 'pointer',
+              background: 'transparent',
+              color: showTemples ? '#FFD700' : 'rgba(255,255,255,0.2)',
+              fontSize: 10, textAlign: 'left', fontFamily: "'Inter', sans-serif",
+            }}
+          >{showTemples ? '✦ Show on map' : '◌ Hidden'}</button>
+          {showTemples && TEMPLE_ERAS.map(era => (
+            <button key={era.name}
+              onClick={() => setSelectedEra(selectedEra === era.name ? null : era.name)}
+              style={{
+                display: 'block', width: '100%', padding: '5px 12px', marginBottom: 2,
+                border: 'none', borderRadius: 4, cursor: 'pointer',
+                background: selectedEra === era.name ? 'rgba(255,215,0,0.15)' : 'transparent',
+                color: selectedEra === era.name ? '#FFD700' : 'rgba(255,215,0,0.4)',
+                fontSize: 9, textAlign: 'left', fontFamily: "'Inter', sans-serif",
+              }}
+            >{era.name}</button>
           ))}
         </div>
 
@@ -160,45 +179,47 @@ export function IndiaMapScreen({ onSelectCity, currentCity }: IndiaMapScreenProp
             <line x1="80" y1="350" x2="300" y2="350" stroke="rgba(255,153,51,0.05)" strokeWidth="1" />
             <line x1="180" y1="10" x2="180" y2="435" stroke="rgba(255,153,51,0.05)" strokeWidth="1" />
 
-            {/* City pins */}
-            {INDIAN_CITIES.map(city => {
-              const pos = getPinPosition(city.lat, city.lon)
-              const isHovered = hoveredCity === city.id
-              const isCurrent = currentCity === city.id
+            {/* All destination pins (cities + temples) */}
+            {visibleDestinations.map(dest => {
+              const pos = getPinPosition(dest.lat, dest.lon)
+              const isHovered = hoveredDest === dest.id
+              const isCurrent = currentCity === dest.destinationId
+              const isTemple = dest.type === 'temple'
 
               return (
                 <g
-                  key={city.id}
-                  onClick={() => onSelectCity(city)}
-                  onMouseEnter={() => setHoveredCity(city.id)}
-                  onMouseLeave={() => setHoveredCity(null)}
+                  key={dest.id}
+                  onClick={() => {
+                    if (dest.type === 'city') {
+                      const city = INDIAN_CITIES.find(c => c.id === dest.destinationId)
+                      if (city) onSelectCity(city)
+                    } else {
+                      const temple = POWERFUL_TEMPLES.find(t => t.id === dest.destinationId)
+                      if (temple) onSelectCity(temple)
+                    }
+                  }}
+                  onMouseEnter={() => setHoveredDest(dest.id)}
+                  onMouseLeave={() => setHoveredDest(null)}
                   style={{ cursor: 'pointer' }}
                 >
-                  {/* Glow for hovered/current */}
                   {(isHovered || isCurrent) && (
                     <circle cx={pos.x} cy={pos.y} r={22} fill="url(#cityGlow)" />
                   )}
-                  {/* Pin dot */}
                   <circle
                     cx={pos.x} cy={pos.y}
-                    r={isHovered || isCurrent ? 7 : 5}
-                    fill={isCurrent ? '#FFD700' : (isHovered ? '#FF9933' : '#FF9933')}
-                    stroke={isCurrent ? '#fff' : 'rgba(255,255,255,0.3)'}
+                    r={isHovered || isCurrent ? 7 : (isTemple ? 6 : 5)}
+                    fill={isCurrent ? '#FFD700' : (isTemple ? '#FF6600' : '#FF9933')}
+                    stroke={isCurrent ? '#fff' : (isHovered ? '#FFD700' : 'rgba(255,255,255,0.3)')}
                     strokeWidth={isCurrent ? 2 : 1}
-                    style={{ transition: 'all 0.15s' }}
                   />
-                  {/* Pin label */}
                   <text
                     x={pos.x} y={pos.y - (isHovered || isCurrent ? 14 : 11)}
                     textAnchor="middle"
-                    fill={isHovered || isCurrent ? '#FFD700' : 'rgba(255,255,255,0.5)'}
-                    fontSize={isHovered || isCurrent ? 9 : 7}
+                    fill={isHovered || isCurrent ? '#FFD700' : (isTemple ? 'rgba(255,153,0,0.5)' : 'rgba(255,255,255,0.5)')}
+                    fontSize={isHovered || isCurrent ? 8 : 6}
                     fontFamily="'Cinzel', serif"
                     fontWeight={isCurrent ? 700 : 400}
-                    style={{ transition: 'all 0.15s' }}
-                  >
-                    {city.name}
-                  </text>
+                  >{isTemple ? dest.name.split(' ').slice(0, 2).join(' ') : dest.name}</text>
                 </g>
               )
             })}
@@ -210,49 +231,52 @@ export function IndiaMapScreen({ onSelectCity, currentCity }: IndiaMapScreenProp
             <text x="200" y="390" fill="rgba(255,255,255,0.06)" fontSize="10" fontFamily="'Cinzel', serif" textAnchor="middle">SOUTH</text>
           </svg>
 
-          {/* City info tooltip */}
+          {/* Destination info tooltip */}
           {hovered && (
             <div style={{
               position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)',
               background: 'rgba(10,10,30,0.92)', backdropFilter: 'blur(12px)',
               border: '1px solid rgba(255,153,51,0.3)', borderRadius: 10,
-              padding: '14px 22px', maxWidth: 400, width: '90%',
+              padding: '14px 22px', maxWidth: 420, width: '90%',
               textAlign: 'center',
               animation: 'slide-up 0.2s ease-out',
             }}>
-              <div style={{ fontSize: 24, marginBottom: 4 }}>{hovered.emoji}</div>
-              <h3 style={{ color: '#FFD700', fontSize: 16, fontWeight: 700, marginBottom: 2 }}>
-                {hovered.name}, {hovered.state}
+              <div style={{ fontSize: 28, marginBottom: 4 }}>{hovered.emoji}</div>
+              <h3 style={{ color: '#FFD700', fontSize: 15, fontWeight: 700, marginBottom: 2 }}>
+                {hovered.name} {hovered.type === 'temple' && `(${hoveredTemple?.century || ''})`}
               </h3>
-              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, marginBottom: 8, fontFamily: "'Inter', sans-serif" }}>
+              <p style={{ color: 'rgba(255,153,51,0.6)', fontSize: 10, marginBottom: 6, fontFamily: "'Inter', sans-serif", fontWeight: 500 }}>
+                {hoveredTemple ? `${hoveredTemple.dynasty} · ${hoveredTemple.builder}` : hovered.state}
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, marginBottom: 8, fontFamily: "'Inter', sans-serif" }}>
                 {hovered.description}
               </p>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
-                {hovered.highlights.slice(0, 3).map(h => (
+              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'center' }}>
+                {hovered.highlights.slice(0, 4).map(h => (
                   <span key={h} style={{
                     padding: '2px 8px', borderRadius: 4,
                     background: 'rgba(255,153,51,0.1)',
-                    color: '#FF9933', fontSize: 10, fontFamily: "'Inter', sans-serif",
+                    color: '#FF9933', fontSize: 9, fontFamily: "'Inter', sans-serif",
                   }}>
                     {h}
                   </span>
                 ))}
               </div>
               <button
-                onClick={() => onSelectCity(hovered)}
+                onClick={() => onSelectCity(hovered as any)}
                 style={{
-                  marginTop: 10, padding: '8px 28px',
-                  background: 'linear-gradient(135deg, #FF9933, #e07800)',
+                  marginTop: 8, padding: '8px 28px',
+                  background: hovered.type === 'temple' ? 'linear-gradient(135deg, #FF6600, #cc4400)' : 'linear-gradient(135deg, #FF9933, #e07800)',
                   border: 'none', borderRadius: 6, cursor: 'pointer',
                   color: '#fff', fontSize: 13, fontWeight: 600,
                   fontFamily: "'Cinzel', serif",
                   boxShadow: '0 3px 15px rgba(255,153,51,0.3)',
                 }}
               >
-                ▶ Explore {hovered.name}
+                {hovered.type === 'temple' ? '🛕 Visit Temple' : '▶ Explore'} {hovered.name}
               </button>
               <p style={{ marginTop: 6, color: 'rgba(255,255,255,0.2)', fontSize: 9, fontFamily: "'Inter', sans-serif" }}>
-                Loads real OSM data · Free · No API key needed
+                {hovered.type === 'temple' ? 'Powered by OpenStreetMap · Free' : 'Loads real OSM data · Free'}
               </p>
             </div>
           )}
