@@ -66,8 +66,8 @@ export default function LandingPage({ onPlay }: LandingPageProps) {
       {/* ─── NAVBAR ─── */}
       <nav className="lp-nav">
         <div className="lp-nav-brand">
-          <img src={`${BASE}logo.png`} alt="Bharat Odyssey" className="lp-nav-logo" />
-          <span>BHARAT ODYSSEY</span>
+          <img src={`${BASE}logo.svg`} alt="Mahabha" className="lp-nav-logo" />
+          <span>MAHABHA</span>
         </div>
         <div className="lp-nav-links">
           {NAV_ITEMS.map((item) => (
@@ -345,11 +345,11 @@ export default function LandingPage({ onPlay }: LandingPageProps) {
       <footer className="lp-footer">
         <div className="lp-footer-links">
           <a href="https://github.com/virahitvin8/maharaja-bharat-odyssey" target="_blank" rel="noreferrer" className="lp-footer-link">GitHub</a>
-          <a href="#" className="lp-footer-link">Privacy</a>
-          <a href="#" className="lp-footer-link">Terms</a>
-          <a href="#" className="lp-footer-link">Contact</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); alert('Privacy Policy coming soon!') }} className="lp-footer-link">Privacy</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); alert('Terms of Service coming soon!') }} className="lp-footer-link">Terms</a>
+          <a href="mailto:ashitvinay4636@gmail.com" className="lp-footer-link">Contact</a>
         </div>
-        <img src={`${BASE}logo.png`} alt="Bharat Odyssey" className="lp-footer-logo" />
+        <img src={`${BASE}logo.svg`} alt="Mahabha" className="lp-footer-logo" />
         <p className="lp-footer-text">
           Maharaja's Bharat Odyssey is a passion project. All game content is fictional.
           © 2026 Akshit Vinay. Built with Three.js, React, and Capacitor.

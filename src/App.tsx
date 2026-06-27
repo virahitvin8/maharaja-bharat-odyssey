@@ -134,7 +134,7 @@ export default function App() {
   const [showTutorial, setShowTutorial] = useState(true)
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: '#050510' }}>
+    <div style={{ width: '100%', height: '100%', position: 'relative', overflow: phase === 'landing' ? 'auto' : 'hidden', background: '#050510' }}>
       
       {/* Background Audio */}
       <audio ref={audioRef} src={`${import.meta.env.BASE_URL}bgm.mp3`} loop />

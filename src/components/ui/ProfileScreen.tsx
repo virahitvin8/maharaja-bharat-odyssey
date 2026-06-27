@@ -17,9 +17,9 @@ export function ProfileScreen() {
     <div style={{
       position: 'fixed', inset: 0, zIndex: 100,
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      background: 'url(./logo.png) no-repeat center center / cover',
-      backgroundColor: '#f5f7fa',
-      color: '#333', fontFamily: "'Noto Serif', serif",
+      background: 'url(./logo.svg) no-repeat center center / cover',
+      backgroundColor: '#FF9933',
+      color: '#333', fontFamily: "'Nunito', sans-serif",
       overflow: 'hidden',
     }}>
       {/* Soft ethereal overlay */}
@@ -30,19 +30,19 @@ export function ProfileScreen() {
       }} />
 
       <h1 style={{
-        fontSize: 'clamp(2rem, 5vw, 2.5rem)', fontWeight: 700,
-        color: '#4a5568', letterSpacing: 2,
+        fontSize: 'clamp(2rem, 5vw, 2.5rem)', fontWeight: 900,
+        color: '#fff', letterSpacing: 2,
         textAlign: 'center', marginBottom: 10, zIndex: 2,
-        textShadow: '0 2px 4px rgba(255,255,255,0.8)'
+        textShadow: '0 4px 12px rgba(0,0,0,0.4)'
       }}>
-        MAHARAJA'S BHARAT ODYSSEY
+        🌟 MAHABHA 🌟
       </h1>
       
       <p style={{
-        fontSize: 14, color: '#718096', marginBottom: 40,
-        fontFamily: "'Inter', sans-serif", zIndex: 2, textAlign: 'center', letterSpacing: 1
+        fontSize: 14, color: 'rgba(255,255,255,0.8)', marginBottom: 40,
+        fontFamily: "'Nunito', sans-serif", zIndex: 2, textAlign: 'center', letterSpacing: 1
       }}>
-        A JOURNEY THROUGH ANCIENT INDIA
+        🌍 India Adventure Game 🎮
       </p>
 
       <form onSubmit={handleSubmit} style={{
