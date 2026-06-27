@@ -6,6 +6,8 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   server: {
     androidScheme: 'https',
+    url: 'https://virahitvin8.github.io/maharaja-bharat-odyssey/',
+    cleartext: true
   },
   android: {
     buildOptions: {
