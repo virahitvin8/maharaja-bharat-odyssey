@@ -1,5 +1,5 @@
 // Game Canvas — main 3D scene with dynamic OSM tile streaming across India
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { DynamicSky } from '../components/3d/DynamicSky'
@@ -352,7 +352,9 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
           gl.toneMappingExposure = 1.0
         }}
       >
-        <GameScene inputRef={input} osmData={osmData} temple={temple} />
+        <Suspense fallback={null}>
+          <GameScene inputRef={input} osmData={osmData} temple={temple} />
+        </Suspense>
       </Canvas>
 
       {/* HUD overlay */}
