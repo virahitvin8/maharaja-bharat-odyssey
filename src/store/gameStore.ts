@@ -202,7 +202,7 @@ export const useGameStore = create<GameState>()(
   score: 0,
   currentBiome: 'gangetic',
   discoveredBiomes: ['gangetic'],
-  currentCity: 'kashi',
+  currentCity: 'varanasi',
   landmarks: INITIAL_LANDMARKS,
   collectibles: INITIAL_COLLECTIBLES,
   timeOfDay: 10,

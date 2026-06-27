@@ -444,7 +444,7 @@ export function GameHUD({ currentCity }: { currentCity?: string }) {
   )
 }
 
-// ============== TOUCH CONTROLS (Android) ==============
+// ============== TOUCH CONTROLS (Android) - Child-friendly ==============
 interface TouchControlsProps {
   setForward: (v: boolean) => void
   setBackward: (v: boolean) => void
@@ -459,64 +459,124 @@ export function TouchControls({
   setForward, setBackward, setLeft, setRight, setJump, setRun, setAttack
 }: TouchControlsProps) {
   const [isMobile, setIsMobile] = useState(false)
+  const [pressedBtn, setPressedBtn] = useState<string | null>(null)
+  
   useEffect(() => {
     setIsMobile('ontouchstart' in window || navigator.maxTouchPoints > 0)
   }, [])
 
   if (!isMobile) return null
 
+  const btnStyle = (name: string, bg: string, border: string, glow: string): React.CSSProperties => ({
+    width: 58, height: 58, borderRadius: 14,
+    background: pressedBtn === name ? bg : `${bg}33`,
+    border: `2px solid ${border}`,
+    color: '#fff', fontSize: 22, cursor: 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    userSelect: 'none', WebkitUserSelect: 'none', touchAction: 'none',
+    transform: pressedBtn === name ? 'scale(0.88)' : 'scale(1)',
+    transition: 'all 0.07s ease',
+    boxShadow: pressedBtn === name ? `0 0 20px ${glow}` : `0 4px 10px rgba(0,0,0,0.3)`,
+    WebkitTapHighlightColor: 'transparent',
+    fontWeight: 700,
+  })
+
+  const handlePress = (name: string, onPress: () => void) => {
+    setPressedBtn(name)
+    onPress()
+  }
+  const handleRelease = (name: string, onRelease: () => void) => {
+    setPressedBtn(null)
+    onRelease()
+  }
+
   return (
     <div style={{
       position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 60,
-      pointerEvents: 'none', height: 180,
+      pointerEvents: 'none', height: 200,
+      background: 'linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%)',
     }}>
-      {/* D-Pad */}
+      {/* Movement D-Pad (left side) */}
       <div style={{
-        position: 'absolute', bottom: 16, left: 16,
-        display: 'grid', gridTemplateColumns: 'repeat(3, 50px)',
-        gridTemplateRows: 'repeat(3, 50px)', gap: 3, pointerEvents: 'auto',
+        position: 'absolute', bottom: 24, left: 20,
+        display: 'grid', gridTemplateColumns: 'repeat(3, 58px)',
+        gridTemplateRows: 'repeat(3, 58px)', gap: 4, pointerEvents: 'auto',
       }}>
         <div />
-        <button className="touch-btn" style={{ fontSize: 20 }}
-          onTouchStart={e => { e.preventDefault(); setForward(true) }}
-          onTouchEnd={e => { e.preventDefault(); setForward(false) }}>▲</button>
+        <button style={btnStyle('up', '#FF9933', '#FFD700', 'rgba(255,153,51,0.8)')}
+          onTouchStart={e => { e.preventDefault(); handlePress('up', () => setForward(true)) }}
+          onTouchEnd={e => { e.preventDefault(); handleRelease('up', () => setForward(false)) }}>
+          ⬆️
+        </button>
         <div />
-        <button className="touch-btn" style={{ fontSize: 20 }}
-          onTouchStart={e => { e.preventDefault(); setLeft(true) }}
-          onTouchEnd={e => { e.preventDefault(); setLeft(false) }}>◀</button>
-        <button className="touch-btn" style={{ fontSize: 16, color: '#FF6600', borderColor: '#FF6600' }}
-          onTouchStart={e => { e.preventDefault(); setRun(true) }}
-          onTouchEnd={e => { e.preventDefault(); setRun(false) }}>⚡</button>
-        <button className="touch-btn" style={{ fontSize: 20 }}
-          onTouchStart={e => { e.preventDefault(); setRight(true) }}
-          onTouchEnd={e => { e.preventDefault(); setRight(false) }}>▶</button>
+        <button style={btnStyle('left', '#FF9933', '#FFD700', 'rgba(255,153,51,0.8)')}
+          onTouchStart={e => { e.preventDefault(); handlePress('left', () => setLeft(true)) }}
+          onTouchEnd={e => { e.preventDefault(); handleRelease('left', () => setLeft(false)) }}>
+          ⬅️
+        </button>
+        <button style={{
+          ...btnStyle('run', '#FF6600', '#FF9933', 'rgba(255,102,0,0.8)'),
+          fontSize: 18, fontWeight: 800, color: '#FFD700',
+        }}
+          onTouchStart={e => { e.preventDefault(); handlePress('run', () => setRun(true)) }}
+          onTouchEnd={e => { e.preventDefault(); handleRelease('run', () => setRun(false)) }}>
+          ⚡
+        </button>
+        <button style={btnStyle('right', '#FF9933', '#FFD700', 'rgba(255,153,51,0.8)')}
+          onTouchStart={e => { e.preventDefault(); handlePress('right', () => setRight(true)) }}
+          onTouchEnd={e => { e.preventDefault(); handleRelease('right', () => setRight(false)) }}>
+          ➡️
+        </button>
         <div />
-        <button className="touch-btn" style={{ fontSize: 20 }}
-          onTouchStart={e => { e.preventDefault(); setBackward(true) }}
-          onTouchEnd={e => { e.preventDefault(); setBackward(false) }}>▼</button>
+        <button style={btnStyle('down', '#FF9933', '#FFD700', 'rgba(255,153,51,0.8)')}
+          onTouchStart={e => { e.preventDefault(); handlePress('down', () => setBackward(true)) }}
+          onTouchEnd={e => { e.preventDefault(); handleRelease('down', () => setBackward(false)) }}>
+          ⬇️
+        </button>
         <div />
       </div>
 
-      {/* Action buttons */}
+      {/* Action buttons (right side) */}
       <div style={{
-        position: 'absolute', bottom: 16, right: 16,
-        display: 'flex', gap: 10, pointerEvents: 'auto',
+        position: 'absolute', bottom: 24, right: 20,
+        display: 'flex', gap: 12, pointerEvents: 'auto',
+        alignItems: 'flex-end',
       }}>
-        <button className="touch-btn" style={{
-          width: 56, height: 56, fontSize: 22, borderRadius: 28,
-          border: '2px solid rgba(255,255,100,0.5)', color: '#FFD700',
+        {/* JUMP - Big gold button */}
+        <button style={{
+          width: 70, height: 70, borderRadius: 35,
+          background: pressedBtn === 'jump' ? 'rgba(255,215,0,0.6)' : 'rgba(255,215,0,0.2)',
+          border: '3px solid #FFD700',
+          color: '#FFD700', fontSize: 28, cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          userSelect: 'none', touchAction: 'none',
+          transform: pressedBtn === 'jump' ? 'scale(0.85)' : 'scale(1)',
+          transition: 'all 0.07s ease',
+          boxShadow: pressedBtn === 'jump' ? '0 0 30px rgba(255,215,0,0.6)' : '0 4px 15px rgba(0,0,0,0.4)',
+          fontWeight: 700,
+          WebkitTapHighlightColor: 'transparent',
         }}
-          onTouchStart={e => { e.preventDefault(); setJump(true) }}
-          onTouchEnd={e => { e.preventDefault(); setJump(false) }}>
-          ▲▲
+          onTouchStart={e => { e.preventDefault(); handlePress('jump', () => setJump(true)) }}
+          onTouchEnd={e => { e.preventDefault(); handleRelease('jump', () => setJump(false)) }}>
+          🦘
         </button>
-        <button className="touch-btn" style={{
-          width: 48, height: 48, fontSize: 16, borderRadius: 24,
-          border: '2px solid rgba(255,100,100,0.5)', color: '#e63946',
+        {/* ATTACK - Sword button */}
+        <button style={{
+          width: 60, height: 60, borderRadius: 30,
+          background: pressedBtn === 'attack' ? 'rgba(230,57,70,0.5)' : 'rgba(230,57,70,0.15)',
+          border: '2px solid #e63946',
+          color: '#e63946', fontSize: 24, cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          userSelect: 'none', touchAction: 'none',
+          transform: pressedBtn === 'attack' ? 'scale(0.85)' : 'scale(1)',
+          transition: 'all 0.07s ease',
+          boxShadow: pressedBtn === 'attack' ? '0 0 25px rgba(230,57,70,0.5)' : '0 4px 12px rgba(0,0,0,0.3)',
+          fontWeight: 700,
+          WebkitTapHighlightColor: 'transparent',
         }}
-          onTouchStart={e => { e.preventDefault(); setAttack(true) }}
-          onTouchEnd={e => { e.preventDefault(); setAttack(false) }}>
-          <SwordIcon size={18} color="#e63946" />
+          onTouchStart={e => { e.preventDefault(); handlePress('attack', () => setAttack(true)) }}
+          onTouchEnd={e => { e.preventDefault(); handleRelease('attack', () => setAttack(false)) }}>
+          ⚔️
         </button>
       </div>
     </div>

@@ -24,6 +24,7 @@ import { GameHUD, TouchControls } from '../components/ui/Screens'
 import { TempleSanctum } from '../components/3d/TempleSanctum'
 import { CuttableTree, FruitTree, Wildlife, HostileAnimal, PickupStone, RaftCrafting, TreeHouse, ClimbableWall, SwimmableWater } from '../components/3d/Exploration'
 import { KrishnaFlute, BrindhavanGrove, DwarakaGate, KrishnaStatue, LotusPond, FluteNotesParticles } from '../components/3d/KrishnaElements'
+import { GuideArrow } from '../components/3d/Collectibles'
 
 // Loading overlay
 function CanvasLoader({ progress, message }: { progress: number; message: string }) {
@@ -184,6 +185,9 @@ function GameScene({ inputRef, osmData, temple }: {
             )}
 
             <Collectibles />
+            
+            {/* Child-friendly guide arrow pointing to nearest collectible */}
+            <GuideArrow />
           </>
         )}
         <MaharajaCharacter input={inputRef} />
@@ -227,7 +231,10 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
       
       if (progress >= 80 && loadingState === 'fetching') {
         setLoadingState('ready')
-        setPhase('playing')
+        const currentPhase = useGameStore.getState().phase
+        if (currentPhase !== 'start') {
+          setPhase('playing')
+        }
       }
     }
   }, [city.lat, city.lon, loadingState, setPhase])
@@ -302,7 +309,8 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
   }
 
   // Loading / fetching state
-  if (loadingState === 'fetching') {
+  const currentPhase = useGameStore.getState().phase
+  if (loadingState === 'fetching' && currentPhase !== 'start') {
     return <CanvasLoader progress={loadProgress} message={`Loading ${city.name} from OpenStreetMap...`} />
   }
 
