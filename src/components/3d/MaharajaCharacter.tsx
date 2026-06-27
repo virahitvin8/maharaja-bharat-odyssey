@@ -6,7 +6,7 @@ import * as THREE from 'three'
 import type { RapierRigidBody } from '@react-three/rapier'
 import type { InputState } from '../../hooks/useInput'
 import { useGameStore, getCharacterHeightFromAge } from '../../store/gameStore'
-import { playJumpSound, playLandSound, playAttackSound } from '../../audio/sounds'
+import { playJumpSound, playLandSound, playAttackSound, playSparkleSound, playCelebrationSound, playPowerUpSound } from '../../audio/sounds'
 
 interface MaharajaProps {
   input: React.MutableRefObject<InputState>
@@ -22,9 +22,10 @@ const STAMINA_DRAIN_RUN  = 12  // per second
 const STAMINA_DRAIN_JUMP = 8
 const STAMINA_REGEN      = 18  // per second when idle
 
-// ---- Rainbow Trail Effect (reads player position from store every frame) ----
+// ---- Rainbow Trail Effect (detects running by position change between frames) ----
 function RainbowTrail() {
   const trailRef = useRef<THREE.Points>(null)
+  const prevPos = useRef<[number, number, number]>([0, 0, 0])
   const particles = useMemo(() => {
     const count = 40
     const pos = new Float32Array(count * 3)
@@ -48,13 +49,18 @@ function RainbowTrail() {
 
     const store = useGameStore.getState()
     const pp = store.playerPos
-    const input = (window as any).__inputState
-    const isRunning = input?.run || false
+    
+    // Detect running by checking speed (position change per frame)
+    const dx = pp[0] - prevPos.current[0]
+    const dz = pp[2] - prevPos.current[2]
+    const speed = Math.sqrt(dx * dx + dz * dz) / Math.max(delta, 0.016)
+    const isMovingFast = speed > 10 // running speed threshold
+    prevPos.current = pp
 
     const array = trailRef.current.geometry.attributes.position.array as Float32Array
     
-    if (isRunning) {
-      // Add new particle at player position
+    if (isMovingFast) {
+      // Add new rainbow particle at player position
       index.current = (index.current + 1) % 40
       array[index.current * 3] = pp[0] + (Math.random() - 0.5) * 0.3
       array[index.current * 3 + 1] = pp[1] - 0.3 + Math.random() * 0.2
@@ -305,8 +311,7 @@ export function MaharajaCharacter({ input }: MaharajaProps) {
   const cameraOffset = new THREE.Vector3(0, 4, 8)
   const cameraTarget = new THREE.Vector3()
   const lerpedCam    = useRef(new THREE.Vector3(0, 4, 8))
-  // Rainbow trail position
-  const trailPos = useRef(new THREE.Vector3(0, 0, 0))
+
 
   useFrame((state, delta) => {
     if (!rigidBodyRef.current || !meshGroupRef.current) return
@@ -353,8 +358,6 @@ export function MaharajaCharacter({ input }: MaharajaProps) {
       const angle = Math.atan2(worldMove.x, worldMove.z)
       meshGroupRef.current.rotation.y = THREE.MathUtils.lerp(meshGroupRef.current.rotation.y, angle, 0.18)
       if (run) store.setStamina(s => s - STAMINA_DRAIN_RUN * delta)
-      // Update trail position
-      trailPos.current.set(pos.x, pos.y, pos.z)
     } else {
       rigidBodyRef.current.setLinvel({ x: vel.x * 0.85, y: vel.y, z: vel.z * 0.85 }, true)
       store.setStamina(s => s + STAMINA_REGEN * delta)
@@ -438,14 +441,14 @@ export function MaharajaCharacter({ input }: MaharajaProps) {
         expressionType.current = 'collect'
         expressionTimer.current = 0.6
         const charName = store.profile?.name || 'Maharaja'
-        if (c.type === 'coin')         { store.addCoins(1);           store.showNotification(`🪙 ${charName} found a coin! 😊`, 'collect') }
-        if (c.type === 'gem_ruby')     { store.addGem('ruby');        store.showNotification(`💎 ${charName} found a Ruby! 🤩`, 'collect') }
-        if (c.type === 'gem_diamond')  { store.addGem('diamond');     store.showNotification(`💎 ${charName} found a Diamond! 🤩`, 'collect') }
-        if (c.type === 'gem_emerald')  { store.addGem('emerald');     store.showNotification(`💎 ${charName} found an Emerald! 🤩`, 'collect') }
-        if (c.type === 'gem_sapphire') { store.addGem('sapphire');    store.showNotification(`💎 ${charName} found a Sapphire! 🤩`, 'collect') }
-        if (c.type === 'lotus')        { store.addLotus();            store.showNotification(`🪷 ${charName} found a Sacred Lotus! 😇`, 'collect') }
-        if (c.type === 'diya')         { store.addCoins(5);           store.showNotification(`🪔 ${charName} received Diya Blessing! +5 ✨`, 'collect') }
-        if (c.type === 'mango' || c.type === 'coconut') { store.addLife(); store.showNotification(`❤️ ${charName}'s vitality restored! 🎉`, 'life') }
+        if (c.type === 'coin')         { store.addCoins(1);           store.showNotification(`🪙 ${charName} found a coin! 😊`, 'collect'); playSparkleSound() }
+        if (c.type === 'gem_ruby')     { store.addGem('ruby');        store.showNotification(`💎 ${charName} found a Ruby! 🤩`, 'collect'); playCelebrationSound() }
+        if (c.type === 'gem_diamond')  { store.addGem('diamond');     store.showNotification(`💎 ${charName} found a Diamond! 🤩`, 'collect'); playCelebrationSound() }
+        if (c.type === 'gem_emerald')  { store.addGem('emerald');     store.showNotification(`💎 ${charName} found an Emerald! 🤩`, 'collect'); playCelebrationSound() }
+        if (c.type === 'gem_sapphire') { store.addGem('sapphire');    store.showNotification(`💎 ${charName} found a Sapphire! 🤩`, 'collect'); playCelebrationSound() }
+        if (c.type === 'lotus')        { store.addLotus();            store.showNotification(`🪷 ${charName} found a Sacred Lotus! 😇`, 'collect'); playCelebrationSound() }
+        if (c.type === 'diya')         { store.addCoins(5);           store.showNotification(`🪔 ${charName} received Diya Blessing! +5 ✨`, 'collect'); playPowerUpSound() }
+        if (c.type === 'mango' || c.type === 'coconut') { store.addLife(); store.showNotification(`❤️ ${charName}'s vitality restored! 🎉`, 'life'); playPowerUpSound() }
       }
     })
 
