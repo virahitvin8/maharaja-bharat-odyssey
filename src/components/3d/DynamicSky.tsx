@@ -77,7 +77,7 @@ function Cloud({ position }: { position: [number, number, number] }) {
 }
 
 export function DynamicSky() {
-  const { weather } = useGameStore(s => ({ weather: s.weather }))
+  const weather = useGameStore(s => s.weather)
   const bgRef = useRef<THREE.Color>(new THREE.Color())
   const sunRef = useRef<THREE.Mesh>(null)
   const moonRef = useRef<THREE.Mesh>(null)
