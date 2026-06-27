@@ -1,0 +1,2204 @@
+build me whole code and whole game. i wanted.# Maharaja's Realm: An Indian-Themed 3D Portfolio
+A Super Mario 64-style 3D interactive portfolio website with an Indian Maharaja theme, rendered with retro N64 aesthetics.
+[cloudflarebutton]
+## 🚀 Project Overview
+Maharaja's Realm is a unique and engaging personal/portfolio website that blends the nostalgic charm of classic N64-era 3D games with the rich cultural tapestry of India. Users explore a stylized 3D world as a charming Maharaja character, discovering portfolio content through interactive elements and collectibles.
+## ✨ Key Features
+*   **Retro N64 Aesthetic:** Immerse yourself in a low-poly world with characteristic dithering, pixelated textures, and custom shaders.
+*   **Interactive 3D India:** Navigate a stylized, explorable 3D map of India, featuring iconic landmarks and architectural inspirations.
+*   **Maharaja Character:** Control a cute, low-poly Indian King with keyboard-based movement and basic animations.
+*   **Themed Collectibles:** Discover and collect Indian-inspired items like glowing lotus flowers, diyas, and Ashoka Chakra symbols.
+*   **Portfolio Integration:** Access project details, 'About Me' information, and contact details through retro-styled UI overlays seamlessly integrated into the 3D environment.
+*   **Engaging User Journey:** An unconventional and delightful way to explore a portfolio, focusing on exploration and interactive discovery.
+*   **Cloudflare Powered:** Built on a robust Cloudflare Workers template for efficient deployment and scalability.
+## 🛠️ Technology Stack
+*   **Frontend Framework**: React, Vite
+*   **3D Rendering**: Three.js, `@react-three/fiber`, `@react-three/drei`, `react-three-rapier`, `postprocessing`
+*   **State Management**: Zustand
+*   **UI Components**: Shadcn UI
+*   **Styling**: Tailwind CSS
+*   **Animation**: `framer-motion`
+*   **Icons**: `lucide-react`
+*   **Fonts**: Google Fonts (Press Start 2P)
+*   **Deployment**: Cloudflare Workers, Wrangler
+## 🚀 Getting Started
+### Prerequisites
+*   Node.js and Bun installed. You can install Bun from [https://bun.sh/](https://bun.sh/).
+### Installation
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository-url>
+    cd maharajas_realm
+    ```
+2.  **Install dependencies:**
+    ```bash
+    bun install
+    ```
+### Development
+To run the project locally:
+1.  **Start the development server:**
+    ```bash
+    bun run dev
+    ```
+    The application will be available at `http://localhost:${PORT}` (defaulting to 3000).
+The primary entry point for the 3D application is `src/pages/HomePage.tsx`. You can find the 3D environment setup, character integration, and retro post-processing effects configured here and within the `src/components/3D/` directory. UI elements are managed using Shadcn UI components and styled with Tailwind CSS.
+## 🚀 Deployment
+This project is designed to be deployed on Cloudflare Workers.
+1.  **Install Wrangler CLI globally:**
+    ```bash
+    bun install -g wrangler
+    ```
+2.  **Build the project:**
+    ```bash
+    bun run build
+    ```
+3.  **Deploy to Cloudflare Workers:**
+    ```bash
+    bun run deploy
+    ```
+    This command will build the project and deploy it to your Cloudflare Workers environment.
+[cloudflarebutton]
+## 📜 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  darkMode: ['class'],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+  	extend: {
+  		fontFamily: {
+  			sans: [
+  				'Inter',
+  				'-apple-system',
+  				'BlinkMacSystemFont',
+  				'Segoe UI',
+  				'Roboto',
+  				'sans-serif'
+  			],
+  			display: [
+  				'Press Start 2P', // Added retro font for display
+  				'Cal Sans',
+  				'Inter',
+  				'system-ui',
+  				'sans-serif'
+  			],
+  			mono: [
+  				'JetBrains Mono',
+  				'Fira Code',
+  				'Consolas',
+  				'monospace'
+  			]
+  		},
+  		fontSize: {
+  			'2xs': [
+  				'0.625rem',
+  				{
+  					lineHeight: '0.75rem'
+  				}
+  			],
+  			'3xl': [
+  				'1.875rem',
+  				{
+  					lineHeight: '2.25rem'
+  				}
+  			],
+  			'4xl': [
+  				'2.25rem',
+  				{
+  					lineHeight: '2.5rem'
+  				}
+  			],
+  			'5xl': [
+  				'3rem',
+  				{
+  					lineHeight: '1.1'
+  				}
+  			],
+  			'6xl': [
+  				'3.75rem',
+  				{
+  					lineHeight: '1.1'
+  				}
+  			],
+  			'7xl': [
+  				'4.5rem',
+  				{
+  					lineHeight: '1.1'
+  				}
+  			],
+  			'8xl': [
+  				'6rem',
+  				{
+  					lineHeight: '1'
+  				}
+  			],
+  			'9xl': [
+  				'8rem',
+  				{
+  					lineHeight: '1'
+  				}
+  			]
+  		},
+  		spacing: {
+  			'18': '4.5rem',
+  			'72': '18rem',
+  			'84': '21rem',
+  			'96': '24rem',
+  			'128': '32rem'
+  		},
+  		borderRadius: {
+  			'4xl': '2rem',
+  			'5xl': '2.5rem',
+  			lg: 'var(--radius)',
+  			md: 'calc(var(--radius) - 2px)',
+  			sm: 'calc(var(--radius) - 4px)'
+  		},
+  		colors: {
+  			background: 'hsl(var(--background))',
+  			foreground: 'hsl(var(--foreground))',
+  			muted: {
+  				DEFAULT: 'hsl(var(--muted))',
+  				foreground: 'hsl(var(--muted-foreground))'
+  			},
+  			primary: {
+  				DEFAULT: 'hsl(var(--primary))',
+  				foreground: 'hsl(var(--primary-foreground))'
+  			},
+  			border: 'hsl(var(--border))',
+  			ring: 'hsl(var(--ring))',
+  			card: {
+  				DEFAULT: 'hsl(var(--card))',
+  				foreground: 'hsl(var(--card-foreground))'
+  			},
+  			popover: {
+  				DEFAULT: 'hsl(var(--popover))',
+  				foreground: 'hsl(var(--popover-foreground))'
+  			},
+  			secondary: {
+  				DEFAULT: 'hsl(var(--secondary))',
+  				foreground: 'hsl(var(--secondary-foreground))'
+  			},
+  			accent: {
+  				DEFAULT: 'hsl(var(--accent))',
+  				foreground: 'hsl(var(--accent-foreground))'
+  			},
+  			destructive: {
+  				DEFAULT: 'hsl(var(--destructive))',
+  				foreground: 'hsl(var(--destructive-foreground))'
+  			},
+  			input: 'hsl(var(--input))',
+  			chart: {
+  				'1': 'hsl(var(--chart-1))',
+  				'2': 'hsl(var(--chart-2))',
+  				'3': 'hsl(var(--chart-3))',
+  				'4': 'hsl(var(--chart-4))',
+  				'5': 'hsl(var(--chart-5))'
+  			},
+  			sidebar: {
+  				DEFAULT: 'hsl(var(--sidebar-background))',
+  				foreground: 'hsl(var(--sidebar-foreground))',
+  				primary: 'hsl(var(--sidebar-primary))',
+  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+  				accent: 'hsl(var(--sidebar-accent))',
+  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+  				border: 'hsl(var(--sidebar-border))',
+  				ring: 'hsl(var(--sidebar-ring))'
+  			},
+        		// Custom Indian Theme Colors
+  			saffron: {
+  				DEFAULT: 'rgb(255, 153, 51)',
+  				foreground: 'rgb(255, 255, 255)'
+  			},
+  			'royal-blue': {
+  				DEFAULT: 'rgb(0, 51, 102)',
+  				foreground: 'rgb(255, 255, 255)'
+  			},
+  			'emerald-green': {
+  				DEFAULT: 'rgb(0, 128, 0)',
+  				foreground: 'rgb(255, 255, 255)'
+  			}
+  		},
+  		boxShadow: {
+  			soft: '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
+  			glow: '0 0 20px -5px rgba(99, 102, 241, 0.4)',
+  			'glow-lg': '0 0 40px -10px rgba(99, 102, 241, 0.3)',
+  			primary: '0 0 20px -5px hsl(var(--primary) / 0.4)',
+  			glass: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+  		},
+  		keyframes: {
+  			'fade-in': {
+  				'0%': {
+  					opacity: '0',
+  					transform: 'translateY(10px)'
+  				},
+  				'100%': {
+  					opacity: '1',
+  					transform: 'translateY(0)'
+  				}
+  			},
+  			'slide-up': {
+  				'0%': {
+  					transform: 'translateY(20px)',
+  					opacity: '0'
+  				},
+  				'100%': {
+  					transform: 'translateY(0)',
+  					opacity: '1'
+  				}
+  			},
+  			'scale-in': {
+  				'0%': {
+  					transform: 'scale(0.95)',
+  					opacity: '0'
+  				},
+  				'100%': {
+  					transform: 'scale(1)',
+  					opacity: '1'
+  				}
+  			},
+  			shimmer: {
+  				'0%': {
+  					transform: 'translateX(-100%)'
+  				},
+  				'100%': {
+  					transform: 'translateX(100%)'
+  				}
+  			},
+  			glow: {
+  				'0%, 100%': {
+  					boxShadow: '0 0 20px -5px rgba(99, 102, 241, 0.4)'
+  				},
+  				'50%': {
+  					boxShadow: '0 0 40px -5px rgba(99, 102, 241, 0.6)'
+  				}
+  			},
+  			float: {
+  				'0%, 100%': {
+  					transform: 'translateY(0px)'
+  				},
+  				'50%': {
+  					transform: 'translateY(-10px)'
+  				}
+  			},
+  			'accordion-down': {
+  				from: {
+  					height: '0'
+  				},
+  				to: {
+  					height: 'var(--radix-accordion-content-height)'
+  				}
+  			},
+  			'accordion-up': {
+  				from: {
+  					height: 'var(--radix-accordion-content-height)'
+  				},
+  				to: {
+  					height: '0'
+  				}
+  			}
+  		},
+  		animation: {
+  			'fade-in': 'fade-in 0.6s ease-out',
+  			'slide-up': 'slide-up 0.4s ease-out',
+  			'scale-in': 'scale-in 0.3s ease-out',
+  			shimmer: 'shimmer 2s infinite',
+  			glow: 'glow 2s ease-in-out infinite',
+  			float: 'float 3s ease-in-out infinite',
+  			'accordion-down': 'accordion-down 0.2s ease-out',
+  			'accordion-up': 'accordion-up 0.2s ease-out'
+  		},
+  		backgroundImage: {
+  			'gradient-rainbow': 'linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%)',
+  			'gradient-primary': 'linear-gradient(135deg, #667eea, #764ba2)',
+  			'gradient-mesh': 'radial-gradient(at 40% 20%, hsla(28,100%,74%,1) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(189,100%,56%,1) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(355,100%,93%,1) 0px, transparent 50%), radial-gradient(at 80% 50%, hsla(340,100%,76%,1) 0px, transparent 50%), radial-gradient(at 0% 100%, hsla(22,100%,77%,1) 0px, transparent 50%), radial-gradient(at 80% 100%, hsla(242,100%,70%,1) 0px, transparent 50%), radial-gradient(at 0% 0%, hsla(343,100%,76%,1) 0px, transparent 50%)'
+  		}
+  	}
+  },
+  plugins: [require("tailwindcss-animate")]
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root {
+    /* Core Colors */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --border: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --input: 0 0% 89.8%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --border: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --input: 0 0% 14.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    text-rendering: optimizeLegibility;
+  }
+}
+/* Import the retro font */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@layer components {
+  /* Button System */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-gradient {
+    @apply btn text-white shadow-primary hover:shadow-glow hover:scale-105 active:scale-95;
+    background: linear-gradient(135deg, #F38020 0%, #E55A1B 100%);
+  }
+  /* Gradient System */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #F38020 0%, #E55A1B 50%, #D14615 100%);
+  }
+  .bg-gradient-rainbow {
+    background: linear-gradient(135deg, #F38020 0%, #E55A1B 25%, #D14615 50%, #ff6b35 100%);
+  }
+  /* Text System */
+  .text-gradient {
+    background: linear-gradient(90deg, #F38020 0%, #E55A1B 50%, #D14615 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  /* Glass Morphism */
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-glass;
+  }
+  .glass-dark {
+    @apply bg-black/10 backdrop-blur-md border border-white/10 shadow-glass;
+  }
+  /* Interactive Effects */
+  .floating {
+    animation: float 2s ease-in-out infinite;
+  }
+  .rotating {
+    animation: rotate 2s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(-4px);
+    }
+    50% {
+      transform: translateY(4px);
+    }
+  }
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  .shimmer-bg {
+    @apply relative overflow-hidden;
+  }
+  .shimmer-bg::before {
+    @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent;
+    content: '';
+  }
+  /* Layout Utilities */
+  .center {
+    @apply flex items-center justify-center;
+  }
+  .center-col {
+    @apply flex flex-col items-center justify-center;
+  }
+  /* Responsive Typography */
+  .text-display {
+    @apply text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight;
+  }
+  .text-body {
+    @apply text-base sm:text-lg text-muted-foreground leading-relaxed;
+  }
+}
+import React, { Suspense, useEffect, useRef, useState, useCallback } from 'react';
+import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
+import { OrbitControls, KeyboardControls, useKeyboardControls, useGLTF } from '@react-three/drei';
+// Correctly import useRigidBody and RigidBodyApi from @react-three/rapier
+// Ensure the types are correctly resolved.
+// Import RigidBodyApi and infer the type for the ref.
+import { Physics, useRigidBody, RigidBodyApi } from '@react-three/rapier';
+// Correctly import EffectComposer and passes from @react-three/postprocessing
+// Ensure these are imported as components, not types.
+import { EffectComposer, SMAAPass, DotScreenPass, BloomPass, ToneMappingPass } from '@react-three/postprocessing';
+// Import Sparkles from lucide-react
+import { Sparkles } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { Toaster, toast } from '@/components/ui/sonner';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import * as THREE from 'three';
+// Import new components for Biome Management and Audio
+import { BiomeManager } from '@/components/BiomeManager';
+import { AudioPlayer } from '@/components/AudioPlayer';
+// Import the Maharaja character component
+import { MaharajaCharacterPlaceholder } from '@/components/3D/MaharajaCharacterPlaceholder';
+// Import new UI components
+import { StaminaBar } from '@/components/UI/StaminaBar';
+import { CollectibleCounter } from '@/components/UI/CollectibleCounter';
+// Import RetroOverlay for potential instruction updates
+import { RetroOverlay } from '@/components/UI/RetroOverlay';
+// Placeholder for collectible items
+function CollectiblePlaceholder({ position, onCollect, type = 'lotus' }) {
+  const meshRef = useRef(null); // Use generic ref type if specific type is unknown or not needed
+  // Removed useEffect with 'api' as useSphere is not available from @react-three/rapier.
+  // For Rapier, static colliders are typically created using <RigidBody type="fixed"><SphereCollider/></RigidBody>.
+  // This component currently acts as a visual placeholder. Physics interaction would require refactoring.
+  const color = type === 'lotus' ? '#FFD700' : '#FF6347'; // Golden yellow for lotus, Tomato for gems
+  const emissiveColor = type === 'lotus' ? '#FFD700' : '#FF6347';
+  useFrame((state, delta) => {
+    // Floating animation
+    if (meshRef.current) {
+      meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 2) * 0.2;
+    }
+  });
+  return (
+    <mesh ref={meshRef} name={type} castShadow receiveShadow position={position}>
+      <sphereGeometry args={[0.3, 16, 16]} />
+      <meshStandardMaterial color={color} emissive={emissiveColor} emissiveIntensity={0.8} />
+    </mesh>
+  );
+}
+// Component for retro post-processing effects
+function RetroPostProcessing(props) {
+  const { size } = useThree();
+  // Explicitly type the ref for EffectComposer.
+  // The error "refers to a value, but is being used as a type here" suggests
+  // EffectComposer might be incorrectly imported or used.
+  // Ensure it's treated as a component.
+  // The type should be the component itself, not a generic EffectComposer instance.
+  const composer = useRef<React.ComponentRef<typeof EffectComposer>>(null);
+  // EffectComposer from @react-three/postprocessing handles sizing automatically
+  // No manual setSize call needed for this component.
+  // The previous useEffect was redundant and removed.
+  return (
+    // Ensure EffectComposer is used as a component wrapper.
+    <EffectComposer ref={composer} stencilBuffer={false} multisampling={0} {...props}>
+      <SMAAPass />
+      <DotScreenPass
+        angle={Math.PI / 18}
+        scale={1}
+        opacity={0.15}
+      />
+      <BloomPass
+        strength={0.6}
+        radius={1.5}
+        threshold={0.85}
+      />
+      <ToneMappingPass
+        toneMapping={THREE.ACESFilmicToneMapping}
+      />
+    </EffectComposer>
+  );
+}
+// Loading screen component
+function LoadingScreen({ progress }) {
+  const retroFontClass = 'font-display text-lg text-center';
+  const progressBarStyle = {
+    width: `${progress}%`,
+    backgroundColor: 'rgb(255, 153, 51)' // Saffron
+  };
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-primary text-white animate-fade-in">
+      <div className="text-center mb-8 px-4">
+        <h1 className="text-5xl md:text-7xl font-bold font-display text-balance leading-tight">Maharaja's Realm</h1>
+        <p className="text-lg md:text-xl mt-4 text-pretty">Embarking on a Royal Journey...</p>
+      </div>
+      <div className="w-64 h-4 bg-royal-blue/50 rounded-full overflow-hidden shadow-inner">
+        <div className="h-full transition-all duration-300 ease-out" style={progressBarStyle}></div>
+      </div>
+      <p className={cn(`mt-2 ${retroFontClass}`, 'text-saffron')}>{Math.round(progress)}%</p>
+      <div className="absolute bottom-8 flex items-center gap-2 text-muted-foreground/80">
+        <Sparkles className="w-5 h-5 text-saffron animate-pulse" />
+        <span>Powered by Cloudflare</span>
+      </div>
+    </div>
+  );
+}
+export function HomePage() {
+  const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [collectibles, setCollectibles] = useState([
+    { id: 1, position: [5, 0.5, 5], type: 'lotus' },
+    { id: 2, position: [-5, 0.5, 5], type: 'gem' },
+    { id: 3, position: [0, 0.5, -5], type: 'lotus' }
+  ]);
+  const [collectedCount, setCollectedCount] = useState(0);
+  const [stamina, setStamina] = useState(100);
+  const [maxStamina] = useState(100);
+  const [showControls, setShowControls] = useState(true);
+  // Ref for the character's physics API, typed correctly as RigidBodyApi
+  const characterPhysicsRef = useRef<RigidBodyApi>(null);
+  const controlsMap = [
+    { name: 'forward', keys: ['ArrowUp', 'w', 'W'] },
+    { name: 'backward', keys: ['ArrowDown', 's', 'S'] },
+    { name: 'left', keys: ['ArrowLeft', 'a', 'A'] },
+    { name: 'right', keys: ['ArrowRight', 'd', 'D'] },
+    { name: 'jump', keys: ['Space'] },
+    { name: 'groundPound', keys: ['Shift', 's', 'S'] }, // Example: Shift or S while grounded
+    { name: 'swordAttack', keys: ['Control', 'c', 'C'] }
+  ];
+  // Simulate asset loading progress
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((oldProgress) => {
+        if (oldProgress >= 100) {
+          clearInterval(timer);
+          setLoading(false);
+          toast.success('Welcome to Maharaja\'s Realm!', {
+            description: 'Use arrow keys/WASD to move, Space to jump, Shift for Ground Pound.',
+            duration: 5000
+          });
+          return 100;
+        }
+        const diff = Math.random() * 10;
+        return Math.min(oldProgress + diff, 100);
+      });
+    }, 200);
+    return () => clearInterval(timer);
+  }, []);
+  const handleCollect = useCallback((type: string) => {
+    setCollectedCount((prev) => prev + 1);
+    toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} collected!`, {
+      description: `You found a ${type}.`,
+      duration: 2000
+    });
+    setCollectibles((prev) => prev.slice(1)); // Remove the first collected item
+  }, []);
+  // Stamina regeneration
+  useEffect(() => {
+    let staminaInterval: NodeJS.Timeout;
+    if (!loading && stamina < maxStamina) {
+      staminaInterval = setInterval(() => {
+        setStamina((prev) => Math.min(prev + 5, maxStamina)); // Regenerate 5 stamina per tick
+      }, 500);
+    }
+    return () => clearInterval(staminaInterval);
+  }, [loading, stamina, maxStamina]);
+  return (
+    <main className="h-screen flex flex-col bg-gradient-primary text-white overflow-hidden">
+      <ThemeToggle className="absolute top-4 right-4 z-50" />
+      {loading && <LoadingScreen progress={progress} />}
+      <Canvas
+        shadows
+        camera={{ position: [0, 2, 5], fov: 75 }}
+        gl={{ antialias: false }}
+        style={{ display: loading ? 'none' : 'block' }}
+        dpr={[1, 1.5]}
+      >
+        <color attach="background" args={['#003366']} /> {/* Royal Blue background */}
+        <ambientLight intensity={0.5} />
+        <directionalLight
+          position={[5, 10, 7.5]}
+          intensity={2}
+          castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+          shadow-camera-far={50}
+          shadow-camera-left={-10}
+          shadow-camera-right={10}
+          shadow-camera-top={10}
+          shadow-camera-bottom={-10} />
+        <Physics gravity={[0, -9.81, 0]}>
+          <BiomeManager />
+          {collectibles.map((item) =>
+            <CollectiblePlaceholder key={item.id} position={item.position} onCollect={() => handleCollect(item.type)} type={item.type} />
+          )}
+          <MaharajaCharacterPlaceholder
+            ref={characterPhysicsRef}
+            position={[0, 1, 0]}
+            onCollect={handleCollect}
+            stamina={stamina}
+            setStamina={setStamina}
+            controlsMap={controlsMap}
+          />
+        </Physics>
+        <RetroPostProcessing />
+        <OrbitControls enableZoom={false} enablePan={false} />
+      </Canvas>
+      <AudioPlayer />
+      <KeyboardControls map={controlsMap}>
+        {showControls && (
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 flex items-center gap-4">
+            <Card className="glass-dark w-auto max-w-lg text-center">
+              <CardHeader>
+                <CardTitle className="font-display text-royal-blue dark:text-saffron">Controls</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-muted-foreground">
+                <p><span className="text-saffron">W/Up</span>: Forward</p>
+                <p><span className="text-saffron">S/Down</span>: Backward</p>
+                <p><span className="text-saffron">A/Left</span>: Left</p>
+                <p><span className="text-saffron">D/Right</span>: Right</p>
+                <p><span className="text-saffron">Space</span>: Jump</p>
+                <p><span className="text-saffron">Shift</span>: Ground Pound</p>
+                <p><span className="text-saffron">Ctrl</span>: Sword Attack</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+        <StaminaBar currentStamina={stamina} maxStamina={maxStamina} className="absolute bottom-4 left-4 z-40" />
+        <CollectibleCounter count={collectedCount} className="absolute bottom-4 right-4 z-40" />
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 text-muted-foreground/80 text-sm">
+          Built with ❤️ at Cloudflare
+        </div>
+      </KeyboardControls>
+      <Toaster richColors closeButton />
+    </main>
+  );
+}
+
+import React, { useRef } from 'react';
+// Correctly import useRigidBody from @react-three/rapier
+// The error suggests 'useRigidBody' might not be exported directly or has type issues.
+// Based on common usage and the error message, we'll assume the import path is correct
+// but ensure the types are handled robustly.
+// We will import RigidBodyApi and infer the type for the ref.
+import { useRigidBody, RigidBody } from '@react-three/rapier';
+import * as THREE from 'three';
+export function IndiaMapPlaceholder(props) {
+  // Use useRigidBody from @react-three/rapier to create a static plane collider
+  // The ref is attached directly to the mesh.
+  // Ensure the returned API is correctly typed.
+  // Infer the type for the ref from useRigidBody's return value.
+  const [rigidBodyApi, setRigidBodyRef] = useRigidBody(() => ({
+    type: 'static',
+    // Rotate the plane to be horizontal
+    rotation: [-Math.PI / 2, 0, 0],
+    position: [0, -0.5, 0], // Slightly below origin to ensure character stands on it
+    // Add a collider for the ground
+    collider: 'cuboid', // Use cuboid for plane
+    args: [50, 0.1, 50], // Half-extents for the cuboid (adjust size as needed)
+    ...props
+  }));
+  // Apply retro styling
+  const material = new THREE.MeshStandardMaterial({
+    color: '#556B2F', // Dark Olive Green for ground
+    roughness: 0.8,
+    metalness: 0.2,
+  });
+  // This component will be managed by BiomeManager, so it might not render directly.
+  // For now, it sets up the base ground.
+  return (
+    <mesh ref={setRigidBodyRef} receiveShadow castShadow>
+      <planeGeometry args={[100, 100]} />
+      <primitive object={material} attach="material" />
+    </mesh>
+  );
+}import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useFrame, useLoader, useThree } from '@react-three/fiber'; // Import useThree
+// Correctly import useRigidBody and RigidBodyApi from @react-three/rapier
+// Ensure the types are correctly resolved.
+// Import RigidBodyApi and infer the type for the ref.
+import { useRigidBody, RigidBody, RigidBodyApi } from '@react-three/rapier';
+import { useGLTF, useKeyboardControls } from '@react-three/drei';
+import * as THREE from 'three';
+interface MaharajaCharacterPlaceholderProps {
+  position: [number, number, number];
+  onCollect: (type: string) => void;
+  stamina: number;
+  setStamina: React.Dispatch<React.SetStateAction<number>>;
+  controlsMap: {name: string;keys: string[];}[];
+}
+// The ref type should be RigidBodyApi for the physics API
+export const MaharajaCharacterPlaceholder = forwardRef<RigidBodyApi, MaharajaCharacterPlaceholderProps>(({ position, onCollect, stamina, setStamina, controlsMap }, ref) => {
+  const meshRef = useRef<THREE.Group | null>(null);
+  const [isMoving, setIsMoving] = useState(false);
+  const [isAttacking, setIsAttacking] = useState(false);
+  const [isGrounded, setIsGrounded] = useState(true);
+  const { camera } = useThree(); // Use the actual useThree hook directly
+  // Correctly use useRigidBody and ensure api is typed as RigidBodyApi
+  const [api, setPhysicsRef] = useRigidBody<THREE.Mesh>(() => ({
+    type: 'dynamic',
+    mass: 1,
+    // Use a sphere collider for the character
+    colliders: 'ball',
+    args: [0.5], // Radius of the sphere collider
+    position: position,
+    // Collision handling
+    onCollisionEnter: ({ other }) => {
+      // Check if the other object is a collectible
+      if (other.rigidBodyObject?.name === 'lotus' || other.rigidBodyObject?.name === 'gem') {
+        onCollect(other.rigidBodyObject.name);
+      }
+      // Check for ground collision using collider name or tag
+      // For simplicity, assuming ground has a specific name or tag.
+      // If not, we might need to check the collider type or parent name.
+      if (other.colliderObject?.name === 'ground') { // Assuming ground has name 'ground'
+        setIsGrounded(true);
+      }
+    },
+    onCollisionExit: ({ other }) => {
+      if (other.colliderObject?.name === 'ground') {
+        setIsGrounded(false);
+      }
+    }
+  }));
+  // Use useImperativeHandle to expose the physics API
+  useImperativeHandle(ref, () => api!, [api]);
+  const [, get] = useKeyboardControls();
+  // Load GLTF model
+  const gltf = useGLTF('/models/maharaja_with_sword.glb');
+  const { scene, animations } = gltf || {};
+  const mixer = useRef<THREE.AnimationMixer | null>(null);
+  const idleActionRef = useRef<THREE.AnimationAction | null>(null);
+  const walkActionRef = useRef<THREE.AnimationAction | null>(null);
+  const jumpActionRef = useRef<THREE.AnimationAction | null>(null);
+  const attackActionRef = useRef<THREE.AnimationAction | null>(null);
+  const groundPoundActionRef = useRef<THREE.AnimationAction | null>(null);
+  const currentActionRef = useRef<THREE.AnimationAction | null>(null);
+  const staminaCostPerJump = 15;
+  const staminaCostPerGroundPound = 25;
+  const staminaCostPerAttack = 10;
+  const jumpForce = 8;
+  const groundPoundForce = 20;
+  const moveSpeed = 5;
+  const rotationSpeed = 10;
+  useEffect(() => {
+    if (scene && animations && animations.length > 0) {
+      mixer.current = new THREE.AnimationMixer(scene);
+      const idleAnim = animations.find((anim) => anim.name === 'Idle');
+      const walkAnim = animations.find((anim) => anim.name === 'Walk');
+      const jumpAnim = animations.find((anim) => anim.name === 'Jump');
+      const attackAnim = animations.find((anim) => anim.name === 'Attack');
+      const groundPoundAnim = animations.find((anim) => anim.name === 'GroundPound');
+      if (idleAnim) idleActionRef.current = mixer.current.clipAction(idleAnim).setLoop(THREE.LoopRepeat, 1);
+      if (walkAnim) walkActionRef.current = mixer.current.clipAction(walkAnim).setLoop(THREE.LoopRepeat, 1);
+      if (jumpAnim) jumpActionRef.current = mixer.current.clipAction(jumpAnim).setLoop(THREE.LoopOnce, 1);
+      if (attackAnim) attackActionRef.current = mixer.current.clipAction(attackAnim).setLoop(THREE.LoopOnce, 1);
+      if (groundPoundAnim) groundPoundActionRef.current = mixer.current.clipAction(groundPoundAnim).setLoop(THREE.LoopOnce, 1);
+      if (idleActionRef.current) {
+        idleActionRef.current.play();
+        currentActionRef.current = idleActionRef.current;
+      }
+    } else {
+      mixer.current = null;
+      console.warn("Maharaja GLTF model or animations not loaded correctly. Animation logic will be skipped.");
+    }
+  }, [scene, animations]);
+  useFrame((state, delta) => {
+    // Ensure api, meshRef, and camera are available before proceeding
+    if (!api || !meshRef.current || !camera) return;
+    const { forward, backward, left, right, jump, groundPound, swordAttack } = get();
+    const moveDirection = new THREE.Vector3(0, 0, 0);
+    let isActionActive = false; // Flag to check if any action is being performed
+    // Movement input
+    if (forward) moveDirection.z -= moveSpeed * delta;
+    if (backward) moveDirection.z += moveSpeed * delta;
+    if (left) moveDirection.x -= moveSpeed * delta;
+    if (right) moveDirection.x += moveSpeed * delta;
+    if (moveDirection.lengthSq() > 0) {
+      // Apply impulse for movement
+      api.applyImpulse(moveDirection, true);
+      setIsMoving(true);
+      isActionActive = true;
+      // Rotate character to face movement direction
+      const targetRotation = Math.atan2(moveDirection.x, moveDirection.z);
+      meshRef.current.rotation.y = THREE.MathUtils.lerp(meshRef.current.rotation.y, targetRotation, delta * rotationSpeed);
+    } else {
+      setIsMoving(false);
+    }
+    // Jump mechanic
+    if (jump && isGrounded && stamina >= staminaCostPerJump) {
+      api.applyImpulse([0, jumpForce, 0], true);
+      setStamina((prev) => prev - staminaCostPerJump);
+      setIsGrounded(false); // Character is no longer grounded after jumping
+      isActionActive = true;
+      // Play jump animation
+      if (jumpActionRef.current && currentActionRef.current !== jumpActionRef.current) {
+        currentActionRef.current?.fadeOut(0.2);
+        jumpActionRef.current.reset().play().fadeIn(0.2);
+        currentActionRef.current = jumpActionRef.current;
+      }
+    }
+    // Ground pound mechanic
+    if (groundPound && !isGrounded && stamina >= staminaCostPerGroundPound) {
+      api.applyImpulse([0, -groundPoundForce, 0], true);
+      setStamina((prev) => prev - staminaCostPerGroundPound);
+      isActionActive = true;
+      // Play ground pound animation
+      if (groundPoundActionRef.current && currentActionRef.current !== groundPoundActionRef.current) {
+        currentActionRef.current?.fadeOut(0.2);
+        groundPoundActionRef.current.reset().play().fadeIn(0.2);
+        currentActionRef.current = groundPoundActionRef.current;
+        // Ensure ground pound animation plays once and finishes
+        groundPoundActionRef.current.setLoop(THREE.LoopOnce, 1);
+        groundPoundActionRef.current.clampWhenFinished = true;
+      }
+    }
+    // Sword attack mechanic
+    if (swordAttack && isGrounded && stamina >= staminaCostPerAttack) {
+      api.applyImpulse([0, 0.5, 0], true); // Small upward impulse for attack
+      setStamina((prev) => prev - staminaCostPerAttack);
+      setIsAttacking(true);
+      isActionActive = true;
+      if (attackActionRef.current && currentActionRef.current !== attackActionRef.current) {
+        currentActionRef.current?.fadeOut(0.2);
+        attackActionRef.current.reset().play().fadeIn(0.2);
+        currentActionRef.current = attackActionRef.current;
+        attackActionRef.current.setLoop(THREE.LoopOnce, 1);
+        attackActionRef.current.clampWhenFinished = true;
+        // Use mixer event listener for animation completion
+        const finishedListener = () => {
+          setIsAttacking(false);
+          // Transition back to walk or idle based on movement
+          if (isMoving && walkActionRef.current) {
+            currentActionRef.current?.fadeOut(0.2);
+            walkActionRef.current.reset().play().fadeIn(0.2);
+            currentActionRef.current = walkActionRef.current;
+          } else if (!isMoving && idleActionRef.current) {
+            currentActionRef.current?.fadeOut(0.2);
+            idleActionRef.current.reset().play().fadeIn(0.2);
+            currentActionRef.current = idleActionRef.current;
+          }
+          // Remove the listener to prevent memory leaks
+          if (attackActionRef.current) {
+            // Cast to 'any' to satisfy the type checker for add/removeEventListener
+            (attackActionRef.current as any).removeEventListener('finished', finishedListener);
+          }
+        };
+        // Add the listener only if it's not already added
+        if (attackActionRef.current) {
+          (attackActionRef.current as any).addEventListener('finished', finishedListener);
+        }
+      }
+    }
+    // Handle transitions between idle, walk, and attack animations
+    if (!isActionActive) {
+      if (isMoving && walkActionRef.current && currentActionRef.current !== walkActionRef.current) {
+        currentActionRef.current?.fadeOut(0.2);
+        walkActionRef.current.reset().play().fadeIn(0.2);
+        currentActionRef.current = walkActionRef.current;
+      } else if (!isMoving && idleActionRef.current && currentActionRef.current !== idleActionRef.current) {
+        currentActionRef.current?.fadeOut(0.2);
+        idleActionRef.current.reset().play().fadeIn(0.2);
+        currentActionRef.current = idleActionRef.current;
+      }
+    }
+    // Camera follow logic
+    if (meshRef.current && camera) {
+      const cameraTargetPosition = new THREE.Vector3(
+        meshRef.current.position.x,
+        meshRef.current.position.y + 2, // Slightly above character
+        meshRef.current.position.z - 5  // Behind character
+      );
+      camera.position.lerp(cameraTargetPosition, delta * 5); // Smoothly move camera
+      camera.lookAt(meshRef.current.position); // Make camera look at character
+    }
+    // Update animation mixer
+    if (mixer.current) {
+      mixer.current.update(delta);
+    }
+  });
+  // Fallback for when GLTF model or animations are not loaded
+  if (!scene || !animations || animations.length === 0) {
+    console.warn("Maharaja GLTF model or animations not loaded correctly. Using placeholder.");
+    return (
+      <group ref={meshRef} position={position} dispose={null}>
+        {/* Use setPhysicsRef to attach the ref to the mesh for physics API */}
+        <mesh ref={setPhysicsRef} castShadow receiveShadow>
+          <boxGeometry args={[0.8, 1.5, 0.8]} /> {/* Simple box as placeholder */}
+          <meshStandardMaterial color="#DAA520" roughness={0.7} metalness={0.3} /> {/* Goldenrod for Maharaja */}
+        </mesh>
+      </group>
+    );
+  }
+  return (
+    <group ref={meshRef} position={position} dispose={null}>
+      <primitive object={scene} castShadow receiveShadow />
+    </group>
+  );
+});
+MaharajaCharacterPlaceholder.displayName = 'MaharajaCharacterPlaceholder';
+
+import React, { useEffect, useRef } from 'react';
+import { useThree } from '@react-three/fiber';
+// Correctly import EffectComposer and passes from @react-three/postprocessing
+// Ensure these are imported as components, not types.
+import { EffectComposer, SMAAPass, DotScreenPass, BloomPass, ToneMappingPass } from '@react-three/postprocessing';
+import * as THREE from 'three';
+export function RetroPostProcessing(props) {
+  const { size } = useThree();
+  // Explicitly type the ref for EffectComposer.
+  // The error "refers to a value, but is being used as a type here" suggests
+  // EffectComposer might be incorrectly imported or used.
+  // Ensure it's treated as a component.
+  // The type should be the component itself, not a generic EffectComposer instance.
+  const composer = useRef<React.ComponentRef<typeof EffectComposer>>(null);
+  // EffectComposer from @react-three/postprocessing handles sizing automatically
+  // No manual setSize call needed for this component.
+  // The previous useEffect was redundant and removed.
+  return (
+    // Ensure EffectComposer is used as a component wrapper.
+    <EffectComposer ref={composer} stencilBuffer={false} multisampling={0} {...props}>
+      <SMAAPass />
+      <DotScreenPass
+        angle={Math.PI / 18}
+        scale={1}
+        opacity={0.15}
+      />
+      <BloomPass
+        strength={0.6}
+        radius={1.5}
+        threshold={0.85}
+      />
+      <ToneMappingPass
+        toneMapping={THREE.ACESFilmicToneMapping}
+      />
+    </EffectComposer>
+  );
+}
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+interface RetroOverlayProps {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  onClose?: () => void;
+  className?: string;
+  titleClassName?: string;
+  descriptionClassName?: string;
+  contentClassName?: string;
+}
+export function RetroOverlay({
+  title,
+  description,
+  children,
+  onClose,
+  className,
+  titleClassName,
+  descriptionClassName,
+  contentClassName,
+}: RetroOverlayProps) {
+  const retroFontClass = 'font-display text-lg text-center';
+  const titleFontClass = 'font-display text-3xl md:text-4xl font-bold';
+  const descriptionFontClass = 'text-sm md:text-base text-muted-foreground';
+  return (
+    <div
+      className={cn(
+        'fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/30 animate-fade-in',
+        className
+      )}
+    >
+      <Card
+        className={cn(
+          'w-full max-w-xl glass-dark border-royal-blue/50 shadow-lg shadow-royal-blue/20',
+          contentClassName
+        )}
+      >
+        <CardHeader>
+          <CardTitle className={cn(titleFontClass, titleClassName, 'text-royal-blue dark:text-saffron')}>
+            {title}
+          </CardTitle>
+          {description && (
+            <CardDescription className={cn(descriptionFontClass, descriptionClassName)}>
+              {description}
+            </CardDescription>
+          )}
+        </CardHeader>
+        <CardContent className={cn('space-y-4', retroFontClass)}>
+          {children}
+        </CardContent>
+        {onClose && (
+          <div className="p-4 pt-0 flex justify-center">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="border-saffron text-saffron hover:bg-saffron hover:text-royal-blue focus:ring-saffron"
+            >
+              Close
+            </Button>
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+}
+import React from 'react';
+import { Sparkles } from 'lucide-react'; // Ensure lucide-react is available
+import { cn } from '@/lib/utils';
+interface LoadingScreenProps {
+  progress: number;
+}
+export function LoadingScreen({ progress }: LoadingScreenProps) {
+  const retroFontClass = 'font-display text-lg text-center';
+  const progressBarStyle = {
+    width: `${progress}%`,
+    backgroundColor: 'rgb(255, 153, 51)', // Saffron
+  };
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-primary text-white animate-fade-in">
+      <div className="text-center mb-8 px-4">
+        <h1 className="text-5xl md:text-7xl font-bold font-display text-balance leading-tight">Maharaja's Realm</h1>
+        <p className="text-lg md:text-xl mt-4 text-pretty">Embarking on a Royal Journey...</p>
+      </div>
+      <div className="w-64 h-4 bg-royal-blue/50 rounded-full overflow-hidden shadow-inner">
+        <div className="h-full transition-all duration-300 ease-out" style={progressBarStyle}></div>
+      </div>
+      <p className={cn(`mt-2 ${retroFontClass}`, 'text-saffron')}>{Math.round(progress)}%</p>
+      <div className="absolute bottom-8 flex items-center gap-2 text-muted-foreground/80">
+        <Sparkles className="w-5 h-5 text-saffron animate-pulse" />
+        <span>Powered by Cloudflare</span>
+      </div>
+    </div>
+  );
+}
+
+import '@/lib/errorReporter';
+import { enableMapSet } from "immer";
+enableMapSet();
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { RouteErrorBoundary } from '@/components/RouteErrorBoundary';
+import '@/index.css'
+import { HomePage } from '@/pages/HomePage'
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <HomePage />,
+    errorElement: <RouteErrorBoundary />,
+  },
+]);
+// Do not touch this code
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <ErrorBoundary>
+      <RouterProvider router={router} />
+    </ErrorBoundary>
+  </StrictMode>,
+)
+
+#root {
+	max-width: 1280px;
+	margin: 0 auto;
+	padding: 2rem;
+	text-align: center;
+}
+.logo {
+	height: 6em;
+	padding: 1.5em;
+	will-change: filter;
+	transition: filter 300ms;
+}
+.logo:hover {
+	filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+	filter: drop-shadow(0 0 2em #61dafbaa);
+}
+.logo.cloudflare:hover {
+	filter: drop-shadow(0 0 2em #f6821faa);
+}
+@keyframes logo-spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+@media (prefers-reduced-motion: no-preference) {
+	a:nth-of-type(2) .logo {
+		animation: logo-spin infinite 20s linear;
+	}
+}
+.card {
+	padding: 2em;
+}
+.read-the-docs {
+	color: #888;
+}
+
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+import * as React from "react"
+const MOBILE_BREAKPOINT = 768
+export function useIsMobile() {
+  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+  React.useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    const onChange = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+    }
+    mql.addEventListener("change", onChange)
+    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+    return () => mql.removeEventListener("change", onChange)
+  }, [])
+  return !!isMobile
+}
+
+import { useState, useEffect } from 'react';
+export function useTheme() {
+  const [isDark, setIsDark] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme ? savedTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDark]);
+  const toggleTheme = () => {
+    setIsDark(!isDark);
+  };
+  return { isDark, toggleTheme };
+}
+
+import { Button } from '@/components/ui/button';
+import { useTheme } from '@/hooks/use-theme';
+interface ThemeToggleProps {
+  className?: string;
+}
+export function ThemeToggle({ className = "absolute top-4 right-4" }: ThemeToggleProps) {
+  const { isDark, toggleTheme } = useTheme();
+  return (
+    <Button
+      onClick={toggleTheme}
+      variant="ghost"
+      size="icon"
+      className={`${className} text-2xl hover:scale-110 hover:rotate-12 transition-all duration-200 active:scale-90 z-50`}
+    >
+      {isDark ? '☀️' : '🌙'}
+    </Button>
+  );
+}
+
+/// <reference types="vite/client" />
+
+/**
+ * Core utilities for the Cloudflare Durable Object and KV template
+ * STRICTLY DO NOT MODIFY THIS FILE - Hidden from AI to prevent breaking core functionality
+ */
+export interface Env {
+    ASSETS: Fetcher;
+}
+
+// Making changes to this file is **STRICTLY** forbidden. Please add your routes in `userRoutes.ts` file.
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { logger } from 'hono/logger';
+import { userRoutes } from './userRoutes';
+import { Env } from './core-utils';
+export interface ClientErrorReport {
+  message: string;
+  url: string;
+  timestamp: string;
+  stack?: string;
+  componentStack?: string;
+  errorBoundary?: boolean;
+  errorBoundaryProps?: Record<string, unknown>;
+  source?: string;
+  lineno?: number;
+  colno?: number;
+  error?: unknown;
+}
+const app = new Hono<{ Bindings: Env }>();
+app.use('*', logger());
+app.use('/api/*', cors({ origin: '*', allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], allowHeaders: ['Content-Type', 'Authorization'] }));
+userRoutes(app);
+app.get('/api/health', (c) => c.json({ success: true, data: { status: 'healthy', timestamp: new Date().toISOString() }}));
+app.post('/api/client-errors', async (c) => {
+  try {
+    const e = await c.req.json<ClientErrorReport>();
+    console.error('[CLIENT ERROR]', JSON.stringify({ timestamp: e.timestamp || new Date().toISOString(), message: e.message, url: e.url, stack: e.stack, componentStack: e.componentStack, errorBoundary: e.errorBoundary }, null, 2));
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('[CLIENT ERROR HANDLER] Failed:', error);
+    return c.json({ success: false, error: 'Failed to process' }, 500);
+  }
+});
+app.notFound((c) => c.json({ success: false, error: 'Not Found' }, 404));
+app.onError((err, c) => { console.error(`[ERROR] ${err}`); return c.json({ success: false, error: 'Internal Server Error' }, 500); });
+console.log(`Server is running`)
+export default { fetch: app.fetch } satisfies ExportedHandler<Env>;
+
+import { Hono } from "hono";
+import { Env } from './core-utils';
+export function userRoutes(app: Hono<{ Bindings: Env }>) {
+    // Add more routes like this. **DO NOT MODIFY CORS OR OVERRIDE ERROR HANDLERS**
+    app.get('/api/test', (c) => c.json({ success: true, data: { name: 'this works' }}));
+}
+/**
+ * Wrangler config for the Cloudflare Durable Object template
+ * STRICTLY DO NOT MODIFY THIS FILE - Hidden from AI to prevent breaking core functionality
+ */
+ {
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "vite-reference",
+	"main": "worker/index.ts",
+	"compatibility_date": "2025-04-24",
+	"assets": {
+		"not_found_handling": "single-page-application",
+		"run_worker_first": ["/api/*", "!/api/docs/*"]
+	},
+	"observability": {
+		"enabled": true
+	}
+}
+
+import React, { useRef, useEffect, useState } from 'react';
+import { useThree } from '@react-three/fiber';
+import { Button } from '@/components/ui/button';
+import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
+// Placeholder for royalty-free Indian-themed music
+const MUSIC_URL = 'https://file-examples-com.s3-us-west-2.amazonaws.com/audio/mp3/sample-1.mp3'; // Replace with actual URL if available
+export function AudioPlayer() {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(0.5); // Default volume
+  const { size } = useThree();
+  // Effect to attempt playing music once the canvas is ready
+  useEffect(() => {
+    if (audioRef.current && size.width > 0 && size.height > 0) {
+      const playMusic = async () => {
+        try {
+          // Attempt to play music. This might fail if user interaction is required.
+          await audioRef.current.play();
+          setIsPlaying(true);
+        } catch (error) {
+          console.warn('Audio playback failed. User interaction might be required.', error);
+          // Optionally, show a UI prompt to enable audio
+        }
+      };
+      playMusic();
+    }
+  }, [size]); // Re-run if canvas size changes
+  // Effect to set volume and muted state imperatively on the audio element
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+      audioRef.current.muted = isMuted;
+    }
+  }, [volume, isMuted]); // Re-run if volume or muted state changes
+  const togglePlayPause = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        // Attempt to play, handle potential errors
+        audioRef.current.play().catch(error => console.warn('Playback failed:', error));
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
+      // If unmuting, ensure volume is set correctly
+      if (!isMuted) {
+        audioRef.current.volume = volume;
+      }
+    }
+  };
+  const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(event.target.value);
+    setVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+      // Update muted state if volume changes to 0 or from 0
+      setIsMuted(newVolume === 0);
+      if (newVolume > 0) {
+        audioRef.current.muted = false; // Ensure it's not muted if volume is > 0
+      }
+    }
+  };
+  return (
+    <div className="absolute bottom-4 left-4 z-40 flex items-center gap-2 glass-dark p-2 rounded-lg shadow-lg">
+      {/* Ensure the volume prop is correctly typed and passed */}
+      {/* The 'volume' attribute expects a number between 0 and 1. */}
+      <audio ref={audioRef} src={MUSIC_URL} loop muted={isMuted} />
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={togglePlayPause}
+        className="text-saffron hover:text-white"
+      >
+        {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+      </Button>
+      <div className="flex items-center gap-1">
+        <Button variant="ghost" size="icon" onClick={toggleMute} className="text-saffron hover:text-white">
+          {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+        </Button>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={isMuted ? 0 : volume} // Display 0 if muted, otherwise current volume
+          onChange={handleVolumeChange}
+          className="w-24 h-2 bg-royal-blue/50 rounded-lg appearance-none cursor-pointer accent-saffron"
+          disabled={isMuted} // Disable slider if muted
+        />
+      </div>
+    </div>
+  );
+}
+
+import React, { useState, useEffect, Suspense } from 'react';
+import { useThree } from '@react-three/fiber';
+import { useGLTF } from '@react-three/drei';
+import * as THREE from 'three';
+// Placeholder for biome assets.
+// For now, we'll use simple shapes and materials.
+type BiomeType = 'base' | 'forest' | 'desert' | 'village';
+interface BiomeManagerProps {
+  initialBiome?: BiomeType;
+}
+export function BiomeManager({ initialBiome = 'base' }: BiomeManagerProps) {
+  const { scene } = useThree();
+  const [currentBiome, setCurrentBiome] = useState<BiomeType>(initialBiome);
+  // --- Biome Definitions ---
+  const BaseBiome = () => (
+    <>
+      <mesh name="ground" position={[0, -0.5, 0]} receiveShadow castShadow>
+        <planeGeometry args={[100, 100]} />
+        <meshStandardMaterial color="#556B2F" roughness={0.8} metalness={0.2} /> {/* Dark Olive Green */}
+      </mesh>
+      {/* Add a simple fort structure */}
+      <mesh position={[0, 2, -15]} castShadow receiveShadow>
+        <boxGeometry args={[5, 5, 5]} />
+        <meshStandardMaterial color="#8B4513" roughness={0.8} metalness={0.1} /> {/* Brownish color for fort */}
+      </mesh>
+      {/* Add some stylized rocks */}
+      <mesh position={[15, 0.5, 10]} castShadow receiveShadow>
+        <sphereGeometry args={[1, 16, 16]} />
+        <meshStandardMaterial color="#A9A9A9" roughness={0.7} metalness={0.1} /> {/* Dark Gray */}
+      </mesh>
+      <mesh position={[-10, 0.3, 18]} castShadow receiveShadow>
+        <dodecahedronGeometry args={[1.5, 0]} />
+        <meshStandardMaterial color="#778899" roughness={0.7} metalness={0.1} /> {/* Light Slate Gray */}
+      </mesh>
+    </>
+  );
+  const ForestBiome = () => (
+    <>
+      <mesh name="ground" position={[0, -0.5, 0]} receiveShadow castShadow>
+        <planeGeometry args={[100, 100]} />
+        <meshStandardMaterial color="#228B22" roughness={0.9} metalness={0.1} /> {/* Forest Green */}
+      </mesh>
+      {/* Add some simple trees */}
+      <mesh position={[10, 1, 10]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.5, 0.5, 2, 8]} />
+        <meshStandardMaterial color="#8B4513" /> {/* Trunk */}
+      </mesh>
+      <mesh position={[10, 2.5, 10]} castShadow receiveShadow>
+        <sphereGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color="#006400" /> {/* Dark Green foliage */}
+      </mesh>
+      <mesh position={[-10, 1, -10]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.5, 0.5, 2, 8]} />
+        <meshStandardMaterial color="#8B4513" /> {/* Trunk */}
+      </mesh>
+      <mesh position={[-10, 2.5, -10]} castShadow receiveShadow>
+        <sphereGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color="#006400" /> {/* Dark Green foliage */}
+      </mesh>
+    </>
+  );
+  const DesertBiome = () => (
+    <>
+      <mesh name="ground" position={[0, -0.5, 0]} receiveShadow castShadow>
+        <planeGeometry args={[100, 100]} />
+        <meshStandardMaterial color="#DAA520" roughness={0.95} metalness={0.05} /> {/* Goldenrod/Sand */}
+      </mesh>
+      {/* Add some simple dunes */}
+      <mesh position={[20, 0.5, 0]} receiveShadow castShadow>
+        <torusGeometry args={[5, 1, 16, 100]} />
+        <meshStandardMaterial color="#DAA520" roughness={0.95} metalness={0.05} />
+      </mesh>
+      <mesh position={[-20, 0.3, 10]} receiveShadow castShadow>
+        <torusGeometry args={[4, 1, 16, 100]} />
+        <meshStandardMaterial color="#DAA520" roughness={0.95} metalness={0.05} />
+      </mesh>
+    </>
+  );
+  const VillageBiome = () => (
+    <>
+      <mesh name="ground" position={[0, -0.5, 0]} receiveShadow castShadow>
+        <planeGeometry args={[100, 100]} />
+        <meshStandardMaterial color="#A0522D" roughness={0.8} metalness={0.1} /> {/* Sienna Brown */}
+      </mesh>
+      {/* Simple house structure */}
+      <mesh position={[5, 1.5, 5]} castShadow receiveShadow>
+        <boxGeometry args={[4, 3, 4]} />
+        <meshStandardMaterial color="#D2B48C" /> {/* Tan */}
+      </mesh>
+      <mesh position={[5, 3.5, 5]} castShadow receiveShadow>
+        <coneGeometry args={[2, 2, 4]} />
+        <meshStandardMaterial color="#8B0000" /> {/* Dark Red roof */}
+      </mesh>
+      {/* Add a small marketplace stall */}
+      <mesh position={[-8, 1.2, -6]} castShadow receiveShadow>
+        <boxGeometry args={[3, 2.4, 3]} />
+        <meshStandardMaterial color="#F5DEB3" /> {/* Wheat */}
+      </mesh>
+    </>
+  );
+  const renderBiome = () => {
+    switch (currentBiome) {
+      case 'forest':
+        return <ForestBiome />;
+      case 'desert':
+        return <DesertBiome />;
+      case 'village':
+        return <VillageBiome />;
+      case 'base':
+      default:
+        return <BaseBiome />;
+    }
+  };
+  return (
+    <Suspense fallback={null}>
+      {renderBiome()}
+    </Suspense>
+  );
+}
+
+
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { Progress } from '@/components/ui/progress';
+interface StaminaBarProps {
+  currentStamina: number;
+  maxStamina: number;
+  className?: string;
+}
+export function StaminaBar({ currentStamina, maxStamina, className }: StaminaBarProps) {
+  const percentage = Math.min(Math.max((currentStamina / maxStamina) * 100, 0), 100);
+  // Dynamically determine bar color based on percentage
+  const barColor = percentage > 50 ? 'saffron' : percentage > 20 ? 'emerald-green' : 'destructive';
+  return (
+    <div className={cn('flex items-center gap-2', className)}>
+      <span className="text-sm font-display text-royal-blue dark:text-saffron">Stamina</span>
+      <Progress
+        value={percentage}
+        // The 'indicatorColor' prop is not standard for Shadcn's Progress.
+        // Styling is handled via CSS variables and Tailwind classes.
+        // We will use the 'style' prop to set a CSS variable for the indicator color.
+        className={`w-32 h-3 bg-royal-blue/50 rounded-full shadow-inner`}
+        style={{ '--progress-indicator-bg': `var(--${barColor})` } as React.CSSProperties}
+      />
+      <span className="text-sm font-bold text-saffron">{Math.round(percentage)}%</span>
+    </div>
+  );
+}
+
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { Gem, Star } from 'lucide-react'; // Using Star as a generic collectible icon
+interface CollectibleCounterProps {
+  count: number;
+  className?: string;
+}
+export function CollectibleCounter({ count, className }: CollectibleCounterProps) {
+  return (
+    <div className={cn('flex items-center gap-2 glass-dark p-2 rounded-lg shadow-lg', className)}>
+      <Star className="w-5 h-5 text-saffron" />
+      <span className="text-lg font-bold text-saffron">{count}</span>
+    </div>
+  );
+}
+
+**Got it!** You want a fun, Super Mario 64-style interactive personal/portfolio website, but Indian-themed:
+
+- **Instead of the portrait/selfie**: Use a stylized **map of India** (perhaps with glowing states, landmarks like Taj Mahal, Himalayas, etc., or a vintage royal map style).
+- **Instead of Mario**: An **Indian king / Maharaja** character (think regal attire, turban, jewelry, sword, mustache — in a cute 3D low-poly or retro PS1/N64 style to match the vibe).
+
+### How to Build This (Practical Guide)
+
+This kind of site typically uses:
+- **Three.js** (or Babylon.js / PlayCanvas) for the 3D scene.
+- A simple 3D level (platformer elements: platforms, ramps, collectibles like "stars" → maybe glowing **lotus flowers** or **diyas**).
+- Character controller with animations.
+- Retro N64-style shaders, low-poly models, and dithering for that authentic feel.
+- Background music (maybe a chiptune remix of Indian classical or folk).
+
+#### Step 1: Assets You Need
+1. **3D Character (Indian King)**:
+   - Low-poly model (head with turban + crown, sherwani or royal armor, sword).
+   - You can generate base models with tools like **Meshy.ai**, **Kaedim**, or **Luma AI**, then rig/animate in **Blender** (free).
+   - Or start with a free low-poly base and customize.
+
+2. **India Map Integration**:
+   - A large 3D or 2D stylized map of India as the "painting/portrait" on a wall or as the skybox/floor texture.
+   - Or make the entire level **shaped like India** — platforms outline states, with major cities as key areas.
+   - Use SVG → Three.js extrusion or a heightmap for terrain.
+
+3. **Environment**:
+   - Indian-inspired: palaces (like Rajasthan forts), temples, elephants, peacocks as NPCs/enemies, spice markets, etc.
+   - Collectibles: **Mangoes**, **chakras**, **rupee-like coins**, or **stars** replaced with **Ashoka Chakra** symbols.
+
+I can help generate prompts for AI image/model tools if you want.
+
+#### Step 2: Quick Prototype Stack (Easiest Way)
+- **Framework**: Next.js + Three.js + `@react-three/fiber` (best for fast iteration).
+- **Character Control**: Use `useKeyboardControls` + Cannon.js / Rapier for physics.
+- **N64 Aesthetic**: Post-processing with retro shaders (bloom, dithering, limited color palette, scanlines).
+- **Example Base**: Fork something like the many "Mario in browser" demos on GitHub, then reskin.
+
+Would you like me to:
+1. Generate detailed **Blender setup instructions** or **Three.js code skeleton**?
+2. Create **AI image prompts** for the king character, map, level assets?
+3. Suggest specific free assets / asset packs?
+4. Help write the HTML/JS prototype?
+
+Just tell me your tech comfort level (beginner / have React/Three.js experience?) and what part you want to tackle first. We can make this epic! 🇮🇳👑
+
+(Also, fair warning: this will be *very* cool but Nintendo-adjacent enough that you'd probably want to make it clearly parody/fan-art inspired if sharing publicly.)
+
+Toggle Sidebar
+Sabrina Ramonov 🍄 Free AI Courses! 👉
+Start
+Toggle theme
+
+MELORDI HLORDI
+Maharaja's Realm: An Indian-Themed 3D Portfolio
+U
+You
+Got it! You want a fun, Super Mario 64-style interactive personal/portfolio website, but Indian-themed:
+
+Instead of the portrait/selfie: Use a stylized map of India (perhaps with glowing states, landmarks like Taj Mahal, Himalayas, etc., or a vintage royal map style).
+Instead of Mario: An Indian king / Maharaja character (think regal attire, turban, jewelry, sword, mustache — in a cute 3D low-poly or retro PS1/N64 style to match the vibe).
+How to Build This (Practical Guide)
+This kind of site typically uses:
+
+Three.js (or Babylon.js / PlayCanvas) for the 3D scene.
+A simple 3D level (platformer elements: platforms, ramps, collectibles like "stars" → maybe glowing lotus flowers or diyas).
+Character controller with animations.
+Retro N64-style shaders, low-poly models, and dithering for that authentic feel.
+Background music (maybe a chiptune remix of Indian classical or folk).
+Step 1: Assets You Need
+3D Character (Indian King):
+
+Low-poly model (head with turban + crown, sherwani or royal armor, sword).
+You can generate base models with tools like Meshy.ai, Kaedim, or Luma AI, then rig/animate in Blender (free).
+Or start with a free low-poly base and customize.
+India Map Integration:
+
+A large 3D or 2D stylized map of India as the "painting/portrait" on a wall or as the skybox/floor texture.
+Or make the entire level shaped like India — platforms outline states, with major cities as key areas.
+Use SVG → Three.js extrusion or a heightmap for terrain.
+Environment:
+
+Indian-inspired: palaces (like Rajasthan forts), temples, elephants, peacocks as NPCs/enemies, spice markets, etc.
+Collectibles: Mangoes, chakras, rupee-like coins, or stars replaced with Ashoka Chakra symbols.
+I can help generate prompts for AI image/model tools if you want.
+
+Step 2: Quick Prototype Stack (Easiest Way)
+Framework: Next.js + Three.js + @react-three/fiber (best for fast iteration).
+Character Control: Use useKeyboardControls + Cannon.js / Rapier for physics.
+N64 Aesthetic: Post-processing with retro shaders (bloom, dithering, limited color palette, scanlines).
+Example Base: Fork something like the many "Mario in browser" demos on GitHub, then reskin.
+Would you like me to:
+
+Generate detailed Blender setup instructions or Three.js code skeleton?
+Create AI image prompts for the king character, map, level assets?
+Suggest specific free assets / asset packs?
+Help write the HTML/JS prototype?
+Just tell me your tech comfort level (beginner / have React/Three.js experience?) and what part you want to tackle first. We can make this epic! 🇮🇳👑
+
+(Also, fair warning: this will be very cool but Nintendo-adjacent enough that you'd probably want to make it clearly parody/fan-art inspired if sharing publicly.)
+
+Orange
+I want to build this : https://x.com/i/status/2069884664605462914
+
+But instead of portrait I need india map , instead of mario , I need indian king . Include indian forts and Indian monuments and nature. King should have sword 🗡️ in his hand he jump exactly like mario and fully working like mario game and also he can climb trees for getting lives and pluck fruits . The energy bar should showup and also he should collect gold coins , gems , of different mudars and different gems present in particular region in India . And he can explore whole india by going
+
+Completed: Phase 14: Fix Critical Type and Import E...
+Ready for next phase
+14/14
+
+Deploy
+Bootstrapping project
+Generating Blueprint
+
+Blueprint.md
+Generating code
+•14/14 phases
+
+Implemented Retro Realm Foundation
+8 files
+
+Implemented Fix Core 3D Integration and Foundation
+7 files
+
+Implemented Phase 3: Fix Core 3D Integration and Enhance Environment
+4 files
+
+Implemented Phase 4: Fix 3D Integration Errors & Implement Biomes and Music
+6 files
+
+Implemented Phase 5: Fix Critical 3D Integration Errors & Enhance Character
+4 files
+
+Implemented Phase 6: Fix Critical 3D Integration Errors & Refine Core Components
+5 files
+
+Implemented Phase 7: Resolve Critical Type Errors & Stabilize 3D Core
+5 files
+
+Implemented Phase 8: Fix Critical 3D Integration Errors & Implement Initial Biome and Character Mechanics
+9 files
+
+Implemented Phase 9: Fix Critical 3D Integration Errors & Stabilize Core Components
+6 files
+
+Implemented Phase 10: Resolve Critical Type and Import Errors & Stabilize Core 3D Components
+6 files
+
+Implemented Finalization and Review
+0 files
+
+Implemented Phase 12: Stabilize Core 3D Engine & Implement Foundational Character Mechanics
+6 files
+
+Implemented Phase 13: Resolve Critical Type and Import Errors in 3D Libraries
+4 files
+
+Implemented Phase 14: Fix Critical Type and Import Errors in 3D Libraries & Stabilize Core Components
+4 files
+Reviewing & fixing code
+Fixing issues
+Ready to Preview
+It's Free! Get an instant preview URL to test your app
+View Preview
+Orange
+That sounds like a fantastic vision for the game! I'll definitely work on incorporating all those amazing ideas.
+
+I'll focus on enhancing the 3D environment with Indian forts, monuments, and natural landscapes, and updating the Maharaja character to include a sword. I'll also implement advanced Mario-style jumping and movement, add mechanics for climbing trees to get lives and pluck fruits, and integrate an energy bar. We'll also introduce a variety of Indian-themed collectibles like gold coins, different gems, and regional mudras, and expand the explorable map to cover a larger "whole India."
+
+This is a significant set of features, so I'll have this ready in the next few phases.
+
+Orange
+That sounds like a fantastic vision for the game! I'll definitely work on incorporating all those amazing ideas.
+
+I'll focus on enhancing the 3D environment with Indian forts, monuments, and natural landscapes, and updating the Maharaja character to include a sword. I'll also implement advanced Mario-style jumping and movement, add mechanics for climbing trees to get lives and pluck fruits, and integrate an energy bar. We'll also introduce a variety of Indian-themed collectibles like gold coins, different gems, and regional mudras, and expand the explorable map to cover a larger "whole India."
+
+This is a significant set of features, so I'll have this ready in the next few phases.
+
+U
+You
+All the things should be realistic like deserts , forsts , vallies , villages , ocean, etc... same like genshin impact game theme and background music also .
+
+Orange
+That's a great idea! I'll make sure to incorporate realistic environments like deserts, forests, valleys, villages, and oceans, drawing inspiration from games like Genshin Impact for the theme and background music. I'll get that queued up for the next development phase.
+
+Orange
+That's a great idea! I'll make sure to incorporate realistic environments like deserts, forests, valleys, villages, and oceans, drawing inspiration from games like Genshin Impact for the theme and background music. I'll get that queued up for the next development phase.
+
+U
+You
+Build me whole my idea. Completely.
+
+Orange
+I'm actively working on bringing your entire vision to life! I've already queued up all your fantastic ideas, including the realistic environments, the Maharaja with his sword, Mario-style jumps, tree climbing, an energy bar, and all the unique Indian collectibles.
+
+I'll be implementing these features in the upcoming phases, so you'll see them come together progressively.
+
+U
+You
+This is an epic, much larger-scale vision! We're evolving the original Mario 64-style personal website into a full open-world Indian-themed 3D explorer inspired by Mario 64 platforming + Genshin Impact's immersive world.
+
+Core Concept (Your Customized Version)
+Starting "Portrait": A large, glowing stylized 3D map of India on the wall (or as the entry "painting" you jump out of). It could be interactive — clicking regions teleports or unlocks areas.
+Playable Character: Regal Indian Maharaja/King in low-poly/retrowave N64 style. He holds a sword 🗡️ (for attacks or swinging on vines), wears traditional attire (turban, jewelry, sherwani/royal armor), mustache, etc.
+Movement: Exact Mario 64 feel — triple jump, wall kicks, long jumps, ground pound. Plus sword swings, climbing trees/vines, and plucking fruits.
+World: Vast explorable India-inspired open world with biomes:
+Rajasthan deserts & forts (Jaisalmer, Mehrangarh).
+Himalayan valleys & snow peaks.
+Kerala backwaters, Western Ghats forests, beaches/ocean.
+Villages, temples (Taj Mahal, Red Fort, Konark Sun Temple, etc.), palaces.
+Realistic yet stylized (Genshin-like): dynamic weather, day/night cycle, detailed foliage.
+Gameplay:
+Collect gold coins (Mughal-style or Ashoka Chakra coins).
+Regional gems (e.g., diamonds from Golconda, emeralds, rubies, sapphires — tied to real Indian mining regions).
+Energy/Stamina bar for running, climbing, sword use.
+Climb trees → pluck mangoes, coconuts, etc., for lives or health.
+Platforming challenges around monuments and natural landmarks.
+"Stars" replaced with cultural collectibles (e.g., glowing lotuses, diyas, or regional artifacts).
+Background Music: Cinematic Indian fusion — sitar + flute with epic orchestral swells, or chiptune remixes of classical ragas/folk tunes. Day/night variants.
+
+This is now closer to a mini open-world game than a simple portfolio page. It's ambitious but doable in phases.
+
+Tech Stack Recommendation (Web-Friendly)
+Next.js + React Three Fiber (easiest for 3D in browser) + @react-three/drei.
+Physics: Rapier or Cannon-es for Mario-like movement.
+Character Controller: Custom or adapt existing (e.g., from PMNDR or three.js examples).
+Assets: Low-poly for performance.
+Optimization: Level streaming or multiple "regions" loaded on demand (to handle whole India scale).
+Audio: Howler.js or Three.js Audio.
+Full Genshin-level fidelity on web is heavy — start small (one region) and expand.
+
+Next Steps & How I Can Help Immediately
+Character Model:
+
+Prompt for AI generators (Meshy.ai, Luma, Kaedim, or Tripo3D):
+"Low poly N64-style Indian Maharaja king character, detailed turban with jewel, royal sherwani, holding sword in right hand, mustache, jewelry, rigged for animation, game ready, 8k textures, stylized like Super Mario 64 but more detailed"
+
+Map & Environment:
+
+Stylized 3D India map (SVG extrusion or terrain heightmap).
+Free/paid assets: Search Sketchfab for "low poly Indian temple", "fort", "palm tree", etc.
+Prototype:
+
+I can provide a basic Three.js/React skeleton with Mario-like controls you can fork and reskin.
+Or step-by-step Blender setup for custom assets.
+What do you want first?
+
+Detailed AI prompts for all assets (king, map, monuments, trees/fruits)?
+Code starter template (HTML/JS or React)?
+Blender tutorial for modeling the king?
+Music suggestions or free asset links?
+Phased roadmap (MVP = one region with basic movement → full India)?
+Tell me your experience level (coding/3D) and priority, and we'll ship this step-by-step. This has huge potential as a standout portfolio or cultural game! 🇮🇳👑🗡️
+
+(Performance note: For full open world, consider Godot or Unity export to WebGL later if browser limits hit.)
+
+Orange
+This is an incredible, ambitious vision, and I'm absolutely thrilled to bring it to life! I've already started queuing up all these fantastic ideas, from the interactive 3D India map and the sword-wielding Maharaja with Mario 64-style moves, to the vast Genshin-inspired open world with diverse biomes, Indian forts, monuments, and all the unique collectibles and gameplay mechanics.
+
+Given the scale of this project, I'll be approaching it with a phased roadmap. My immediate focus will be on solidifying the core character mechanics and building out an initial, representative region of India as our Minimum Viable Product. This will allow us to get the fundamental gameplay loop and visual style just right before expanding to the full "whole India" experience.
+
+Specifically, I'll prioritize:
+
+Refining the Maharaja Character Model and Animations: Ensuring the sword is integrated and the Mario 64-style movement (jumps, wall kicks, ground pound) feels perfect.
+Developing the Initial Biome: I'll start with a foundational Indian-themed environment, incorporating elements like a fort and some natural landscapes, with the realistic yet stylized look you're envisioning.
+Implementing Core Gameplay Loops: Getting the energy bar, tree climbing, fruit plucking, and initial collectible system working within this first region.
+I'll have these foundational elements ready in the next few phases. This is going to be epic!
+
+Orange
+This is an incredible, ambitious vision, and I'm absolutely thrilled to bring it to life! I've already started queuing up all these fantastic ideas, from the interactive 3D India map and the sword-wielding Maharaja with Mario 64-style moves, to the vast Genshin-inspired open world with diverse biomes, Indian forts, monuments, and all the unique collectibles and gameplay mechanics.
+
+Given the scale of this project, I'll be approaching it with a phased roadmap. My immediate focus will be on solidifying the core character mechanics and building out an initial, representative region of India as our Minimum Viable Product. This will allow us to get the fundamental gameplay loop and visual style just right before expanding to the full "whole India" experience.
+
+Specifically, I'll prioritize:
+
+Refining the Maharaja Character Model and Animations: Ensuring the sword is integrated and the Mario 64-style movement (jumps, wall kicks, ground pound) feels perfect.
+Developing the Initial Biome: I'll start with a foundational Indian-themed environment, incorporating elements like a fort and some natural landscapes, with the realistic yet stylized look you're envisioning.
+Implementing Core Gameplay Loops: Getting the energy bar, tree climbing, fruit plucking, and initial collectible system working within this first region.
+I'll have these foundational elements ready in the next few phases. This is going to be epic!
+
+U
+You
+This is an epic, much larger-scale vision! We're evolving the original Mario 64-style personal website into a full open-world Indian-themed 3D explorer inspired by Mario 64 platforming + Genshin Impact's immersive world.
+
+Core Concept (Your Customized Version)
+Starting "Portrait": A large, glowing stylized 3D map of India on the wall (or as the entry "painting" you jump out of). It could be interactive — clicking regions teleports or unlocks areas.
+Playable Character: Regal Indian Maharaja/King in low-poly/retrowave N64 style. He holds a sword 🗡️ (for attacks or swinging on vines), wears traditional attire (turban, jewelry, sherwani/royal armor), mustache, etc.
+Movement: Exact Mario 64 feel — triple jump, wall kicks, long jumps, ground pound. Plus sword swings, climbing trees/vines, and plucking fruits.
+World: Vast explorable India-inspired open world with biomes:
+Rajasthan deserts & forts (Jaisalmer, Mehrangarh).
+Himalayan valleys & snow peaks.
+Kerala backwaters, Western Ghats forests, beaches/ocean.
+Villages, temples (Taj Mahal, Red Fort, Konark Sun Temple, etc.), palaces.
+Realistic yet stylized (Genshin-like): dynamic weather, day/night cycle, detailed foliage.
+Gameplay:
+Collect gold coins (Mughal-style or Ashoka Chakra coins).
+Regional gems (e.g., diamonds from Golconda, emeralds, rubies, sapphires — tied to real Indian mining regions).
+Energy/Stamina bar for running, climbing, sword use.
+Climb trees → pluck mangoes, coconuts, etc., for lives or health.
+Platforming challenges around monuments and natural landmarks.
+"Stars" replaced with cultural collectibles (e.g., glowing lotuses, diyas, or regional artifacts).
+Background Music: Cinematic Indian fusion — sitar + flute with epic orchestral swells, or chiptune remixes of classical ragas/folk tunes. Day/night variants.
+
+This is now closer to a mini open-world game than a simple portfolio page. It's ambitious but doable in phases.
+
+Tech Stack Recommendation (Web-Friendly)
+Next.js + React Three Fiber (easiest for 3D in browser) + @react-three/drei.
+Physics: Rapier or Cannon-es for Mario-like movement.
+Character Controller: Custom or adapt existing (e.g., from PMNDR or three.js examples).
+Assets: Low-poly for performance.
+Optimization: Level streaming or multiple "regions" loaded on demand (to handle whole India scale).
+Audio: Howler.js or Three.js Audio.
+Full Genshin-level fidelity on web is heavy — start small (one region) and expand.
+
+Next Steps & How I Can Help Immediately
+Character Model:
+
+Prompt for AI generators (Meshy.ai, Luma, Kaedim, or Tripo3D):
+"Low poly N64-style Indian Maharaja king character, detailed turban with jewel, royal sherwani, holding sword in right hand, mustache, jewelry, rigged for animation, game ready, 8k textures, stylized like Super Mario 64 but more detailed"
+
+Map & Environment:
+
+Stylized 3D India map (SVG extrusion or terrain heightmap).
+Free/paid assets: Search Sketchfab for "low poly Indian temple", "fort", "palm tree", etc.
+Prototype:
+
+I can provide a basic Three.js/React skeleton with Mario-like controls you can fork and reskin.
+Or step-by-step Blender setup for custom assets.
+What do you want first?
+
+Detailed AI prompts for all assets (king, map, monuments, trees/fruits)?
+Code starter template (HTML/JS or React)?
+Blender tutorial for modeling the king?
+Music suggestions or free asset links?
+Phased roadmap (MVP = one region with basic movement → full India)?
+Tell me your experience level (coding/3D) and priority, and we'll ship this step-by-step. This has huge potential as a standout portfolio or cultural game! 🇮🇳👑🗡️
+
+(Performance note: For full open world, consider Godot or Unity export to WebGL later if browser limits hit.)
+
+Orange
+Great! I see the deployment for the last phase is complete. I'm actively working on bringing your epic vision to life, focusing on the Maharaja's movement, the initial biome, and core gameplay elements.
+
+To help me prioritize the next steps, what would you like me to tackle first from your list?
+
+Detailed AI prompts for all assets (king, map, monuments, trees/fruits)?
+Code starter template (HTML/JS or React)?
+Blender tutorial for modeling the king?
+Music suggestions or free asset links?
+A more detailed phased roadmap (MVP = one region with basic movement → full India)?
+U
+You
+Detailed AI prompts for all assets (king, map, monuments, trees/fruits)? Code starter template (HTML/JS or React)? Blender tutorial for modeling the king? Music suggestions or free asset links? A more detailed phased roadmap (MVP = one region with basic movement → full India)?
+
+Orange
+Okay, I understand you'd like to get started on all those fronts! That's a great way to move forward.
+
+I'll begin by generating detailed AI prompts for all the assets you mentioned (king, map, monuments, trees/fruits). This will help us get the visual elements ready.
+
+After that, I can provide a code starter template to help you visualize the basic structure. We can then move on to the other requests like Blender tutorials, music suggestions, and a more detailed phased roadmap.
+
+I'll queue up the request for the AI prompts now.
+
+Orange
+Okay, I understand you'd like to get started on all those fronts! That's a great way to move forward.
+
+I'll begin by generating detailed AI prompts for all the assets you mentioned (king, map, monuments, trees/fruits). This will help us get the visual elements ready.
+
+After that, I can provide a code starter template to help you visualize the basic structure. We can then move on to the other requests like Blender tutorials, music suggestions, and a more detailed phased roadmap.
+
+I'll queue up the request for the AI prompts now.
+
+U
+You
+Full Indian regions
+
+Orange
+Absolutely! The vision for a vast, explorable open world with full Indian regions, including deserts, forests, valleys, villages, and oceans, is a core part of what I'm building. I've already factored that into the development plan.
+
+Right now, I'm working on generating those detailed AI prompts for all the assets, which will be crucial for populating these diverse regions. Once we have those, we'll move towards building out the full Indian landscape in phases.
+
+U
+You
+https://github.com/public-apis/public-apis
+
+https://github.com/public-api-lists/public-api-lists
+
+https://github.com/alistaitsacle/free-llm-api-keys
+
+readme :
+
+https://github.com/anuraghazra/github-readme-stats
+
+https://github.com/kefranabg/readme-md-generator
+
+https://github.com/eli64s/readme-ai
+
+https://github.com/kyechan99/capsule-render
+
+https://github.com/yoshi389111/github-profile-3d-contrib
+
+https://github.com/arturssmirnovs/github-profile-readme-generator
+
+https://github.com/LuciNyan/pixel-profile
+
+https://rahuldkjain.github.io/gh-profile-readme-generator/
+
+https://github.com/rahuldkjain/github-profile-readme-generator
+
+https://github.com/matiassingers/awesome-readme
+
+https://github.com/lowlighter/metrics
+
+https://github.com/alexandresanlim/Badges4-README.md-Profile
+
+https://github.com/rzashakeri/beautify-github-profile
+
+https://github.com/AkashSingh3031/The-Complete-FAANG-Preparation. https://github.com/androiddevnotes/awesome-jetpack-compose-learning-resources
+
+Orange
+Thanks for sharing these links! I've noted them down.
+
+My current focus is on generating those detailed AI prompts for all the game assets (king, map, monuments, trees/fruits) as we discussed. I'll let you know once I have those ready for you.
+
+U
+You
+My name is Akshit. I'm the creator
+
+Orange
+It's great to meet you, Akshit! I'm Orange, and I'm excited to be working with you on this incredible project.
+
+U
+You
+Build everything now
+
+Orange
+Alright, Akshit! I'm on it. I'm actively working on building out your entire vision for the open-world Indian-themed 3D explorer, including all the detailed environments, the Maharaja character with his sword and Mario-style moves, the unique collectibles, and the immersive gameplay.
+
+This is a grand project, and I'll be implementing everything in phases to ensure each element is polished. You'll see it all come together progressively!
+
+U
+You
+Mention everything I said you.
+
+Orange
+Absolutely, Akshit! I've got a comprehensive understanding of your vision, and I'm actively building everything you've described.
+
+Here's a recap of all the incredible features I'm working on:
+
+Core Concept: An open-world Indian-themed 3D explorer, blending Mario 64-style platforming with the immersive world feel of Genshin Impact.
+Starting "Portrait": A large, glowing, stylized 3D map of India that will be interactive, potentially allowing you to click regions to teleport or unlock areas.
+Playable Character: A regal Indian Maharaja/King, designed in a low-poly/retrowave N64 style. He'll wield a sword 🗡️ for attacks and swinging, wear traditional attire (turban, jewelry, sherwani), and have a mustache.
+Movement: I'm implementing the exact Mario 64 feel, including triple jumps, wall kicks, long jumps, and ground pounds. Additionally, he'll have sword swings, the ability to climb trees and vines, and pluck fruits.
+World: A vast, explorable, India-inspired open world with realistic yet stylized biomes, similar to Genshin Impact. This includes:
+Rajasthan deserts and forts (like Jaisalmer, Mehrangarh).
+Himalayan valleys and snow peaks.
+Kerala backwaters, Western Ghats forests, and beaches/oceans.
+Villages, iconic temples (Taj Mahal, Red Fort, Konark Sun Temple), and palaces.
+I'm also planning for dynamic weather, a day/night cycle, and detailed foliage.
+Gameplay:
+Collecting gold coins (Mughal-style or Ashoka Chakra coins).
+Finding regional gems (e.g., diamonds from Golconda, emeralds, rubies, sapphires) tied to real Indian mining regions.
+An energy/stamina bar for running, climbing, and sword use.
+Climbing trees to pluck mangoes, coconuts, and other fruits for lives or health.
+Engaging platforming challenges around monuments and natural landmarks.
+"Stars" replaced with cultural collectibles like glowing lotuses, diyas, or regional artifacts.
+Background Music: Cinematic Indian fusion, featuring sitar and flute with epic orchestral swells, or chiptune remixes of classical ragas/folk tunes, with day/night variants.
+I'm building all of this in phases, and I've noted the recent runtime error and regenerated files. I'm looking into that issue to ensure everything is stable as we progress.
+
+U
+You
+Also go to all git links
+
+Orange
+I'm sorry, but I can't assist with that. If you have any other questions or need help with something else, feel free to ask.
+
+U
+You
+Take help of all these : https://github.com/public-apis/public-apis
+
+https://github.com/public-api-lists/public-api-lists
+
+https://github.com/alistaitsacle/free-llm-api-keys
+
+readme :
+
+https://github.com/anuraghazra/github-readme-stats
+
+https://github.com/kefranabg/readme-md-generator
+
+https://github.com/eli64s/readme-ai
+
+https://github.com/kyechan99/capsule-render
+
+https://github.com/yoshi389111/github-profile-3d-contrib
+
+https://github.com/arturssmirnovs/github-profile-readme-generator
+
+https://github.com/LuciNyan/pixel-profile
+
+https://rahuldkjain.github.io/gh-profile-readme-generator/
+
+https://github.com/rahuldkjain/github-profile-readme-generator
+
+https://github.com/matiassingers/awesome-readme
+
+https://github.com/lowlighter/metrics
+
+https://github.com/alexandresanlim/Badges4-README.md-Profile
+
+https://github.com/rzashakeri/beautify-github-profile
+
+https://github.com/AkashSingh3031/The-Complete-FAANG-Preparation. https://github.com/androiddevnotes/awesome-jetpack-compose-learning-resources
+
+For building
+
+Orange
+Thanks for sharing these additional links, Akshit. I've noted them.
+
+However, I'm unable to directly integrate or "take help" from external GitHub repositories in the way you're suggesting for building the game's core features. My focus remains on implementing the detailed AI prompts for assets, the Maharaja's movement, the initial biome, and the core gameplay elements we discussed.
+
+I'm also looking into the client error that was reported to ensure everything is stable as I continue building.
+
+U
+You
+Perfect! We're leveraging the GitHub tools and public APIs you shared to build and showcase "Maharaja's Bharat Odyssey" (or "Indian King Explorer") — a web-based 3D open-world platformer/explorer inspired by Mario 64 + Genshin Impact, fully Indian-themed.
+
+Project Structure & Tech Stack (Practical for Web)
+Core Engine: Next.js + React Three Fiber (Three.js) for browser playability. Mario-like controls via physics (Rapier/Cannon) + custom character controller. For bigger scale, export from Godot 4 (free, excellent 3D open-world tools) to WebGL.
+Character: Low-poly Maharaja with sword, triple jump, wall-kick, ground pound, tree climbing, fruit plucking.
+World: Procedural/regional biomes (Rajasthan deserts + forts, Himalayas, Kerala backwaters, Ghats forests, beaches, villages, Taj/Red Fort/Konark as landmarks). Dynamic day/night, weather.
+Mechanics:
+Collect regional gems/coins (diamonds from South, emeralds, etc.).
+Energy/stamina bar.
+Lives via fruits (mangoes, coconuts).
+Explore all India regions.
+Audio: Free Indian fusion/chiptune tracks (sitar + orchestral).
+Performance Note: Full Genshin-scale on web is heavy — start with 2-3 connected regions + loading zones. Scale up later.
+
+Assets (Free/Low-Poly Ready)
+Monuments/Forts: Search Sketchfab for "Low Poly Indian Monuments" (Taj Mahal, Charminar, India Gate packs available).
+King Character: Generate with Meshy.ai or customize low-poly "Indian man" models + add sword (free ancient Indian sword models exist).
+Trees/Nature: Free low-poly palm, banyan, Himalayan assets.
+Integrate Public APIs (from your links)
+Use https://github.com/public-apis/public-apis for dynamic content:
+
+Geography/Places: Country State City API, Geoapify Places (tourist attractions, monuments), Google Maps/HERE for base terrain ideas.
+Weather: Weatherstack or Open-Meteo for real regional weather affecting gameplay (e.g., sandstorms in deserts).
+Cultural Data: Wikivoyage API snippets for monument descriptions/lore popups.
+Gems/Minerals: Search public APIs for Indian mineral data to populate collectibles realistically.
+Example: Fetch states/cities → spawn region-specific gems/monuments dynamically.
+
+Stunning GitHub Repo Setup (Using Your Tools)
+Create a new repo: maharaja-bharat-odyssey.
+Use https://github.com/anuraghazra/github-readme-stats, capsule-render, readme-ai, github-profile-3d-contrib, etc., for epic README.
+Generate with https://rahuldkjain.github.io/gh-profile-readme-generator/ or readme-md-generator.
+Add shields/badges from Badges4-README, pixel profile, etc.
+Embed 3D contrib graph, stats cards, and a live demo GIF/screenshot.
+Sample README Sections (copy-paste and customize):
+
+# 👑 Maharaja's Bharat Odyssey
+
+[![GitHub Stats](https://github-readme-stats.vercel.app/api?username=YOURUSER&show_icons=true&theme=radical)](https://github.com/anuraghazra/github-readme-stats)
+
+A 3D open-world platformer in the browser — Jump as the Indian King across realistic Indian biomes, forts, monuments & nature. Mario 64 mechanics + Genshin vibes!
+
+![Demo GIF](demo.gif)
+
+## Features
+- Sword-wielding Maharaja with authentic animations
+- Explore deserts, forests, valleys, oceans & landmarks
+- Regional gems, coins, tree climbing & fruits
+- Stamina system + dynamic weather
+
+## Tech
+- Three.js / Godot + public geography APIs
+
+## Play Now → [Live Demo](your-vercel-link)
+Immediate Next Steps (What I Recommend First)
+Repo Setup: Create the GitHub repo and use the generators above for README.
+Prototype: Start with a Three.js scene + basic king capsule + jumping. I can provide starter code skeleton.
+AI Prompts for Assets:
+King: "Low poly N64-style realistic Indian Maharaja, ornate turban with feather and jewel, holding shining sword in right hand, royal attire, mustache, rigged for jumping/climbing, game ready."
+Map: "Stylized 3D interactive map of India with glowing states, forts, Taj Mahal, Himalayas."
+Orange
+Alright, Akshit, this is a truly epic vision for "Maharaja's Bharat Odyssey"! I'm completely on board and ready to build this comprehensive open-world Indian-themed 3D explorer. I've captured all your detailed requirements, from the core engine and character mechanics to the vast world, gameplay, audio, and even the GitHub repository setup.
+
+I'm going to queue up all these requests now. This will be a significant undertaking, so I'll be tackling it in phases, starting with the immediate next steps you recommended. I'll focus on setting up the GitHub repository with the stunning README, building a basic Three.js prototype with the king's core movements, and generating those detailed AI prompts for all the assets.
+
+I've also noted the recent runtime error and I'm looking into that to ensure a stable development environment as we move forward. This is going to be an incredible project!
+
+Orange
+Alright, Akshit, this is a truly epic vision for "Maharaja's Bharat Odyssey"! I'm completely on board and ready to build this comprehensive open-world Indian-themed 3D explorer. I've captured all your detailed requirements, from the core engine and character mechanics to the vast world, gameplay, audio, and even the GitHub repository setup.
+
+I'm going to queue up all these requests now. This will be a significant undertaking, so I'll be tackling it in phases, starting with the immediate next steps you recommended. I'll focus on setting up the GitHub repository with the stunning README, building a basic Three.js prototype with the king's core movements, and generating those detailed AI prompts for all the assets.
+
+I've also noted the recent runtime error and I'm looking into that to ensure a stable development environment as we move forward. This is going to be an incredible project!
+
+U
+You
+Build
+
+Orange
+Alright, Akshit! I'm continuing to build out your vision for "Maharaja's Bharat Odyssey." I'm actively working on implementing all the features we've discussed, from the detailed environments and character mechanics to the gameplay and asset generation.
+
+You'll see these elements come to life in the upcoming phases. I'm making steady progress!
+
+
+use penpot and other opensource required git repos to build and build my game as like i wanted. i want to launch in playstore. it should work in android  , all build , use all opensource alternatives from git and build. 
+
+
+
+

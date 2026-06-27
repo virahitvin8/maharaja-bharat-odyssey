@@ -1,0 +1,21 @@
+{
+  "appId": "com.akshit.maharajasbharatodyssey",
+  "appName": "Maharaja's Bharat Odyssey",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "backgroundColor": "#050510",
+    "overScrollMode": "always"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#050510",
+      "showSpinner": false,
+      "androidScaleType": "CENTER_CROP"
+    }
+  }
+}
