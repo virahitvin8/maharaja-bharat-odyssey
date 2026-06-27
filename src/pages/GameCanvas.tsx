@@ -231,10 +231,13 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
       
       if (progress >= 80 && loadingState === 'fetching') {
         setLoadingState('ready')
-        const currentPhase = useGameStore.getState().phase
-        if (currentPhase !== 'start') {
-          setPhase('playing')
-        }
+        // Use setTimeout to prevent React error #185 (state update during render)
+        setTimeout(() => {
+          const currentPhase = useGameStore.getState().phase
+          if (currentPhase !== 'start') {
+            setPhase('playing')
+          }
+        }, 0)
       }
     }
   }, [city.lat, city.lon, loadingState, setPhase])

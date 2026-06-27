@@ -66,8 +66,8 @@ export default function LandingPage({ onPlay }: LandingPageProps) {
       {/* ─── NAVBAR ─── */}
       <nav className="lp-nav">
         <div className="lp-nav-brand">
-          <img src={`${BASE}logo.svg`} alt="Mahabha" className="lp-nav-logo" />
-          <span>MAHABHA</span>
+          <img src={`${BASE}logo.svg`} alt="Rajyatra" className="lp-nav-logo" />
+          <span>RAJYATRA</span>
         </div>
         <div className="lp-nav-links">
           {NAV_ITEMS.map((item) => (
@@ -349,9 +349,9 @@ export default function LandingPage({ onPlay }: LandingPageProps) {
           <a href="#" onClick={(e) => { e.preventDefault(); alert('Terms of Service coming soon!') }} className="lp-footer-link">Terms</a>
           <a href="mailto:ashitvinay4636@gmail.com" className="lp-footer-link">Contact</a>
         </div>
-        <img src={`${BASE}logo.svg`} alt="Mahabha" className="lp-footer-logo" />
+        <img src={`${BASE}logo.svg`} alt="Rajyatra" className="lp-footer-logo" />
         <p className="lp-footer-text">
-          Maharaja's Bharat Odyssey is a passion project. All game content is fictional.
+          Rajyatra is a passion project. All game content is fictional.
           © 2026 Akshit Vinay. Built with Three.js, React, and Capacitor.
         </p>
       </footer>

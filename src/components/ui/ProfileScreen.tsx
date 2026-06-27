@@ -35,14 +35,14 @@ export function ProfileScreen() {
         textAlign: 'center', marginBottom: 10, zIndex: 2,
         textShadow: '0 4px 12px rgba(0,0,0,0.4)'
       }}>
-        🌟 MAHABHA 🌟
+        RAJYATRA
       </h1>
       
       <p style={{
         fontSize: 14, color: 'rgba(255,255,255,0.8)', marginBottom: 40,
         fontFamily: "'Nunito', sans-serif", zIndex: 2, textAlign: 'center', letterSpacing: 1
       }}>
-        🌍 India Adventure Game 🎮
+        The Royal Journey Begins
       </p>
 
       <form onSubmit={handleSubmit} style={{
