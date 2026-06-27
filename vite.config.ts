@@ -4,7 +4,7 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/maharaja-bharat-odyssey/',
+  base: process.env.GITHUB_PAGES === 'true' ? '/maharaja-bharat-odyssey/' : './',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

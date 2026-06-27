@@ -11,6 +11,12 @@ const config: CapacitorConfig = {
     allowMixedContent: true,
   },
   plugins: {
+    SplashScreen: {
+      launchShowDuration: 2000,
+      backgroundColor: '#050510',
+      showSpinner: false,
+      androidScaleType: 'CENTER_CROP',
+    },
     Keyboard: {
       resizeOnFullScreen: true,
     },
