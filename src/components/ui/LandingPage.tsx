@@ -59,7 +59,7 @@ export default function LandingPage({ onPlay }: LandingPageProps) {
     setMobileOpen(false)
   }, [])
 
-  const apkUrl = 'https://github.com/virahitvin8/maharaja-bharat-odyssey/releases/tag/v1.0'
+  const apkUrl = `${BASE}MaharajasBharatOdyssey-v1.0.apk`
 
   return (
     <div className="lp-wrapper">
@@ -243,7 +243,19 @@ export default function LandingPage({ onPlay }: LandingPageProps) {
             A spiritual action-adventure built from the ground up with Three.js, Rapier physics, and React.
           </p>
         </motion.div>
-        <div className="lp-features-grid">
+        <div 
+          className="lp-features-grid"
+          onMouseMove={(e) => {
+            const cards = document.querySelectorAll('.lp-feature-card') as NodeListOf<HTMLElement>;
+            cards.forEach(card => {
+              const rect = card.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              card.style.setProperty('--mouse-x', `${x}px`);
+              card.style.setProperty('--mouse-y', `${y}px`);
+            });
+          }}
+        >
           {[
             { icon: <MountainIcon size={22} color="#e2d5a3" />, title: 'Open World', desc: 'Six biomes spanning India — from the snowy Himalayas to the Kerala backwaters. Every region has unique architecture, wildlife, and secrets.' },
             { icon: <TempleIcon size={22} color="#e2d5a3" />, title: '20 Temples', desc: 'Each temple is a hand-crafted 3D model with a unique deity, superpower blessing, and ornament reward. Seek all 20.' },
