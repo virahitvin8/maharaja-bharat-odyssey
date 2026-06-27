@@ -189,12 +189,6 @@ function GameScene({ inputRef, osmData, temple }: {
         <MaharajaCharacter input={inputRef} />
       </Physics>
 
-      {/* Genshin Style Post-Processing */}
-      <EffectComposer disableNormalPass>
-        <Bloom luminanceThreshold={0.7} luminanceSmoothing={0.9} height={300} intensity={1.5} />
-        <Vignette eskil={false} offset={0.1} darkness={0.9} />
-      </EffectComposer>
-
       {/* Temple Sanctum overlay (rendered in world space near temple) */}
       {showSanctum && temple && templePosition && (
         <TempleSanctum 

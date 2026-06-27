@@ -2,7 +2,7 @@
 // Full immersive homepage with hero, character showcase, temples, features, news, footer
 import { useEffect, useRef, useState } from 'react'
 import { useGameStore } from '../../store/gameStore'
-import { POWERFUL_TEMPLES } from '../../data/powerfulTemples'
+import { POWERFUL_TEMPLES, TEMPLE_ERAS } from '../../data/powerfulTemples'
 import { getSuperpowerByTemple } from '../../data/superpowers'
 
 // ===================== TYPEWRITER HOOK =====================
@@ -91,7 +91,6 @@ function ParticleBackground() {
       for (const p of particles) {
         ctx!.beginPath()
         ctx!.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-        const color = p.hue === 35 ? '#FFD700' : p.hue === 220 ? '#87CEEB' : '#ffffff'
         ctx!.fillStyle = `rgba(255, 215, 0, ${p.alpha})`
         ctx!.fill()
 
@@ -618,6 +617,12 @@ function TempleShowcase() {
   const [scrollProgress, setScrollProgress] = useState(0)
   const sectionRef = useRef<HTMLDivElement>(null)
 
+  // Build temple ID -> era lookup from TEMPLE_ERAS
+  const templeEraMap = new Map<string, string>()
+  TEMPLE_ERAS.forEach(era => {
+    era.temples.forEach(id => templeEraMap.set(id, era.name))
+  })
+
   useEffect(() => {
     const onScroll = () => {
       if (sectionRef.current) {
@@ -632,14 +637,14 @@ function TempleShowcase() {
 
   const eras = [
     { id: 'all', label: 'All Temples' },
-    { id: 'ancient', label: 'Ancient (Pre-6th C)' },
-    { id: 'medieval', label: 'Early Medieval' },
-    { id: 'golden', label: 'Golden Age' },
+    { id: TEMPLE_ERAS[0].name, label: 'Ancient (Pre-6th C)' },
+    { id: TEMPLE_ERAS[1].name, label: 'Early Medieval' },
+    { id: TEMPLE_ERAS[2].name, label: 'Golden Age' },
   ]
 
   const filteredTemples = selectedEra === 'all'
     ? POWERFUL_TEMPLES
-    : POWERFUL_TEMPLES.filter(t => t.era === selectedEra)
+    : POWERFUL_TEMPLES.filter(t => templeEraMap.get(t.id) === selectedEra)
 
   return (
     <section id="temples" ref={sectionRef} style={{
@@ -746,7 +751,7 @@ function TempleShowcase() {
                 fontFamily: "'Inter', sans-serif", marginBottom: 10,
                 textTransform: 'uppercase', letterSpacing: 0.5,
               }}>
-                {temple.era}
+                {templeEraMap.get(temple.id) || 'Ancient'}
               </div>
 
               {/* Temple icon */}
@@ -782,7 +787,7 @@ function TempleShowcase() {
                 display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
               }}>
-                {temple.highlight}
+                {temple.highlights[0]}
               </p>
 
               {/* Superpower badge */}
@@ -794,7 +799,7 @@ function TempleShowcase() {
                   borderRadius: 8, marginTop: 'auto',
                   transition: 'all 0.3s',
                 }}>
-                  <span style={{ fontSize: 16 }}>{superpower.icon || '✨'}</span>
+                  <span style={{ fontSize: 16 }}>{superpower.emoji || '✨'}</span>
                   <span style={{
                     color: '#FFD700', fontSize: 11, fontWeight: 600,
                     fontFamily: "'Inter', sans-serif",
