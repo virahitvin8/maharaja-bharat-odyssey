@@ -88,8 +88,12 @@ export default function App() {
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: '#050510' }}>
-      {/* Landing Page — Genshin Impact-style website home */}
-      {phase === 'landing' && <LandingPage />}
+      {/* Landing Page — professional game website */}
+      {phase === 'landing' && <LandingPage onPlay={() => {
+        const s = useGameStore.getState()
+        if (!s.profile) s.setPhase('profile')
+        else s.setPhase('loading')
+      }} />}
       
       {/* Overlays */}
       {phase === 'profile'  && <AccountScreen />}

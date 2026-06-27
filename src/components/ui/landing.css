@@ -477,6 +477,11 @@
 }
 
 /* ---------- Mobile Responsive ---------- */
+/* Mobile menu toggle */
+.lp-mobile-toggle {
+  display: none !important;
+}
+
 @media (max-width: 768px) {
   .lp-nav {
     padding: 0 20px;
@@ -488,6 +493,14 @@
 
   .lp-nav-brand span {
     display: none;
+  }
+
+  .lp-mobile-toggle {
+    display: flex !important;
+  }
+
+  .lp-hero-title {
+    font-size: clamp(2rem, 10vw, 3rem);
   }
 
   .lp-hero-title {
