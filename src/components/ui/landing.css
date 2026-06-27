@@ -1,5 +1,5 @@
 /* ============================================
-   Landing Page — Professional Game Website
+   Landing Page — Genshin Impact-style Cinematic Design
    ============================================ */
 
 /* ---------- Design Tokens ---------- */
@@ -8,7 +8,7 @@
   --lp-surface: #111111;
   --lp-border: #1a1a1a;
   --lp-text: #e8e8e8;
-  --lp-muted: #666666;
+  --lp-muted: #888888;
   --lp-accent: #e2d5a3;
   --lp-accent-dim: rgba(226, 213, 163, 0.15);
   --lp-gold: #d4af37;
@@ -39,11 +39,15 @@
   justify-content: space-between;
   padding: 0 32px;
   z-index: 1000;
-  background: rgba(10, 10, 10, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(10, 10, 10, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   transition: background 0.3s ease;
+}
+
+.lp-nav:hover {
+  background: rgba(10, 10, 10, 0.7);
 }
 
 .lp-nav-brand {
@@ -53,15 +57,16 @@
   font-family: var(--lp-font-display);
   font-weight: 700;
   font-size: 14px;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
   color: #fff;
 }
 
 .lp-nav-logo {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
+  border: 1px solid rgba(212, 175, 55, 0.3);
 }
 
 .lp-nav-links {
@@ -107,7 +112,7 @@
   border: none;
   border-radius: 100px;
   cursor: pointer;
-  transition: all 0.2s var(--lp-ease);
+  transition: all 0.25s var(--lp-ease);
   text-decoration: none;
   letter-spacing: 0.3px;
 }
@@ -119,30 +124,32 @@
 
 .lp-btn-primary:hover {
   transform: scale(1.03);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
 }
 
 .lp-btn-outline {
-  background: transparent;
-  color: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .lp-btn-outline:hover {
   border-color: rgba(255, 255, 255, 0.4);
   color: #fff;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.03);
 }
 
 .lp-btn-gold {
-  background: var(--lp-gold);
+  background: linear-gradient(135deg, #d4af37, #f0c040);
   color: #000;
   font-weight: 700;
-  box-shadow: 0 0 24px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 0 24px rgba(212, 175, 55, 0.25);
 }
 
 .lp-btn-gold:hover {
   transform: scale(1.04);
-  box-shadow: 0 0 32px rgba(212, 175, 55, 0.5);
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
 }
 
 .lp-btn-large {
@@ -150,11 +157,12 @@
   font-size: 15px;
 }
 
-/* ---------- Hero ---------- */
+/* ---------- Hero (Genshin-style cinematic) ---------- */
 .lp-hero {
   position: relative;
   width: 100%;
   height: 100vh;
+  min-height: 600px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -163,21 +171,19 @@
 
 .lp-hero-bg {
   position: absolute;
-  inset: 0;
+  inset: -5%;
   background-size: cover;
   background-position: center center;
   will-change: transform;
+  filter: brightness(0.55) saturate(1.2);
 }
 
 .lp-hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to top,
-    var(--lp-bg) 0%,
-    transparent 50%,
-    rgba(0, 0, 0, 0.4) 100%
-  );
+  background:
+    linear-gradient(to top, var(--lp-bg) 0%, rgba(10, 10, 10, 0.4) 35%, rgba(10, 10, 10, 0.3) 60%, rgba(0, 0, 0, 0.5) 100%),
+    radial-gradient(ellipse at center bottom, rgba(212, 175, 55, 0.06) 0%, transparent 60%);
 }
 
 .lp-hero-content {
@@ -188,37 +194,38 @@
   align-items: center;
   text-align: center;
   padding: 0 24px;
-  max-width: 720px;
+  max-width: 780px;
   margin-top: 40px;
 }
 
 .lp-hero-eyebrow {
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 3px;
+  letter-spacing: 4px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.3);
-  margin-bottom: 16px;
+  color: var(--lp-accent);
+  margin-bottom: 20px;
   font-family: var(--lp-font-body);
+  opacity: 0.7;
 }
 
 .lp-hero-title {
   font-family: var(--lp-font-display);
-  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
   font-weight: 900;
   line-height: 1.05;
   color: #fff;
-  margin-bottom: 20px;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  margin-bottom: 24px;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.7);
 }
 
 .lp-hero-subtitle {
   font-size: clamp(0.9rem, 1.3vw, 1.1rem);
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.55);
-  max-width: 520px;
-  line-height: 1.6;
-  margin-bottom: 40px;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 540px;
+  line-height: 1.7;
+  margin-bottom: 44px;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
 }
 
@@ -232,21 +239,21 @@
 /* Scroll indicator */
 .lp-scroll {
   position: absolute;
-  bottom: 32px;
+  bottom: 36px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  opacity: 0.4;
+  opacity: 0.35;
 }
 
 .lp-scroll-label {
   font-size: 10px;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .lp-scroll-line {
@@ -257,7 +264,7 @@
 }
 
 @keyframes lp-scroll-bounce {
-  0%, 100% { transform: scaleY(0.6); opacity: 0.4; }
+  0%, 100% { transform: scaleY(0.6); opacity: 0.3; }
   50% { transform: scaleY(1); opacity: 1; }
 }
 
@@ -298,7 +305,7 @@
   margin-top: 12px;
 }
 
-/* ---------- News Section ---------- */
+/* ---------- News Section (Genshin-style cards with images) ---------- */
 .lp-news-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -307,24 +314,36 @@
 
 .lp-news-card {
   background: var(--lp-surface);
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   border: 1px solid var(--lp-border);
   cursor: pointer;
-  transition: transform 0.35s var(--lp-ease), box-shadow 0.35s var(--lp-ease);
+  transition: transform 0.4s var(--lp-ease), box-shadow 0.4s var(--lp-ease), border-color 0.3s ease;
 }
 
 .lp-news-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  border-color: rgba(226, 213, 163, 0.15);
+}
+
+.lp-news-card-image-wrap {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  position: relative;
 }
 
 .lp-news-card-image {
   width: 100%;
-  height: 180px;
+  height: 100%;
   object-fit: cover;
   display: block;
-  background: #181818;
+  transition: transform 0.5s var(--lp-ease);
+}
+
+.lp-news-card:hover .lp-news-card-image {
+  transform: scale(1.06);
 }
 
 .lp-news-card-body {
@@ -366,26 +385,27 @@
 .lp-feature-card {
   padding: 28px 24px;
   background: var(--lp-surface);
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid var(--lp-border);
-  transition: border-color 0.25s ease, background 0.25s ease;
+  transition: border-color 0.25s ease, background 0.25s ease, transform 0.3s var(--lp-ease);
 }
 
 .lp-feature-card:hover {
   border-color: rgba(226, 213, 163, 0.2);
   background: rgba(17, 17, 17, 0.8);
+  transform: translateY(-4px);
 }
 
 .lp-feature-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
   margin-bottom: 16px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(226, 213, 163, 0.08);
+  border: 1px solid rgba(226, 213, 163, 0.12);
 }
 
 .lp-feature-title {
@@ -398,12 +418,87 @@
 .lp-feature-desc {
   font-size: 13px;
   color: var(--lp-muted);
-  line-height: 1.5;
+  line-height: 1.6;
+}
+
+/* ---------- Screenshots Gallery ---------- */
+.lp-screenshots {
+  padding: 80px 32px 100px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.lp-screenshots-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.lp-screenshots-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 16px;
+}
+
+.lp-screenshot-card {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--lp-border);
+  cursor: pointer;
+  transition: transform 0.4s var(--lp-ease), box-shadow 0.4s var(--lp-ease);
+  aspect-ratio: 16 / 9;
+}
+
+.lp-screenshot-card:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+  aspect-ratio: auto;
+}
+
+.lp-screenshot-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.lp-screenshot-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s var(--lp-ease);
+}
+
+.lp-screenshot-card:hover img {
+  transform: scale(1.06);
+}
+
+.lp-screenshot-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, transparent 50%);
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.lp-screenshot-card:hover .lp-screenshot-overlay {
+  opacity: 1;
+}
+
+.lp-screenshot-label {
+  font-family: var(--lp-font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.5px;
 }
 
 /* ---------- Download Section ---------- */
 .lp-download-section {
-  background: linear-gradient(180deg, var(--lp-bg) 0%, rgba(212, 175, 55, 0.03) 50%, var(--lp-bg) 100%);
+  background: linear-gradient(180deg, var(--lp-bg) 0%, rgba(212, 175, 55, 0.04) 50%, var(--lp-bg) 100%);
   padding: 100px 32px;
   text-align: center;
   border-top: 1px solid var(--lp-border);
@@ -477,7 +572,6 @@
 }
 
 /* ---------- Mobile Responsive ---------- */
-/* Mobile menu toggle */
 .lp-mobile-toggle {
   display: none !important;
 }
@@ -503,10 +597,6 @@
     font-size: clamp(2rem, 10vw, 3rem);
   }
 
-  .lp-hero-title {
-    font-size: clamp(2rem, 10vw, 3rem);
-  }
-
   .lp-section {
     padding: 60px 20px;
   }
@@ -517,6 +607,20 @@
 
   .lp-features-grid {
     grid-template-columns: 1fr;
+  }
+
+  .lp-screenshots {
+    padding: 60px 20px;
+  }
+
+  .lp-screenshots-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-screenshot-card:first-child {
+    grid-column: span 1;
+    grid-row: span 1;
+    aspect-ratio: 16 / 9;
   }
 
   .lp-download-section {

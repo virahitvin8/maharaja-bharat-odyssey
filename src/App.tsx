@@ -23,6 +23,11 @@ export default function App() {
   const [selectedCity, setSelectedCity] = useState<IndianLocation>(INDIAN_CITIES[0])
   const [selectedTemple, setSelectedTemple] = useState<PowerfulTemple | null>(null)
 
+  // Force landing page on initial load (override persisted state)
+  useEffect(() => {
+    setPhase('landing')
+  }, [setPhase])
+
   // Simulate loading progress if phase is loading (bypass if coming from profile)
   useEffect(() => {
     if (phase !== 'loading') return

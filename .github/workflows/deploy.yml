@@ -31,7 +31,9 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
       - name: Build
-        run: npx vite build --base=/maharaja-bharat-odyssey/
+        run: npx vite build
+      - name: Copy APK to dist for download
+        run: cp MaharajasBharatOdyssey-v1.0.apk dist/ 2>/dev/null || echo 'No APK file found, skipping'
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

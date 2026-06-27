@@ -1,6 +1,11 @@
 // UI Screens — Loading, Start, Pause, GameOver, HUD, Touch Controls
 import { useEffect, useState } from 'react'
 import { useGameStore } from '../../store/gameStore'
+import {
+  CrownIcon, MapIcon, PauseIcon, PlayIcon, SkullIcon, StarIcon,
+  HeartIcon, SwordIcon, BackpackIcon, GearIcon, CoinIcon, GemIcon,
+  LightningIcon, MoonIcon, SunIcon, VillageIcon
+} from './Icons'
 
 // ============== LOADING SCREEN ==============
 export function LoadingScreen() {
@@ -12,7 +17,7 @@ export function LoadingScreen() {
       background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a30 50%, #0a0a1a 100%)',
       color: '#fff', fontFamily: "'Cinzel', serif",
     }}>
-      <div style={{ fontSize: 60, marginBottom: 24, animation: 'float 3s ease-in-out infinite' }}>👑</div>
+      <div style={{ marginBottom: 24, animation: 'float 3s ease-in-out infinite' }}><CrownIcon size={60} color="#FFD700" /></div>
       <h1 style={{
         fontSize: 'clamp(1.5rem, 5vw, 3rem)', fontWeight: 900,
         background: 'linear-gradient(135deg, #FF9933, #FFD700, #FF9933)',
@@ -77,7 +82,7 @@ export function StartScreen({ onExplore }: { onExplore: () => void }) {
           fontSize: 'clamp(1rem, 2vw, 1.2rem)', color: '#FFD700',
           margin: 0, fontFamily: "'Inter', sans-serif", letterSpacing: 1,
         }}>
-          🏃 Walk up and jump into the painting to begin!
+          Walk up and jump into the painting to begin!
         </p>
       </div>
     </div>
@@ -98,7 +103,7 @@ export function PauseMenu() {
       <div className="glass-panel" style={{
         padding: '36px 44px', textAlign: 'center', maxWidth: 380, width: '90%',
       }}>
-        <div style={{ fontSize: 36, marginBottom: 12 }}>⏸️</div>
+        <div style={{ marginBottom: 12 }}><PauseIcon size={36} color="#FF9933" /></div>
         <h2 style={{ fontSize: 22, color: '#FF9933', marginBottom: 20, fontWeight: 700 }}>
           Paused
         </h2>
@@ -128,7 +133,7 @@ export function PauseMenu() {
             }}
             onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,153,51,0.15)' }}
             onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,153,51,0.05)' }}>
-            🗺️ India Map
+            India Map
           </button>
           <button onClick={() => { setPhase('start') }}
             style={{
@@ -162,7 +167,7 @@ export function GameOverScreen() {
       <div className="glass-panel" style={{
         padding: '36px 44px', textAlign: 'center', maxWidth: 380, width: '90%',
       }}>
-        <div style={{ fontSize: 40, marginBottom: 8 }}>💀</div>
+        <div style={{ marginBottom: 8 }}><SkullIcon size={40} color="#e63946" /></div>
         <h2 style={{ fontSize: 24, color: '#e63946', marginBottom: 8, fontWeight: 700 }}>
           {playerName}'s Journey Ends
         </h2>
@@ -282,13 +287,13 @@ export function GameHUD({ currentCity }: { currentCity?: string }) {
           border: '1px solid rgba(255,255,255,0.1)', pointerEvents: 'auto'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#e2d5a3', fontSize: 13, fontWeight: 600 }}>
-            <span style={{ fontSize: 16 }}>🪙</span> {coins}
+            <CoinIcon size={16} color="#FFD700" /> {coins}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#e2d5a3', fontSize: 13, fontWeight: 600 }}>
-            <span style={{ fontSize: 16 }}>💎</span> {gems.diamond + gems.ruby + gems.emerald + gems.sapphire}
+            <GemIcon size={16} color="#a8dadc" /> {gems.diamond + gems.ruby + gems.emerald + gems.sapphire}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#e2d5a3', fontSize: 13, fontWeight: 600 }}>
-            <span style={{ fontSize: 16 }}>✨</span> {useGameStore.getState().inventory.ornaments || 0}
+            <StarIcon size={16} color="#FFD700" /> {useGameStore.getState().inventory.ornaments || 0}
           </div>
         </div>
       </div>
@@ -345,7 +350,7 @@ export function GameHUD({ currentCity }: { currentCity?: string }) {
             cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.3)', color: '#fff'
           }}
         >
-          🎒
+          <BackpackIcon size={20} color="#fff" />
         </div>
         
         {showMenu && (
@@ -357,9 +362,9 @@ export function GameHUD({ currentCity }: { currentCity?: string }) {
             boxShadow: '0 5px 20px rgba(0,0,0,0.5)', color: '#fff', fontSize: 13
           }}>
             <div style={{ color: '#FFD700', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 5 }}>Inventory</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>🪵 Wood</span> <span>{inventory.wood}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>🪨 Stone</span> <span>{inventory.stone}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>🍎 Food</span> <span>{inventory.food}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Wood</span> <span>{inventory.wood}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Stone</span> <span>{inventory.stone}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Food</span> <span>{inventory.food}</span></div>
           </div>
         )}
       </div>
@@ -371,11 +376,11 @@ export function GameHUD({ currentCity }: { currentCity?: string }) {
         border: '1px solid rgba(255,153,51,0.2)', borderRadius: 8, pointerEvents: 'auto',
         fontSize: 11, textAlign: 'right',
       }}>
-        <span style={{ color: isNight ? '#aaccff' : '#FFD700', fontWeight: 600, fontFamily: "'Cinzel', serif" }}>
-          🏛️ {currentCity || 'India'}
+        <span style={{ color: isNight ? '#aaccff' : '#FFD700', fontWeight: 600, fontFamily: "'Cinzel', serif", display: 'flex', alignItems: 'center', gap: 6 }}>
+          <VillageIcon size={14} color={isNight ? '#aaccff' : '#FFD700'} /> {currentCity || 'India'}
         </span>
-        <span style={{ color: '#888', display: 'block', fontSize: 10, marginTop: 2 }}>
-          {timeStr} {isNight ? '🌙' : '☀️'}
+        <span style={{ color: '#888', display: 'block', fontSize: 10, marginTop: 2, display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+          {timeStr} {isNight ? <MoonIcon size={10} color="#aaccff" /> : <SunIcon size={10} color="#FFD700" />}
         </span>
       </div>
 
@@ -413,7 +418,7 @@ export function GameHUD({ currentCity }: { currentCity?: string }) {
           fontFamily: "'Cinzel', serif",
         }}>
           <div className="glass-panel" style={{ padding: '32px 40px', textAlign: 'center', maxWidth: 360, width: '90%' }}>
-            <h2 style={{ fontSize: 20, color: '#FF9933', marginBottom: 16, fontWeight: 700 }}>⚙️ Menu</h2>
+            <h2 style={{ fontSize: 20, color: '#FF9933', marginBottom: 16, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}><GearIcon size={18} color="#FF9933" /> Menu</h2>
             <button onClick={() => setShowMenu(false)}
               style={{
                 display: 'block', width: '100%', padding: '10px 0', marginBottom: 8,
@@ -511,7 +516,7 @@ export function TouchControls({
         }}
           onTouchStart={e => { e.preventDefault(); setAttack(true) }}
           onTouchEnd={e => { e.preventDefault(); setAttack(false) }}>
-          ⚔️
+          <SwordIcon size={18} color="#e63946" />
         </button>
       </div>
     </div>

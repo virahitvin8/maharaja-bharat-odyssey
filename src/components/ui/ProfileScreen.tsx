@@ -17,7 +17,7 @@ export function ProfileScreen() {
     <div style={{
       position: 'fixed', inset: 0, zIndex: 100,
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      background: 'url(/logo.png) no-repeat center center / cover',
+      background: 'url(./logo.png) no-repeat center center / cover',
       backgroundColor: '#f5f7fa',
       color: '#333', fontFamily: "'Noto Serif', serif",
       overflow: 'hidden',
