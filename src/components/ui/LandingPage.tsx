@@ -59,7 +59,7 @@ export default function LandingPage({ onPlay }: LandingPageProps) {
     setMobileOpen(false)
   }, [])
 
-  const apkUrl = `${BASE}MaharajasBharatOdyssey-v1.0.apk`
+  const apkUrl = 'https://github.com/virahitvin8/maharaja-bharat-odyssey/releases/tag/v1.0'
 
   return (
     <div className="lp-wrapper">
