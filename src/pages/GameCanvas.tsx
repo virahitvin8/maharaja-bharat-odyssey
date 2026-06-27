@@ -9,6 +9,9 @@ import { Collectibles } from '../components/3d/Collectibles'
 import { useInput } from '../hooks/useInput'
 import { useGameStore } from '../store/gameStore'
 import { initializeTileManager, getMergedTileData, getLoadProgress, setTileCallback } from '../services/TileManager'
+import { getMapData } from '../services/osmData'
+import { MAP_ORIGIN } from '../utils/projection'
+import { EffectComposer, N8AO, Bloom, SMAA, Vignette, ToneMapping } from '@react-three/postprocessing'
 import type { IndianLocation } from '../data/indianCities'
 import type { Tile } from '../services/TileManager'
 import type { OSMData } from '../services/osmData'
@@ -34,13 +37,41 @@ function CanvasLoader({ progress, message }: { progress: number; message: string
   )
 }
 
-// Scene component — renders all 3D content
+// Scene component — renders all 3D content with cinematic post-processing
 function GameScene({ inputRef, osmData }: {
   inputRef: React.MutableRefObject<any>
   osmData: OSMData | null
 }) {
   return (
     <>
+      <EffectComposer multisampling={4} autoClear={false}>
+        {/* Screen Space Ambient Occlusion — realistic contact shadows */}
+        <N8AO 
+          aoRadius={1.5}
+          intensity={2.5}
+          distanceFalloff={0.8}
+          screenSpaceRadius={true}
+          color="rgba(0, 0, 0, 0.35)"
+        />
+        {/* Bloom — subtle glow on lights and emissive surfaces */}
+        <Bloom 
+          luminanceThreshold={0.6}
+          luminanceSmoothing={0.08}
+          intensity={0.8}
+          mipmapBlur={true}
+        />
+        {/* Temporal Anti-Aliasing + Morphological Anti-Aliasing */}
+        <SMAA />
+        {/* Cinematic vignette */}
+        <Vignette 
+          offset={0.3}
+          darkness={0.5}
+          eskil={false}
+        />
+        {/* ACES Filmic Tone Mapping */}
+        <ToneMapping adaptive={true} resolution={256} middleGrey={0.6} />
+      </EffectComposer>
+
       <DynamicSky />
       <Physics gravity={[0, -30, 0]} debug={false}>
         <DynamicWorld data={osmData} />
@@ -163,16 +194,17 @@ export function GameCanvas({ city }: GameCanvasProps) {
         gl={{
           antialias: true,
           toneMapping: 3,
-          toneMappingExposure: 1.2,
+          toneMappingExposure: 1.0,
+          outputColorSpace: 'srgb-linear',
         }}
         dpr={[1, 1.5]}
         onCreated={({ gl }) => {
           gl.setClearColor('#0a0a1a')
           gl.toneMapping = 3
-          gl.toneMappingExposure = 1.2
+          gl.toneMappingExposure = 1.0
         }}
       >
-        <GameScene inputRef={input} osmData={mergedData} />
+        <GameScene inputRef={input} osmData={osmData} />
       </Canvas>
 
       {/* HUD overlay */}

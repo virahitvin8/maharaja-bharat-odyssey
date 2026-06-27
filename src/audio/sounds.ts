@@ -78,10 +78,12 @@ export function playGameOverSound() {
 }
 
 // Genshin-style Ambient Music Generator
-const biomeAmbientNodes: { osc1: OscillatorNode; osc2: OscillatorNode; gain: GainNode; interval?: NodeJS.Timeout } | null = null
+type TimerId = ReturnType<typeof setInterval>
+
+const biomeAmbientNodes: { osc1: OscillatorNode; osc2: OscillatorNode; gain: GainNode; interval?: TimerId } | null = null
 
 export function useBiomeAmbient() {
-  const ambientRef = useRef<{ osc1: OscillatorNode; osc2: OscillatorNode; gain: GainNode; interval?: NodeJS.Timeout } | null>(null)
+  const ambientRef = useRef<{ osc1: OscillatorNode; osc2: OscillatorNode; gain: GainNode; interval?: TimerId } | null>(null)
 
   const setBiomeAmbient = useCallback((biome: BiomeType) => {
     try {
