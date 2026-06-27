@@ -1,5 +1,9 @@
-// Zustand game state store — single source of truth for all game data
+// Zustand game state store — complete game state with accounts, superpowers, ornaments
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+import type { Superpower } from '../data/superpowers'
+import type { Ornament } from '../data/ornaments'
+import type { Mission, MissionProgress } from '../data/missions'
 
 export type BiomeType = 'rajasthan' | 'himalaya' | 'kerala' | 'deccan' | 'gangetic' | 'coastal'
 
@@ -23,13 +27,23 @@ export interface Inventory {
   wood: number
   stone: number
   food: number
+  ornaments: number
+}
+
+export interface PlayerProfile {
+  name: string
+  age: number
 }
 
 export interface GameState {
   // Core game flow
-  phase: 'loading' | 'start' | 'map' | 'playing' | 'paused' | 'gameover'
+  phase: 'profile' | 'loading' | 'start' | 'map' | 'playing' | 'paused' | 'gameover'
   loadingProgress: number
 
+  // Player Profile & Progress
+  profile: PlayerProfile | null
+  blessings: string[]
+  
   // Survival Mechanics
   health: number
   maxHealth: number
@@ -59,7 +73,7 @@ export interface GameState {
   weather: 'clear' | 'rain' | 'sandstorm' | 'snow' | 'fog'
 
   // Notifications
-  notification: { message: string; type: 'collect' | 'landmark' | 'life' | 'region' } | null
+  notification: { message: string; type: 'collect' | 'landmark' | 'life' | 'region' | 'blessing' | 'mission' | 'ornament' | 'superpower' } | null
 
   // Actions
   setPhase: (phase: GameState['phase']) => void
@@ -77,6 +91,9 @@ export interface GameState {
   
   setPlayerPos: (pos: [number, number, number]) => void
   setIsAttacking: (attacking: boolean) => void
+
+  setProfile: (profile: PlayerProfile) => void
+  addBlessing: (blessing: string) => void
 
   setStamina: (s: number | ((prev: number) => number)) => void
   addLife: () => void
@@ -152,18 +169,24 @@ const INITIAL_LANDMARKS: Landmark[] = [
   { id: 'ajanta',       name: 'Ajanta Caves',         description: 'Ancient Buddhist rock-cut cave monuments.',               position: [-15, 5, 20],  biome: 'deccan',    discovered: false },
 ]
 
-export const useGameStore = create<GameState>((set, get) => ({
-  phase: 'loading',
-  loadingProgress: 0,
-  health: 100,
-  maxHealth: 100,
-  stamina: 100,
-  maxStamina: 100,
-  inventory: { wood: 0, stone: 0, food: 0 },
-  equippedWeapon: null,
-  playerPos: [0, 0, 0],
-  isAttacking: false,
-  lives: 3,
+export const useGameStore = create<GameState>()(
+  persist(
+    (set, get) => ({
+      phase: 'loading',
+      loadingProgress: 0,
+      
+      profile: null,
+      blessings: [],
+      
+      health: 100,
+      maxHealth: 100,
+      stamina: 100,
+      maxStamina: 100,
+      inventory: { wood: 0, stone: 0, food: 0, ornaments: 0 },
+      equippedWeapon: null,
+      playerPos: [0, 0, 0],
+      isAttacking: false,
+      lives: 3,
   coins: 0,
   gems: { ruby: 0, diamond: 0, emerald: 0, sapphire: 0 },
   lotus: 0,
@@ -248,10 +271,30 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   setTimeOfDay: (timeOfDay) => set({ timeOfDay }),
   setWeather: (weather) => set({ weather }),
-
-  showNotification: (message, type) => set({ notification: { message, type } }),
+  showNotification: (msg, type) =>
+    set({ notification: { message: msg, type } }),
   clearNotification: () => set({ notification: null }),
-
   addScore: (n) => set((s) => ({ score: s.score + n })),
-  setCity: (city) => set({ currentCity: city }),
-}))
+  
+  setProfile: (profile) => set({ profile, phase: 'start' }),
+  addBlessing: (blessing) => set(s => ({
+    blessings: s.blessings.includes(blessing) ? s.blessings : [...s.blessings, blessing]
+  })),
+    }),
+    {
+      name: 'maharaja-game-storage',
+      partialize: (state) => ({ 
+        profile: state.profile, 
+        blessings: state.blessings, 
+        inventory: state.inventory,
+        gems: state.gems,
+        coins: state.coins,
+        score: state.score,
+        health: state.health,
+        maxHealth: state.maxHealth,
+        stamina: state.stamina,
+        maxStamina: state.maxStamina
+      }),
+    }
+  )
+)

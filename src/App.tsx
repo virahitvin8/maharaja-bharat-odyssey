@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react'
 import { useGameStore } from './store/gameStore'
 import { LoadingScreen, StartScreen, PauseMenu, GameOverScreen } from './components/ui/Screens'
+import { AccountScreen } from './components/ui/AccountScreen'
+
 import { IndiaMapScreen } from './components/ui/IndiaMapScreen'
 import { GameCanvas } from './pages/GameCanvas'
 import type { IndianLocation } from './data/indianCities'
@@ -13,12 +15,14 @@ export default function App() {
   const phase = useGameStore(s => s.phase)
   const setLoadingProgress = useGameStore(s => s.setLoadingProgress)
   const setPhase = useGameStore(s => s.setPhase)
+  const profile = useGameStore(s => s.profile)
+  const hasAccount = profile !== null
   
   // Track the selected destination (city or temple)
   const [selectedCity, setSelectedCity] = useState<IndianLocation>(INDIAN_CITIES[0])
   const [selectedTemple, setSelectedTemple] = useState<PowerfulTemple | null>(null)
 
-  // Simulate loading progress
+  // Simulate loading progress if phase is loading (bypass if coming from profile)
   useEffect(() => {
     if (phase !== 'loading') return
     let p = 0
@@ -28,7 +32,14 @@ export default function App() {
       setLoadingProgress(clamped)
       if (p >= 100) {
         clearInterval(interval)
-        setTimeout(() => setPhase('start'), 600)
+        setTimeout(() => {
+          const s = useGameStore.getState()
+          if (!s.profile) {
+            setPhase('profile')
+          } else {
+            setPhase('start')
+          }
+        }, 600)
       }
     }, 120)
     return () => clearInterval(interval)
@@ -76,6 +87,7 @@ export default function App() {
     <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: '#050510' }}>
       {/* Overlays */}
       {/* Overlays */}
+      {phase === 'profile'  && <AccountScreen />}
       {phase === 'loading'  && <LoadingScreen />}
       {phase === 'start'    && <StartScreen onExplore={() => {}} />}
       {phase === 'gameover' && <GameOverScreen />}

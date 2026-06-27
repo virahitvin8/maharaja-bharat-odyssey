@@ -183,6 +183,11 @@ export function MaharajaCharacter({ input }: MaharajaProps) {
 
   // Use getState() in useFrame for actions that don't need reactivity
   const storeRef = useGameStore
+  
+  // Calculate scale based on age
+  const profile = useGameStore(s => s.profile)
+  const scale = profile ? Math.min(1, Math.max(0.5, profile.age / 18)) : 1
+
   const lastBiomeRef = useRef<string>('gangetic')
 
   // Camera offset
@@ -336,8 +341,8 @@ export function MaharajaCharacter({ input }: MaharajaProps) {
       angularDamping={1}
       colliders={false}
     >
-      <CapsuleCollider args={[0.45, 0.3]} />
-      <group ref={meshGroupRef}>
+      <CapsuleCollider args={[0.45 * scale, 0.3 * scale]} />
+      <group ref={meshGroupRef} scale={scale}>
         <MaharajaMesh
           isMoving={isMoving.current}
           isAttacking={isAttacking.current}

@@ -201,6 +201,26 @@ export const INDIAN_CITIES: IndianLocation[] = [
     emoji: '🐚',
     highlights: ['Jagannath Temple', 'Puri Beach', 'Konark Sun Temple', 'Chilika Lake'],
   },
+  {
+    id: 'vrindavan',
+    name: 'Vrindavan',
+    state: 'Uttar Pradesh',
+    lat: 27.5796,
+    lon: 77.6987,
+    description: 'The sacred city of Lord Krishna\'s childhood, filled with divine flute melodies.',
+    emoji: '🪈',
+    highlights: ['Banke Bihari Temple', 'Prem Mandir', 'Radha Raman Temple', 'Yamuna River'],
+  },
+  {
+    id: 'dwarka',
+    name: 'Dwarka',
+    state: 'Gujarat',
+    lat: 22.2442,
+    lon: 68.9685,
+    description: 'The legendary golden city of Lord Krishna, submerged and eternal.',
+    emoji: '🌊',
+    highlights: ['Dwarkadhish Temple', 'Gomti Ghat', 'Bet Dwarka', 'Rukmini Devi Temple'],
+  },
 ]
 
 // Northern, Central, Southern, Eastern, Western regions for map grouping
@@ -208,8 +228,8 @@ export const INDIA_REGIONS = [
   { name: 'North India', cities: ['delhi', 'jaipur', 'amritsar', 'rishikesh', 'leh', 'agra'] },
   { name: 'South India', cities: ['chennai', 'bengaluru', 'hyderabad', 'mysore', 'madurai', 'hampi'] },
   { name: 'East India', cities: ['kolkata', 'purii', 'guwahati'] },
-  { name: 'West India', cities: ['mumbai', 'goa', 'khajuraho'] },
-  { name: 'Holy Cities', cities: ['varanasi', 'rishikesh', 'amritsar', 'madurai', 'khajuraho'] },
+  { name: 'West India', cities: ['mumbai', 'goa', 'khajuraho', 'dwarka'] },
+  { name: 'Holy Cities', cities: ['varanasi', 'rishikesh', 'amritsar', 'madurai', 'khajuraho', 'vrindavan'] },
 ]
 
 // Get city by ID

@@ -21,6 +21,9 @@ import type { Tile } from '../services/TileManager'
 import type { OSMData } from '../services/osmData'
 import { IntroRoom } from '../components/3d/IntroRoom'
 import { GameHUD, TouchControls } from '../components/ui/Screens'
+import { TempleSanctum } from '../components/3d/TempleSanctum'
+import { CuttableTree, FruitTree, Wildlife, HostileAnimal, PickupStone, RaftCrafting, TreeHouse, ClimbableWall, SwimmableWater } from '../components/3d/Exploration'
+import { KrishnaFlute, BrindhavanGrove, DwarakaGate, KrishnaStatue, LotusPond, FluteNotesParticles } from '../components/3d/KrishnaElements'
 
 // Loading overlay
 function CanvasLoader({ progress, message }: { progress: number; message: string }) {
@@ -49,65 +52,129 @@ function GameScene({ inputRef, osmData, temple }: {
   temple?: PowerfulTemple | null
 }) {
   const phase = useGameStore(s => s.phase)
+  const profile = useGameStore(s => s.profile)
+  const playerName = profile?.name || 'Maharaja'
+  const [showSanctum, setShowSanctum] = useState(false)
+
+  // Temple position for sanctum
+  const templePosition = temple ? (() => {
+    const [tx, tz] = latLonToLocalWorld(temple.lat, temple.lon)
+    return [tx, 0, tz] as [number, number, number]
+  })() : null
 
   return (
     <>
       <EffectComposer multisampling={4} autoClear={false}>
-        {/* Screen Space Ambient Occlusion — realistic contact shadows */}
-        <N8AO 
-          aoRadius={1.5}
-          intensity={2.5}
-          distanceFalloff={0.8}
-          screenSpaceRadius={true}
-          color="rgba(0, 0, 0, 0.35)"
-        />
-        {/* Bloom — subtle glow on lights and emissive surfaces */}
-        <Bloom 
-          luminanceThreshold={0.6}
-          luminanceSmoothing={0.08}
-          intensity={0.8}
-          mipmapBlur={true}
-        />
-        {/* Temporal Anti-Aliasing + Morphological Anti-Aliasing */}
+        <N8AO aoRadius={1.5} intensity={2.5} distanceFalloff={0.8} screenSpaceRadius={true} color="rgba(0, 0, 0, 0.35)" />
+        <Bloom luminanceThreshold={0.6} luminanceSmoothing={0.08} intensity={0.8} mipmapBlur={true} />
         <SMAA />
-        {/* Cinematic vignette */}
-        <Vignette 
-          offset={0.3}
-          darkness={0.5}
-          eskil={false}
-        />
-        {/* ACES Filmic Tone Mapping */}
+        <Vignette offset={0.3} darkness={0.5} eskil={false} />
         <ToneMapping adaptive={true} resolution={256} middleGrey={0.6} />
       </EffectComposer>
 
-      {/* @takram photorealistic atmosphere with Rayleigh scattering */}
+      {/* @takram photorealistic atmosphere */}
       <Atmosphere date={Date.now()}>
         <TakramSky />
         <SunLight color="#fff5e0" />
       </Atmosphere>
 
-      {/* DynamicSky provides weather effects (clouds, rain, snow, sandstorm) + time sync */}
+      {/* DynamicSky — weather effects + time sync */}
       <DynamicSky />
+
+      {/* Krishna flute ambient music particles */}
+      <FluteNotesParticles count={30} />
+
       <Physics gravity={[0, -30, 0]} debug={false}>
         {phase === 'start' ? (
           <IntroRoom />
         ) : (
           <>
             <DynamicWorld data={osmData} />
-            {/* Render powerful temple 3D model at its real GPS location */}
-            {temple && (() => {
-              const [tx, tz] = latLonToLocalWorld(temple.lat, temple.lon)
-              return (
-                <group position={[tx, 0, tz]}>
-                  <PowerfulTempleModel temple={temple} scale={1.5} />
-                </group>
-              )
-            })()}
+
+            {/* Krishna Flute near temple */}
+            {templePosition && (
+              <KrishnaFlute position={[templePosition[0] + 3, 3, templePosition[2] + 3]} />
+            )}
+
+            {/* Brindhavan Grove near temple */}
+            {templePosition && (
+              <BrindhavanGrove position={[templePosition[0] - 4, 0, templePosition[2] - 4]} scale={0.8} />
+            )}
+
+            {/* Lotus Pond near temple */}
+            {templePosition && (
+              <LotusPond position={[templePosition[0] + 5, 0, templePosition[2] - 3]} size={4} />
+            )}
+
+            {/* Dwaraka Gate at key locations */}
+            <DwarakaGate position={[-20, 0, -30]} scale={0.5} />
+
+            {/* Krishna statue in temple courtyard */}
+            {templePosition && (
+              <KrishnaStatue position={[templePosition[0] + 2, 0, templePosition[2] + 2]} />
+            )}
+
+            {/* Cuttable trees for resource gathering */}
+            <CuttableTree position={[5, 0, 5]} scale={1} treeId="tree_1" />
+            <CuttableTree position={[-5, 0, 8]} scale={1.2} treeId="tree_2" />
+            <CuttableTree position={[10, 0, -3]} scale={0.9} treeId="tree_3" />
+
+            {/* Fruit trees for energy */}
+            <FruitTree position={[8, 0, 10]} fruitType="mango" treeId="mango_tree_1" />
+            <FruitTree position={[-8, 0, -5]} fruitType="coconut" treeId="coconut_tree_1" />
+
+            {/* Wildlife */}
+            <Wildlife position={[12, 0, 12]} animalId="deer_1" type="deer" />
+            <Wildlife position={[-10, 0, 15]} animalId="peacock_1" type="peacock" />
+            <Wildlife position={[15, 0, -10]} animalId="cow_1" type="cow" />
+
+            {/* Hostile animals */}
+            <HostileAnimal position={[20, 0, 20]} animalId="boar_1" type="boar" />
+            <HostileAnimal position={[-20, 0, -15]} animalId="tiger_1" type="tiger" />
+
+            {/* Pickup stones for crafting */}
+            <PickupStone position={[3, 0.5, 3]} stoneId="stone_1" />
+            <PickupStone position={[-3, 0.5, -4]} stoneId="stone_2" />
+            <PickupStone position={[7, 0.5, -2]} stoneId="stone_3" />
+
+            {/* Raft crafting zone */}
+            <RaftCrafting position={[0, 0, 15]} onRaftReady={() => {}} />
+
+            {/* Tree house */}
+            <TreeHouse position={[6, 0, 6]} treeHouseId="main" />
+
+            {/* Climbable walls for Tirumala-style mountain climbing */}
+            <ClimbableWall position={[3, 0, -8]} size={[2, 6, 0.5]} wallId="wall_1" />
+            <ClimbableWall position={[-3, 0, -10]} size={[2, 8, 0.5]} rotation={Math.PI / 4} wallId="wall_2" />
+
+            {/* Swimmable water */}
+            <SwimmableWater position={[0, 0, 0]} size={[8, 8]} />
+
+            {/* Render powerful temple 3D model */}
+            {temple && templePosition && (
+              <group position={[templePosition[0], 0, templePosition[2]]}>
+                <PowerfulTempleModel temple={temple} scale={1.5} />
+                {/* Click to enter sanctum */}
+                <mesh position={[0, 1.5, 3]} onClick={() => setShowSanctum(true)} visible={false}>
+                  <boxGeometry args={[3, 4, 2]} />
+                </mesh>
+              </group>
+            )}
+
             <Collectibles />
           </>
         )}
         <MaharajaCharacter input={inputRef} />
       </Physics>
+
+      {/* Temple Sanctum overlay (rendered in world space near temple) */}
+      {showSanctum && temple && templePosition && (
+        <TempleSanctum 
+          position={[templePosition[0], 0, templePosition[2] + 5]} 
+          temple={temple} 
+          onExit={() => setShowSanctum(false)} 
+        />
+      )}
     </>
   )
 }
