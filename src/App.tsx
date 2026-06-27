@@ -5,6 +5,7 @@ import { LoadingScreen, StartScreen, PauseMenu, GameOverScreen } from './compone
 import { AccountScreen } from './components/ui/AccountScreen'
 import LandingPage from './components/ui/LandingPage'
 import { TutorialOverlay } from './components/ui/TutorialOverlay'
+import { playWelcomeSound } from './audio/sounds'
 
 import { IndiaMapScreen } from './components/ui/IndiaMapScreen'
 import { GameCanvas } from './pages/GameCanvas'
@@ -36,6 +37,8 @@ export default function App() {
         setPhase('profile')
       } else {
         setPhase('start')
+        // Play welcome sound when entering game
+        playWelcomeSound()
       }
     } else {
       setPhase('landing')
@@ -83,6 +86,7 @@ export default function App() {
             setPhase('profile')
           } else {
             setPhase('start')
+            playWelcomeSound()
           }
         }, 600)
       }

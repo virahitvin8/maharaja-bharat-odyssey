@@ -45,44 +45,38 @@ export function LoadingScreen() {
   )
 }
 
-// ============== START SCREEN ==============
+// ============== START SCREEN (simplified for children) ==============
 export function StartScreen({ onExplore }: { onExplore: () => void }) {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 100, pointerEvents: 'none',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start',
-      color: '#fff', fontFamily: "'Cinzel', serif",
-      paddingTop: '10vh'
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      color: '#fff', fontFamily: "'Nunito', 'Comic Sans MS', sans-serif",
     }}>
-      <h1 style={{
-        fontSize: 'clamp(2rem, 6vw, 3.5rem)', fontWeight: 900,
-        background: 'linear-gradient(135deg, #FF9933, #FFD700, #FF9933)',
-        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-        textAlign: 'center', lineHeight: 1.2, padding: '0 20px', marginBottom: 6,
-        filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.8))'
-      }}>
-        Maharaja's
-      </h1>
-      <h2 style={{
-        fontSize: 'clamp(1.5rem, 5vw, 3rem)', fontWeight: 700,
-        background: 'linear-gradient(135deg, #FFD700, #FF9933)',
-        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-        textAlign: 'center', marginBottom: 8,
-        filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.8))'
-      }}>
-        Bharat Odyssey
-      </h2>
       <div style={{
-        marginTop: 'auto', marginBottom: '15vh',
-        background: 'rgba(0,0,0,0.6)', padding: '16px 32px', borderRadius: 30,
-        border: '1px solid rgba(255,215,0,0.3)',
+        fontSize: 64, marginBottom: 16,
         animation: 'float 3s ease-in-out infinite',
       }}>
+        👑
+      </div>
+      <h1 style={{
+        fontSize: 'clamp(2rem, 6vw, 3rem)', fontWeight: 900,
+        background: 'linear-gradient(135deg, #FFD700, #FF9933, #FFD700)',
+        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+        textAlign: 'center', padding: '0 20px', marginBottom: 8,
+        filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.8))'
+      }}>
+        🌟 Welcome, Explorer! 🌟
+      </h1>
+      <div style={{
+        background: 'rgba(0,0,0,0.5)', padding: '16px 24px', borderRadius: 20,
+        border: '1px solid rgba(255,215,0,0.3)',
+      }}>
         <p style={{
-          fontSize: 'clamp(1rem, 2vw, 1.2rem)', color: '#FFD700',
-          margin: 0, fontFamily: "'Inter', sans-serif", letterSpacing: 1,
+          fontSize: 'clamp(0.9rem, 2vw, 1.1rem)', color: '#FFD700',
+          margin: 0, fontFamily: "'Nunito', sans-serif",
         }}>
-          Walk up and jump into the painting to begin!
+          Use arrows or touch buttons to move 🎮
         </p>
       </div>
     </div>

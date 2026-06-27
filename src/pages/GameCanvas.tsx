@@ -239,13 +239,25 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
     }
   }, [city.lat, city.lon, loadingState, setPhase])
 
-  // Initialize TileManager and fetch initial tiles
+  // Initialize TileManager and fetch initial tiles with timeout fallback
   useEffect(() => {
     let cancelled = false
     
     setTileCallback((tiles) => {
       if (!cancelled) handleTilesChanged(tiles)
     })
+
+    // Fallback: if OSM doesn't load within 5 seconds, proceed with procedural world
+    const fallbackTimer = setTimeout(() => {
+      if (!cancelled) {
+        const s = useGameStore.getState()
+        if (s.phase === 'loading' || s.phase === 'start') {
+          console.warn('OSM data loading timed out — using procedural fallback world')
+          setLoadingState('ready')
+          s.setPhase('playing')
+        }
+      }
+    }, 5000)
 
     const loadData = async () => {
       try {
@@ -255,7 +267,14 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
           initializeTileManager(city.lat, city.lon)
         }
       } catch (e) {
-        if (!cancelled) setLoadingState('error')
+        if (!cancelled) {
+          console.warn('OSM fetch failed — using procedural fallback world:', e)
+          setLoadingState('ready')
+          const s = useGameStore.getState()
+          if (s.phase !== 'start') {
+            s.setPhase('playing')
+          }
+        }
       }
     }
     
@@ -281,6 +300,7 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
 
     return () => {
       cancelled = true
+      clearInterval(fallbackTimer)
       clearInterval(progressInterval)
     }
   }, [setPhase, currentCity, city.lat, city.lon, handleTilesChanged])

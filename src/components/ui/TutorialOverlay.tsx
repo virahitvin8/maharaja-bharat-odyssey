@@ -1,5 +1,6 @@
 // Child-friendly Tutorial Overlay — 4 simple steps with big emojis
 import { useState, useEffect } from 'react'
+import { playTutorialSound } from '../../audio/sounds'
 
 interface TutorialStep {
   emoji: string
@@ -23,6 +24,7 @@ export function TutorialOverlay({ onDismiss }: { onDismiss: () => void }) {
   useEffect(() => {
     // Auto-advance after 3.5 seconds
     if (step >= STEPS.length - 1) return
+    playTutorialSound()
     const t = setTimeout(() => {
       setFadeIn(false)
       setTimeout(() => {
