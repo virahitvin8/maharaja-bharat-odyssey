@@ -163,7 +163,7 @@ export default function LandingPage({ onPlay }: LandingPageProps) {
               <PlayIcon size={18} color="#000" />
               Play Now — Free
             </button>
-            <a href={apkUrl} download="MaharajasBharatOdyssey-v1.0.apk" style={{ textDecoration: 'none' }}>
+            <a href={apkUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
               <button className="lp-btn lp-btn-outline lp-btn-large">
                 <ArrowRightIcon size={16} color="rgba(255,255,255,0.7)" />
                 Download APK
@@ -319,7 +319,7 @@ export default function LandingPage({ onPlay }: LandingPageProps) {
               <PlayIcon size={18} color="#000" />
               Play in Browser
             </button>
-            <a href={apkUrl} download="MaharajasBharatOdyssey-v1.0.apk" style={{ textDecoration: 'none' }}>
+            <a href={apkUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
               <button className="lp-btn lp-btn-outline lp-btn-large">
                 <ArrowRightIcon size={16} color="rgba(255,255,255,0.7)" />
                 Download APK
