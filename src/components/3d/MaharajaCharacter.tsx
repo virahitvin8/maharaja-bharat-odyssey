@@ -1,5 +1,5 @@
 // Complete Maharaja Character — procedural geometry, full Mario 64 physics
-import { useRef, useEffect, useCallback } from 'react'
+import { useRef, useEffect, useCallback, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { RigidBody, CapsuleCollider } from '@react-three/rapier'
 import * as THREE from 'three'
@@ -22,11 +22,78 @@ const STAMINA_DRAIN_RUN  = 12  // per second
 const STAMINA_DRAIN_JUMP = 8
 const STAMINA_REGEN      = 18  // per second when idle
 
+// ---- Rainbow Trail Effect (reads player position from store every frame) ----
+function RainbowTrail() {
+  const trailRef = useRef<THREE.Points>(null)
+  const particles = useMemo(() => {
+    const count = 40
+    const pos = new Float32Array(count * 3)
+    const cols = new Float32Array(count * 3)
+    for (let i = 0; i < count; i++) {
+      pos[i*3] = 0; pos[i*3+1] = -100; pos[i*3+2] = 0 // hidden initially
+      const hue = (i / count) * 360
+      const c = new THREE.Color(`hsl(${hue}, 100%, 60%)`)
+      cols[i*3] = c.r; cols[i*3+1] = c.g; cols[i*3+2] = c.b
+    }
+    return { pos, cols }
+  }, [])
+  const index = useRef(0)
+  const timer = useRef(0)
+
+  useFrame((_, delta) => {
+    if (!trailRef.current) return
+    timer.current += delta
+    if (timer.current < 0.05) return // throttle to ~20fps trail
+    timer.current = 0
+
+    const store = useGameStore.getState()
+    const pp = store.playerPos
+    const input = (window as any).__inputState
+    const isRunning = input?.run || false
+
+    const array = trailRef.current.geometry.attributes.position.array as Float32Array
+    
+    if (isRunning) {
+      // Add new particle at player position
+      index.current = (index.current + 1) % 40
+      array[index.current * 3] = pp[0] + (Math.random() - 0.5) * 0.3
+      array[index.current * 3 + 1] = pp[1] - 0.3 + Math.random() * 0.2
+      array[index.current * 3 + 2] = pp[2] + (Math.random() - 0.5) * 0.3
+    } else {
+      // Slowly fade particles downward
+      for (let i = 0; i < 40; i++) {
+        array[i * 3 + 1] -= delta * 0.5
+      }
+    }
+    trailRef.current.geometry.attributes.position.needsUpdate = true
+  })
+
+  return (
+    <points ref={trailRef}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[particles.pos, 3]} />
+        <bufferAttribute attach="attributes-color" args={[particles.cols, 3]} />
+      </bufferGeometry>
+      <pointsMaterial size={0.12} vertexColors transparent opacity={0.7} blending={THREE.AdditiveBlending} depthWrite={false} sizeAttenuation />
+    </points>
+  )
+}
+
 // Procedural Maharaja mesh built from THREE primitives
-function MaharajaMesh({ isMoving, isAttacking, isJumping }: { isMoving: boolean, isAttacking: boolean, isJumping: boolean }) {
+function MaharajaMesh({ isMoving, isAttacking, isJumping, expressionType }: { isMoving: boolean, isAttacking: boolean, isJumping: boolean; expressionType: string }) {
   const groupRef = useRef<THREE.Group>(null)
   const swordRef = useRef<THREE.Mesh>(null)
   const t = useRef(0)
+  // Eye blink
+  const eyeLRef = useRef<THREE.Mesh>(null)
+  const eyeRRef = useRef<THREE.Mesh>(null)
+  const blinkTimer = useRef(Math.random() * 3)
+  const isBlinking = useRef(false)
+  const blinkDuration = useRef(0)
+  // Happy expression - big eyes on collect
+  const eyeScale = useRef(1)
+  // Mouth visibility
+  const mouthRef = useRef<THREE.Mesh>(null)
 
   useFrame((_, delta) => {
     if (!groupRef.current) return
@@ -50,6 +117,41 @@ function MaharajaMesh({ isMoving, isAttacking, isJumping }: { isMoving: boolean,
       } else {
         swordRef.current.rotation.z = THREE.MathUtils.lerp(swordRef.current.rotation.z, -0.2, 0.1)
       }
+    }
+
+    // Animated blinking
+    blinkTimer.current -= delta
+    if (blinkTimer.current <= 0 && !isBlinking.current) {
+      isBlinking.current = true
+      blinkDuration.current = 0.1
+      blinkTimer.current = 2 + Math.random() * 3
+    }
+    if (isBlinking.current) {
+      blinkDuration.current -= delta
+      if (eyeLRef.current && eyeRRef.current) {
+        const s = Math.abs(Math.sin(t.current * 60)) * 0.7 + 0.3
+        eyeLRef.current.scale.y = s
+        eyeRRef.current.scale.y = s
+      }
+      if (blinkDuration.current <= 0) {
+        isBlinking.current = false
+        if (eyeLRef.current && eyeRRef.current) {
+          eyeLRef.current.scale.y = 1
+          eyeRRef.current.scale.y = 1
+        }
+      }
+    }
+
+    // Happy expression - bigger eyes on collect/jump
+    const targetEyeScale = expressionType === 'collect' || expressionType === 'happy' ? 1.4 : 1
+    eyeScale.current = THREE.MathUtils.lerp(eyeScale.current, targetEyeScale, delta * 5)
+    if (eyeLRef.current) eyeLRef.current.scale.setScalar(eyeScale.current)
+    if (eyeRRef.current) eyeRRef.current.scale.setScalar(eyeScale.current)
+
+    // Mouth - smile on happy
+    if (mouthRef.current) {
+      const targetVisible = expressionType === 'happy' || expressionType === 'collect' || expressionType === 'jump' ? 1 : 0
+      mouthRef.current.visible = targetVisible > 0.5
     }
   })
 
@@ -106,14 +208,19 @@ function MaharajaMesh({ isMoving, isAttacking, isJumping }: { isMoving: boolean,
         <torusGeometry args={[0.1, 0.025, 6, 10, Math.PI]} />
         <meshStandardMaterial color="#1a0a00" roughness={0.8} />
       </mesh>
-      {/* Eyes */}
-      <mesh position={[-0.08, 0.58, 0.19]}>
+      {/* Eyes with blink */}
+      <mesh ref={eyeLRef} position={[-0.08, 0.58, 0.19]}>
         <sphereGeometry args={[0.035, 6, 6]} />
         <meshStandardMaterial color="#111111" />
       </mesh>
-      <mesh position={[0.08, 0.58, 0.19]}>
+      <mesh ref={eyeRRef} position={[0.08, 0.58, 0.19]}>
         <sphereGeometry args={[0.035, 6, 6]} />
         <meshStandardMaterial color="#111111" />
+      </mesh>
+      {/* Smile - visible when happy/collecting */}
+      <mesh ref={mouthRef} position={[0, 0.50, 0.21]} visible={false}>
+        <torusGeometry args={[0.06, 0.015, 4, 8, Math.PI]} />
+        <meshStandardMaterial color="#cc3333" roughness={0.5} />
       </mesh>
       {/* Turban base */}
       <mesh position={[0, 0.73, 0]} castShadow>
@@ -181,6 +288,10 @@ export function MaharajaCharacter({ input }: MaharajaProps) {
   const prevJump = useRef(false)
   const prevAttack = useRef(false)
 
+  // Expression tracking for child-friendly animations
+  const expressionType = useRef<'idle' | 'happy' | 'jump' | 'attack' | 'collect'>('idle')
+  const expressionTimer = useRef(0)
+
   // Use getState() in useFrame for actions that don't need reactivity
   const storeRef = useGameStore
   
@@ -194,6 +305,8 @@ export function MaharajaCharacter({ input }: MaharajaProps) {
   const cameraOffset = new THREE.Vector3(0, 4, 8)
   const cameraTarget = new THREE.Vector3()
   const lerpedCam    = useRef(new THREE.Vector3(0, 4, 8))
+  // Rainbow trail position
+  const trailPos = useRef(new THREE.Vector3(0, 0, 0))
 
   useFrame((state, delta) => {
     if (!rigidBodyRef.current || !meshGroupRef.current) return
@@ -240,13 +353,23 @@ export function MaharajaCharacter({ input }: MaharajaProps) {
       const angle = Math.atan2(worldMove.x, worldMove.z)
       meshGroupRef.current.rotation.y = THREE.MathUtils.lerp(meshGroupRef.current.rotation.y, angle, 0.18)
       if (run) store.setStamina(s => s - STAMINA_DRAIN_RUN * delta)
+      // Update trail position
+      trailPos.current.set(pos.x, pos.y, pos.z)
     } else {
       rigidBodyRef.current.setLinvel({ x: vel.x * 0.85, y: vel.y, z: vel.z * 0.85 }, true)
       store.setStamina(s => s + STAMINA_REGEN * delta)
     }
 
+    // Expression timer
+    expressionTimer.current -= delta
+    if (expressionTimer.current <= 0) {
+      expressionType.current = 'idle'
+    }
+
     // Triple jump
     if (jump && !prevJump.current) {
+      expressionType.current = 'jump'
+      expressionTimer.current = 0.8
       if (onGround && jumpCount.current === 0) {
         rigidBodyRef.current.setLinvel({ x: vel.x, y: JUMP_FORCE, z: vel.z }, true)
         jumpCount.current = 1; isJumping.current = true
@@ -270,6 +393,8 @@ export function MaharajaCharacter({ input }: MaharajaProps) {
 
     // Sword attack
     if (attack && !prevAttack.current) {
+      expressionType.current = 'attack'
+      expressionTimer.current = 0.5
       isAttacking.current = true
       store.setIsAttacking(true)
       attackTimer.current = 0.4
@@ -309,15 +434,18 @@ export function MaharajaCharacter({ input }: MaharajaProps) {
       const cPos = new THREE.Vector3(...c.position)
       if (posVec.distanceTo(cPos) < 2.2) {
         store.collectItem(c.id)
+        // Show happy expression on collect
+        expressionType.current = 'collect'
+        expressionTimer.current = 0.6
         const charName = store.profile?.name || 'Maharaja'
-        if (c.type === 'coin')         { store.addCoins(1);           store.showNotification(`🪙 ${charName} found a coin!`, 'collect') }
-        if (c.type === 'gem_ruby')     { store.addGem('ruby');        store.showNotification(`💎 ${charName} found a Ruby!`, 'collect') }
-        if (c.type === 'gem_diamond')  { store.addGem('diamond');     store.showNotification(`💎 ${charName} found a Diamond!`, 'collect') }
-        if (c.type === 'gem_emerald')  { store.addGem('emerald');     store.showNotification(`💎 ${charName} found an Emerald!`, 'collect') }
-        if (c.type === 'gem_sapphire') { store.addGem('sapphire');    store.showNotification(`💎 ${charName} found a Sapphire!`, 'collect') }
-        if (c.type === 'lotus')        { store.addLotus();            store.showNotification(`🪷 ${charName} found a Sacred Lotus!`, 'collect') }
-        if (c.type === 'diya')         { store.addCoins(5);           store.showNotification(`🪔 ${charName} received Diya Blessing! +5`, 'collect') }
-        if (c.type === 'mango' || c.type === 'coconut') { store.addLife(); store.showNotification(`❤️ ${charName}'s vitality restored!`, 'life') }
+        if (c.type === 'coin')         { store.addCoins(1);           store.showNotification(`🪙 ${charName} found a coin! 😊`, 'collect') }
+        if (c.type === 'gem_ruby')     { store.addGem('ruby');        store.showNotification(`💎 ${charName} found a Ruby! 🤩`, 'collect') }
+        if (c.type === 'gem_diamond')  { store.addGem('diamond');     store.showNotification(`💎 ${charName} found a Diamond! 🤩`, 'collect') }
+        if (c.type === 'gem_emerald')  { store.addGem('emerald');     store.showNotification(`💎 ${charName} found an Emerald! 🤩`, 'collect') }
+        if (c.type === 'gem_sapphire') { store.addGem('sapphire');    store.showNotification(`💎 ${charName} found a Sapphire! 🤩`, 'collect') }
+        if (c.type === 'lotus')        { store.addLotus();            store.showNotification(`🪷 ${charName} found a Sacred Lotus! 😇`, 'collect') }
+        if (c.type === 'diya')         { store.addCoins(5);           store.showNotification(`🪔 ${charName} received Diya Blessing! +5 ✨`, 'collect') }
+        if (c.type === 'mango' || c.type === 'coconut') { store.addLife(); store.showNotification(`❤️ ${charName}'s vitality restored! 🎉`, 'life') }
       }
     })
 
@@ -333,23 +461,27 @@ export function MaharajaCharacter({ input }: MaharajaProps) {
   })
 
   return (
-    <RigidBody
-      ref={rigidBodyRef}
-      type="dynamic"
-      position={[0, 2, 0]}
-      enabledRotations={[false, false, false]}
-      linearDamping={0.5}
-      angularDamping={1}
-      colliders={false}
-    >
-      <CapsuleCollider args={[0.45 * scale, 0.3 * scale]} />
-      <group ref={meshGroupRef} scale={scale}>
-        <MaharajaMesh
-          isMoving={isMoving.current}
-          isAttacking={isAttacking.current}
-          isJumping={isJumping.current}
-        />
-      </group>
-    </RigidBody>
+    <>
+      <RainbowTrail />
+      <RigidBody
+        ref={rigidBodyRef}
+        type="dynamic"
+        position={[0, 2, 0]}
+        enabledRotations={[false, false, false]}
+        linearDamping={0.5}
+        angularDamping={1}
+        colliders={false}
+      >
+        <CapsuleCollider args={[0.45 * scale, 0.3 * scale]} />
+        <group ref={meshGroupRef} scale={scale}>
+          <MaharajaMesh
+            isMoving={isMoving.current}
+            isAttacking={isAttacking.current}
+            isJumping={isJumping.current}
+            expressionType={expressionType.current}
+          />
+        </group>
+      </RigidBody>
+    </>
   )
 }

@@ -65,16 +65,54 @@ export function playAttackSound() {
   setTimeout(() => playTone(100, 0.1, 'sawtooth', 0.15), 50)
 }
 
-// Life up
+// Life up — happy ascending chime
 export function playLifeSound() {
   const notes = [523, 659, 784, 1047]
   notes.forEach((f, i) => setTimeout(() => playTone(f, 0.25, 'sine', 0.3), i * 100))
+}
+
+// Running footsteps — gentle rhythmic taps
+export function playFootstepSound() {
+  playTone(80, 0.05, 'triangle', 0.08)
+}
+
+// Celebration — triumphant fanfare for kids!
+export function playCelebrationSound() {
+  const notes = [523, 659, 784, 1047, 1319]
+  notes.forEach((f, i) => setTimeout(() => playTone(f, 0.3, 'sine', 0.25), i * 80))
+  setTimeout(() => playTone(1319, 0.6, 'triangle', 0.2), 400)
+}
+
+// Power-up sound — exciting boost
+export function playPowerUpSound() {
+  playTone(440, 0.08, 'square', 0.15)
+  setTimeout(() => playTone(660, 0.08, 'square', 0.12), 60)
+  setTimeout(() => playTone(880, 0.08, 'square', 0.1), 120)
+  setTimeout(() => playTone(1100, 0.15, 'sine', 0.15), 180)
+}
+
+// Tutorial ding prompt
+export function playTutorialSound() {
+  playTone(880, 0.15, 'sine', 0.2)
+  setTimeout(() => playTone(1100, 0.2, 'sine', 0.15), 150)
+}
+
+// Collect sparkle sound
+export function playSparkleSound() {
+  playTone(1200, 0.05, 'sine', 0.15)
+  setTimeout(() => playTone(1600, 0.08, 'sine', 0.1), 40)
 }
 
 // Game over
 export function playGameOverSound() {
   const notes = [440, 349, 294, 220]
   notes.forEach((f, i) => setTimeout(() => playTone(f, 0.4, 'triangle', 0.3), i * 150))
+}
+
+// Welcome jingle — play when game starts
+export function playWelcomeSound() {
+  const notes = [523, 659, 784, 1047, 784, 1047, 1319]
+  notes.forEach((f, i) => setTimeout(() => playTone(f, 0.25, 'sine', 0.3), i * 120))
 }
 
 // Genshin-style Ambient Music Generator

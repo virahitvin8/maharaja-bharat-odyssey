@@ -4,6 +4,7 @@ import { useGameStore } from './store/gameStore'
 import { LoadingScreen, StartScreen, PauseMenu, GameOverScreen } from './components/ui/Screens'
 import { AccountScreen } from './components/ui/AccountScreen'
 import LandingPage from './components/ui/LandingPage'
+import { TutorialOverlay } from './components/ui/TutorialOverlay'
 
 import { IndiaMapScreen } from './components/ui/IndiaMapScreen'
 import { GameCanvas } from './pages/GameCanvas'
@@ -126,6 +127,7 @@ export default function App() {
   }, [])
 
   const showCanvas = (phase === 'playing' || phase === 'paused') && selectedCity !== null
+  const [showTutorial, setShowTutorial] = useState(true)
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: '#050510' }}>
@@ -185,6 +187,11 @@ export default function App() {
         <div style={{ position: 'absolute', inset: 0 }}>
           <GameCanvas city={selectedCity!} temple={selectedTemple} />
         </div>
+      )}
+
+      {/* Child-friendly tutorial overlay on first play */}
+      {showTutorial && (phase === 'start' || phase === 'playing') && (
+        <TutorialOverlay onDismiss={() => setShowTutorial(false)} />
       )}
 
       {/* Pause menu on top of canvas */}
