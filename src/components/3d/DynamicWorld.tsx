@@ -316,33 +316,6 @@ function TempleStructure({ feature, onEnter }: { feature: OSMFeature; onEnter: (
   )
 }
 
-// ========== PROCEDURAL TREE (ez-tree) ==========
-function ProceduralTree({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
-  const groupRef = useRef<THREE.Group>(null)
-  const treeRef = useRef<any>(null)
-  useEffect(() => {
-    import('@dgreenheck/ez-tree').then((mod: any) => {
-      const Tree = mod.Tree
-      if (!Tree) return
-      const tree = new Tree()
-      const opts = tree.options
-      opts.seed = Math.floor(Math.random() * 100000)
-      opts.type = 'deciduous'
-      opts.trunkHeight = 3 * scale; opts.trunkRadius = 0.2 * scale
-      if (opts.bark) opts.bark.type = 'oak'
-      if (opts.leaves) { opts.leaves.type = 'oak'; opts.leaves.count = 40; opts.leaves.size = 2.0 * scale }
-      tree.generate()
-      tree.scale.set(scale, scale, scale)
-      tree.position.set(position[0], 0, position[2])
-      if (groupRef.current) groupRef.current.add(tree)
-      treeRef.current = tree
-    })
-    return () => { if (treeRef.current && groupRef.current) groupRef.current.remove(treeRef.current) }
-  }, [position[0], position[2]])
-  useFrame((state) => { if (treeRef.current?.update) treeRef.current.update(state.clock.elapsedTime) })
-  return <group ref={groupRef} />
-}
-
 // ========== PARTICLES ==========
 function AtmosphereParticles({ count = 300, spread = 150, height = 25 }: { count?: number; spread?: number; height?: number }) {
   const ref = useRef<THREE.Points>(null)
@@ -433,7 +406,7 @@ function FoliageCluster({ feature }: { feature: OSMFeature }) {
     } catch { return [] }
   }, [feature])
   const randomScales = useMemo(() => trees.map(() => 0.6 + Math.random() * 0.6), [trees])
-  return <>{trees.map((pos, i) => <ProceduralTree key={i} position={pos} scale={randomScales[i]} />)}</>
+  return <>{trees.map((pos, i) => <SimpleTree key={i} position={pos} scale={randomScales[i]} />)}</>
 }
 
 function SimpleTree({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
