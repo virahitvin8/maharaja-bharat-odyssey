@@ -91,7 +91,7 @@ function GameScene({ inputRef, osmData, temple }: {
 
   return (
     <>
-      <EffectComposer multisampling={4} autoClear={false}>
+      <EffectComposer multisampling={0}>
         <N8AO aoRadius={1.5} intensity={2.5} distanceFalloff={0.8} screenSpaceRadius={true} color="rgba(0, 0, 0, 0.35)" />
         <Bloom luminanceThreshold={0.6} luminanceSmoothing={0.08} intensity={0.8} mipmapBlur={true} />
         <SMAA />
@@ -218,8 +218,11 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
   const [osmData, setOsmData] = useState<OSMData | null>(null)
   const [loadingState, setLoadingState] = useState<'fetching' | 'ready' | 'error'>('fetching')
   const [loadProgress, setLoadProgress] = useState(0)
+  // Ref to track loadingState without causing stale closures or re-running effects
+  const loadingStateRef = useRef(loadingState)
+  loadingStateRef.current = loadingState
 
-  // Handle tile updates from the TileManager
+  // Handle tile updates from the TileManager — use ref for loadingState to avoid stale closure
   const handleTilesChanged = useCallback((tiles: Tile[]) => {
     const merged = getMergedTileData()
     if (merged) {
@@ -229,7 +232,7 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
       const progress = getLoadProgress(city.lat, city.lon)
       setLoadProgress(progress)
       
-      if (progress >= 80 && loadingState === 'fetching') {
+      if (progress >= 80 && loadingStateRef.current === 'fetching') {
         setLoadingState('ready')
         // Use setTimeout to prevent React error #185 (state update during render)
         setTimeout(() => {
@@ -240,7 +243,7 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
         }, 0)
       }
     }
-  }, [city.lat, city.lon, loadingState, setPhase])
+  }, [city.lat, city.lon, setPhase])
 
   // Initialize TileManager and fetch initial tiles with timeout fallback
   useEffect(() => {
@@ -251,18 +254,21 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
     })
 
     // Fallback: if OSM doesn't load within 5 seconds, proceed with procedural world
+    // This works regardless of the current phase (start, playing, etc.)
     const fallbackTimer = setTimeout(() => {
-      if (!cancelled) {
+      if (!cancelled && loadingStateRef.current === 'fetching') {
+        console.warn('OSM data loading timed out — using procedural fallback world')
+        setLoadingState('ready')
         const s = useGameStore.getState()
-        if (s.phase === 'loading' || s.phase === 'start') {
-          console.warn('OSM data loading timed out — using procedural fallback world')
-          setLoadingState('ready')
+        if (s.phase !== 'playing') {
           s.setPhase('playing')
         }
       }
     }, 5000)
 
     const loadData = async () => {
+      setLoadingState('fetching')
+      setLoadProgress(0)
       try {
         const data = await getMapData(currentCity, MAP_ORIGIN.lat, MAP_ORIGIN.lon, 1000)
         if (!cancelled) {
@@ -274,7 +280,7 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
           console.warn('OSM fetch failed — using procedural fallback world:', e)
           setLoadingState('ready')
           const s = useGameStore.getState()
-          if (s.phase !== 'start') {
+          if (s.phase !== 'playing') {
             s.setPhase('playing')
           }
         }
@@ -331,8 +337,8 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
     )
   }
 
-  // Loading / fetching state
-  const currentPhase = useGameStore.getState().phase
+  // Loading / fetching state — use reactive selector so it re-renders when phase changes
+  const currentPhase = useGameStore(s => s.phase)
   if (loadingState === 'fetching' && currentPhase !== 'start') {
     return <CanvasLoader progress={loadProgress} message={`Loading ${city.name} from OpenStreetMap...`} />
   }
@@ -355,7 +361,12 @@ export function GameCanvas({ city, temple }: GameCanvasProps) {
           gl.toneMappingExposure = 1.0
         }}
       >
-        <Suspense fallback={null}>
+        <Suspense fallback={
+          <mesh scale={[100, 100, 1]}>
+            <planeGeometry />
+            <meshBasicMaterial color="#0a0a1a" />
+          </mesh>
+        }>
           <GameScene inputRef={input} osmData={osmData} temple={temple} />
         </Suspense>
       </Canvas>

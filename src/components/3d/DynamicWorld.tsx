@@ -252,7 +252,8 @@ function AllRoads({ roads }: { roads: OSMFeature[] }) {
   </mesh>
 }
 
-// ========== TEMPLE STRUCTURE ==========
+import { useTexture } from '@react-three/drei'
+
 function TempleStructure({ feature, onEnter }: { feature: OSMFeature; onEnter: () => void }) {
   const pos = useMemo(() => {
     if (feature.lat && feature.lon) {
@@ -266,38 +267,50 @@ function TempleStructure({ feature, onEnter }: { feature: OSMFeature; onEnter: (
     }
     return null
   }, [feature])
+
+  // Load the photorealistic temple image to match the landing page exactly
+  const texture = useTexture(`${import.meta.env.BASE_URL}images/hero_temple.png`)
+
   if (!pos) return null
   const name = feature.tags.name || 'Temple'
   const isMajor = name.toLowerCase().includes('kashi') || name.toLowerCase().includes('vishwanath')
+  
+  // Scale based on importance
+  const scale = isMajor ? 20 : 10
 
   return (
     <group position={pos}>
       <RigidBody type="fixed" colliders="cuboid">
-        <mesh castShadow receiveShadow position={[0, 1, 0]}><boxGeometry args={[12, 2, 12]} /><meshStandardMaterial color="#e8dcc8" roughness={0.6} map={SHARED_BRICK_NORMAL} normalScale={new THREE.Vector2(0.15, 0.15)} /></mesh>
-        <mesh castShadow receiveShadow position={[0, 4, 0]}><boxGeometry args={[8, 4, 8]} /><meshStandardMaterial color="#f0e8d8" roughness={0.5} /></mesh>
-        <mesh castShadow position={[0, 10, 0]}><coneGeometry args={[4, 8, 8]} /><meshStandardMaterial color="#e8d4b0" roughness={0.5} metalness={0.2} /></mesh>
-        <mesh castShadow position={[0, 15, 0]}><cylinderGeometry args={[0.6, 0.4, 1.5, 8]} /><meshStandardMaterial color="#DAA520" metalness={0.9} roughness={0.1} emissive="#FFD700" emissiveIntensity={0.3} /></mesh>
-        {[[-3, 0, -3], [3, 0, -3], [-3, 0, 3], [3, 0, 3]].map(([x, , z], i) => (
-          <mesh key={i} castShadow position={[x, 2.5, z]}><cylinderGeometry args={[0.3, 0.35, 5, 8]} /><meshStandardMaterial color="#d4c4a8" roughness={0.6} /></mesh>
-        ))}
-        <mesh castShadow position={[0, 6, 0]}><sphereGeometry args={[3, 12, 12, 0, Math.PI * 2, 0, Math.PI / 2]} /><meshStandardMaterial color="#f0e4d0" roughness={0.4} metalness={0.1} /></mesh>
-        <mesh position={[0, 2.5, 4.1]}><boxGeometry args={[3, 5, 0.3]} /><meshStandardMaterial color="#4a2a10" roughness={0.8} /></mesh>
-        <mesh position={[0, 5, 4.1]}><torusGeometry args={[1.8, 0.2, 6, 12, Math.PI]} /><meshStandardMaterial color="#DAA520" metalness={0.7} roughness={0.3} /></mesh>
+        {/* Transparent physical bound for collision */}
+        <mesh position={[0, scale/2, 0]}>
+          <boxGeometry args={[scale, scale, 2]} />
+          <meshBasicMaterial visible={false} />
+        </mesh>
+        
+        {/* Photorealistic Billboard rendering the exact AI image */}
+        <mesh position={[0, scale/2, 0]} castShadow receiveShadow>
+          <planeGeometry args={[scale * 1.5, scale]} />
+          <meshStandardMaterial 
+            map={texture} 
+            transparent 
+            alphaTest={0.1}
+            roughness={0.4} 
+            emissive={new THREE.Color(0.2, 0.2, 0.2)}
+          />
+        </mesh>
       </RigidBody>
+      
       {/* Entrance trigger zone */}
       <mesh position={[0, 1.5, 4.5]} onClick={onEnter} visible={false}>
         <boxGeometry args={[3, 4, 1]} />
       </mesh>
+      
       {/* Entrance glow arch */}
-      <pointLight color="#FFD700" intensity={4} distance={8} position={[0, 2, 4.5]} />
-      <pointLight color="#FFD700" intensity={isMajor ? 8 : 3} distance={isMajor ? 30 : 15} position={[0, 8, 0]} />
+      <pointLight color="#FFD700" intensity={4} distance={15} position={[0, 2, 4.5]} />
+      <pointLight color="#FFD700" intensity={isMajor ? 8 : 4} distance={isMajor ? 40 : 20} position={[0, scale, 0]} />
+      
       {isMajor && (
-        <>
-          {[[-5, 0, -5], [5, 0, -5], [-5, 0, 5], [5, 0, 5]].map(([x, , z], i) => (
-            <mesh key={i} castShadow position={[x, 4, z]}><coneGeometry args={[1.5, 6, 6]} /><meshStandardMaterial color="#e0d0b8" roughness={0.5} /></mesh>
-          ))}
-          <mesh position={[0, 0.3, 0]}><cylinderGeometry args={[0.5, 2, 0.5, 8]} /><meshStandardMaterial color="#FFD700" emissive="#FFD700" emissiveIntensity={1} transparent opacity={0.3} /></mesh>
-        </>
+        <mesh position={[0, 0.3, 2]}><cylinderGeometry args={[2, 4, 0.5, 12]} /><meshStandardMaterial color="#FFD700" emissive="#FFD700" emissiveIntensity={1} transparent opacity={0.3} /></mesh>
       )}
     </group>
   )

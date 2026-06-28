@@ -85,200 +85,51 @@ function RainbowTrail() {
   )
 }
 
-// Procedural Maharaja mesh built from THREE primitives
+import { useGraph } from '@react-three/fiber'
+import { useGLTF, useAnimations } from '@react-three/drei'
+import { SkeletonUtils } from 'three-stdlib'
+
 function MaharajaMesh({ isMoving, isAttacking, isJumping, expressionType }: { isMoving: boolean, isAttacking: boolean, isJumping: boolean; expressionType: string }) {
-  const groupRef = useRef<THREE.Group>(null)
-  const swordRef = useRef<THREE.Mesh>(null)
-  const t = useRef(0)
-  // Eye blink
-  const eyeLRef = useRef<THREE.Mesh>(null)
-  const eyeRRef = useRef<THREE.Mesh>(null)
-  const blinkTimer = useRef(Math.random() * 3)
-  const isBlinking = useRef(false)
-  const blinkDuration = useRef(0)
-  // Happy expression - big eyes on collect
-  const eyeScale = useRef(1)
-  // Mouth visibility
-  const mouthRef = useRef<THREE.Mesh>(null)
+  const group = useRef<THREE.Group>(null)
+  
+  // Use absolute URL to the models folder in public
+  const { scene, animations } = useGLTF(`${import.meta.env.BASE_URL}models/character.glb`)
+  const clone = useMemo(() => SkeletonUtils.clone(scene), [scene])
+  const { nodes, materials } = useGraph(clone)
+  const { actions, names } = useAnimations(animations, group)
 
-  useFrame((_, delta) => {
-    if (!groupRef.current) return
-    t.current += delta
-
-    // Idle bob
-    if (!isMoving && !isJumping) {
-      groupRef.current.position.y = Math.sin(t.current * 2) * 0.04
-    }
-    // Walk bob
-    if (isMoving) {
-      groupRef.current.position.y = Math.abs(Math.sin(t.current * 8)) * 0.06
-      groupRef.current.rotation.z = Math.sin(t.current * 8) * 0.04
+  useEffect(() => {
+    // Basic animation state machine
+    let currentActionName = names[0] // fallback to first animation
+    
+    // Attempt to find standard action names
+    const hasRun = names.includes('Run')
+    const hasWalk = names.includes('Walk')
+    const hasIdle = names.includes('Idle')
+    
+    if (isJumping && names.includes('Jump')) {
+      currentActionName = 'Jump'
+    } else if (isMoving) {
+      currentActionName = hasRun ? 'Run' : (hasWalk ? 'Walk' : names[1] || names[0])
     } else {
-      groupRef.current.rotation.z = 0
-    }
-    // Sword attack swing
-    if (swordRef.current) {
-      if (isAttacking) {
-        swordRef.current.rotation.z = Math.sin(t.current * 20) * 0.8 - 0.4
-      } else {
-        swordRef.current.rotation.z = THREE.MathUtils.lerp(swordRef.current.rotation.z, -0.2, 0.1)
-      }
+      currentActionName = hasIdle ? 'Idle' : names[0]
     }
 
-    // Animated blinking
-    blinkTimer.current -= delta
-    if (blinkTimer.current <= 0 && !isBlinking.current) {
-      isBlinking.current = true
-      blinkDuration.current = 0.1
-      blinkTimer.current = 2 + Math.random() * 3
+    const action = actions[currentActionName]
+    if (action) {
+      action.reset().fadeIn(0.2).play()
+      return () => { action.fadeOut(0.2) }
     }
-    if (isBlinking.current) {
-      blinkDuration.current -= delta
-      if (eyeLRef.current && eyeRRef.current) {
-        const s = Math.abs(Math.sin(t.current * 60)) * 0.7 + 0.3
-        eyeLRef.current.scale.y = s
-        eyeRRef.current.scale.y = s
-      }
-      if (blinkDuration.current <= 0) {
-        isBlinking.current = false
-        if (eyeLRef.current && eyeRRef.current) {
-          eyeLRef.current.scale.y = 1
-          eyeRRef.current.scale.y = 1
-        }
-      }
-    }
-
-    // Happy expression - bigger eyes on collect/jump
-    const targetEyeScale = expressionType === 'collect' || expressionType === 'happy' ? 1.4 : 1
-    eyeScale.current = THREE.MathUtils.lerp(eyeScale.current, targetEyeScale, delta * 5)
-    if (eyeLRef.current) eyeLRef.current.scale.setScalar(eyeScale.current)
-    if (eyeRRef.current) eyeRRef.current.scale.setScalar(eyeScale.current)
-
-    // Mouth - smile on happy
-    if (mouthRef.current) {
-      const targetVisible = expressionType === 'happy' || expressionType === 'collect' || expressionType === 'jump' ? 1 : 0
-      mouthRef.current.visible = targetVisible > 0.5
-    }
-  })
+  }, [isMoving, isJumping, actions, names])
 
   return (
-    <group ref={groupRef}>
-      {/* Legs */}
-      <mesh position={[-0.18, -0.55, 0]} castShadow>
-        <cylinderGeometry args={[0.1, 0.12, 0.5, 8]} />
-        <meshStandardMaterial color="#1a3a6e" roughness={0.7} />
-      </mesh>
-      <mesh position={[0.18, -0.55, 0]} castShadow>
-        <cylinderGeometry args={[0.1, 0.12, 0.5, 8]} />
-        <meshStandardMaterial color="#1a3a6e" roughness={0.7} />
-      </mesh>
-      {/* Sherwani body — saffron gold */}
-      <mesh position={[0, -0.05, 0]} castShadow>
-        <cylinderGeometry args={[0.28, 0.32, 0.7, 12]} />
-        <meshStandardMaterial color="#FF9933" roughness={0.5} metalness={0.2} />
-      </mesh>
-      {/* Gold belt */}
-      <mesh position={[0, -0.38, 0]} castShadow>
-        <cylinderGeometry args={[0.295, 0.295, 0.08, 12]} />
-        <meshStandardMaterial color="#DAA520" metalness={0.8} roughness={0.2} />
-      </mesh>
-      {/* Decorative buttons */}
-      {[0, 1, 2].map(i => (
-        <mesh key={i} position={[0, 0.12 - i * 0.14, 0.29]} castShadow>
-          <sphereGeometry args={[0.03, 6, 6]} />
-          <meshStandardMaterial color="#DAA520" metalness={0.9} roughness={0.1} emissive="#FFD700" emissiveIntensity={0.3} />
-        </mesh>
-      ))}
-      {/* Arms */}
-      <mesh position={[-0.38, 0.05, 0]} rotation={[0, 0, 0.4]} castShadow>
-        <cylinderGeometry args={[0.09, 0.1, 0.45, 8]} />
-        <meshStandardMaterial color="#FF9933" roughness={0.5} />
-      </mesh>
-      {/* Right arm — holds sword */}
-      <mesh position={[0.38, 0.05, 0]} rotation={[0, 0, -0.4]} castShadow>
-        <cylinderGeometry args={[0.09, 0.1, 0.45, 8]} />
-        <meshStandardMaterial color="#FF9933" roughness={0.5} />
-      </mesh>
-      {/* Neck */}
-      <mesh position={[0, 0.38, 0]} castShadow>
-        <cylinderGeometry args={[0.1, 0.12, 0.12, 8]} />
-        <meshStandardMaterial color="#c8956c" roughness={0.7} />
-      </mesh>
-      {/* Head */}
-      <mesh position={[0, 0.56, 0]} castShadow>
-        <sphereGeometry args={[0.22, 12, 12]} />
-        <meshStandardMaterial color="#c8956c" roughness={0.6} />
-      </mesh>
-      {/* Mustache */}
-      <mesh position={[0, 0.49, 0.2]} rotation={[0, 0, 0]} castShadow>
-        <torusGeometry args={[0.1, 0.025, 6, 10, Math.PI]} />
-        <meshStandardMaterial color="#1a0a00" roughness={0.8} />
-      </mesh>
-      {/* Eyes with blink */}
-      <mesh ref={eyeLRef} position={[-0.08, 0.58, 0.19]}>
-        <sphereGeometry args={[0.035, 6, 6]} />
-        <meshStandardMaterial color="#111111" />
-      </mesh>
-      <mesh ref={eyeRRef} position={[0.08, 0.58, 0.19]}>
-        <sphereGeometry args={[0.035, 6, 6]} />
-        <meshStandardMaterial color="#111111" />
-      </mesh>
-      {/* Smile - visible when happy/collecting */}
-      <mesh ref={mouthRef} position={[0, 0.50, 0.21]} visible={false}>
-        <torusGeometry args={[0.06, 0.015, 4, 8, Math.PI]} />
-        <meshStandardMaterial color="#cc3333" roughness={0.5} />
-      </mesh>
-      {/* Turban base */}
-      <mesh position={[0, 0.73, 0]} castShadow>
-        <cylinderGeometry args={[0.24, 0.22, 0.15, 10]} />
-        <meshStandardMaterial color="#003366" roughness={0.5} metalness={0.1} />
-      </mesh>
-      {/* Turban top coil */}
-      <mesh position={[0, 0.83, 0]} castShadow>
-        <torusGeometry args={[0.16, 0.06, 6, 12]} />
-        <meshStandardMaterial color="#003366" roughness={0.5} />
-      </mesh>
-      {/* Turban jewel */}
-      <mesh position={[0, 0.83, 0.2]} castShadow>
-        <sphereGeometry args={[0.055, 8, 8]} />
-        <meshStandardMaterial color="#e63946" emissive="#e63946" emissiveIntensity={0.8} metalness={0.5} roughness={0.2} />
-      </mesh>
-      {/* Feather in turban */}
-      <mesh position={[0, 1.0, 0.1]} rotation={[0.3, 0, 0]} castShadow>
-        <cylinderGeometry args={[0.012, 0.005, 0.35, 5]} />
-        <meshStandardMaterial color="#138808" roughness={0.8} />
-      </mesh>
-      {/* Crown band */}
-      <mesh position={[0, 0.68, 0]} castShadow>
-        <cylinderGeometry args={[0.245, 0.245, 0.06, 12]} />
-        <meshStandardMaterial color="#DAA520" metalness={0.9} roughness={0.1} emissive="#FFD700" emissiveIntensity={0.2} />
-      </mesh>
-      {/* SWORD in right hand */}
-      <group ref={swordRef} position={[0.55, -0.08, 0]} rotation={[0, 0, -0.2]}>
-        {/* Handle */}
-        <mesh position={[0, -0.15, 0]}>
-          <cylinderGeometry args={[0.025, 0.025, 0.2, 6]} />
-          <meshStandardMaterial color="#4a2c0a" roughness={0.8} />
-        </mesh>
-        {/* Guard */}
-        <mesh position={[0, -0.04, 0]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.015, 0.015, 0.18, 6]} />
-          <meshStandardMaterial color="#DAA520" metalness={0.9} roughness={0.1} />
-        </mesh>
-        {/* Blade */}
-        <mesh position={[0, 0.28, 0]}>
-          <boxGeometry args={[0.03, 0.55, 0.008]} />
-          <meshStandardMaterial color="#c0c0c0" metalness={0.95} roughness={0.05} emissive="#aaaaff" emissiveIntensity={0.1} />
-        </mesh>
-        {/* Blade tip */}
-        <mesh position={[0, 0.575, 0]} rotation={[0, 0, 0]}>
-          <coneGeometry args={[0.015, 0.06, 4]} />
-          <meshStandardMaterial color="#e0e0e0" metalness={0.95} roughness={0.05} />
-        </mesh>
-      </group>
+    <group ref={group} dispose={null} position={[0, -0.6, 0]}>
+      {/* Dynamic scale for the soldier model to match original size */}
+      <primitive object={clone} scale={1.2} />
     </group>
   )
 }
+
 
 export function MaharajaCharacter({ input }: MaharajaProps) {
   const rigidBodyRef = useRef<RapierRigidBody>(null)

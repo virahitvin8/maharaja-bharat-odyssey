@@ -1,6 +1,7 @@
 // Procedural audio engine using Web Audio API (no external assets needed)
 import { useRef, useEffect, useCallback } from 'react'
 import type { BiomeType } from '../store/gameStore'
+import { useGameStore } from '../store/gameStore'
 
 let audioCtx: AudioContext | null = null
 
@@ -11,6 +12,7 @@ function getCtx(): AudioContext {
 
 // Generate a simple tone
 function playTone(freq: number, duration: number, type: OscillatorType = 'sine', vol = 0.3) {
+  if (useGameStore.getState().isMuted) return;
   try {
     const ctx = getCtx()
     const osc = ctx.createOscillator()
@@ -128,6 +130,19 @@ export function useBiomeAmbient() {
   const ambientRef = useRef<{ osc1: OscillatorNode; osc2: OscillatorNode; gain: GainNode; interval?: TimerId; lfo1?: OscillatorNode; lfo2?: OscillatorNode } | null>(null)
 
   const setBiomeAmbient = useCallback((biome: BiomeType) => {
+    if (useGameStore.getState().isMuted) {
+      if (ambientRef.current) {
+        try {
+          ambientRef.current.osc1.stop()
+          ambientRef.current.osc2.stop()
+          if (ambientRef.current.lfo1) ambientRef.current.lfo1.stop()
+          if (ambientRef.current.lfo2) ambientRef.current.lfo2.stop()
+          if (ambientRef.current.interval) clearInterval(ambientRef.current.interval)
+        } catch {}
+        ambientRef.current = null
+      }
+      return
+    }
     try {
       const ctx = getCtx()
       

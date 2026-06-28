@@ -118,6 +118,8 @@ export interface GameState {
   showNotification: (msg: string, type: GameState['notification']['type']) => void
   clearNotification: () => void
   addScore: (n: number) => void
+  isMuted: boolean
+  setIsMuted: (muted: boolean) => void
 }
 
 const INITIAL_COLLECTIBLES: Collectible[] = [
@@ -208,7 +210,9 @@ export const useGameStore = create<GameState>()(
   timeOfDay: 10,
   weather: 'clear',
   notification: null,
+  isMuted: false,
 
+  setIsMuted: (isMuted) => set({ isMuted }),
   setPhase: (phase) => set({ phase }),
   setLoadingProgress: (loadingProgress) => set({ loadingProgress }),
   setCity: (currentCity) => set({ currentCity }),
@@ -302,7 +306,8 @@ export const useGameStore = create<GameState>()(
         health: state.health,
         maxHealth: state.maxHealth,
         stamina: state.stamina,
-        maxStamina: state.maxStamina
+        maxStamina: state.maxStamina,
+        isMuted: state.isMuted
       }),
     }
   )

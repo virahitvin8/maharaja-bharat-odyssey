@@ -21,7 +21,8 @@ export default function App() {
   const setPhase = useGameStore(s => s.setPhase)
   const profile = useGameStore(s => s.profile)
   const hasAccount = profile !== null
-  const [bgmMuted, setBgmMuted] = useState(false)
+  const isMuted = useGameStore(s => s.isMuted)
+  const setIsMuted = useGameStore(s => s.setIsMuted)
   const audioRef = React.useRef<HTMLAudioElement>(null)
   
   // Track the selected destination (city or temple)
@@ -59,13 +60,13 @@ export default function App() {
     
     // Play on first click anywhere if it was blocked
     const startAudio = () => {
-      if (audioRef.current && audioRef.current.paused && !bgmMuted) {
+      if (audioRef.current && audioRef.current.paused && !isMuted) {
         audioRef.current.play().catch(()=>{})
       }
     }
     window.addEventListener('pointerdown', startAudio, { once: true })
     return () => window.removeEventListener('pointerdown', startAudio)
-  }, [bgmMuted])
+  }, [isMuted])
 
 
   // Simulate loading progress if phase is loading (bypass if coming from profile)
@@ -96,20 +97,23 @@ export default function App() {
 
   // Handle destination selection (city or temple)
   const handleCitySelect = (dest: IndianLocation | PowerfulTemple) => {
+    const s = useGameStore.getState()
     if ('style' in dest) {
       // It's a temple
       setSelectedTemple(dest)
-      // Find nearest city for OSM data
       const nearestCity = INDIAN_CITIES.reduce((best, city) => {
         const dist = Math.sqrt((city.lat - dest.lat) ** 2 + (city.lon - dest.lon) ** 2)
         return dist < best.dist ? { city, dist } : best
       }, { city: INDIAN_CITIES[0], dist: Infinity }).city
       setSelectedCity(nearestCity)
+      s.setCity(nearestCity.id)
     } else {
       setSelectedCity(dest)
       setSelectedTemple(null)
+      s.setCity(dest.id)
     }
-    setPhase('playing')
+    // Show loading screen while OSM data loads for the new city
+    setPhase('loading')
   }
 
   // Pause on Escape — also show India Map from playing
@@ -144,12 +148,12 @@ export default function App() {
         <button
           onClick={() => {
             if (audioRef.current) {
-              if (bgmMuted) {
+              if (isMuted) {
                 audioRef.current.play().catch(()=>{})
-                setBgmMuted(false)
+                setIsMuted(false)
               } else {
                 audioRef.current.pause()
-                setBgmMuted(true)
+                setIsMuted(true)
               }
             }
           }}
@@ -161,7 +165,7 @@ export default function App() {
             justifyContent: 'center', cursor: 'pointer', color: '#FFD700', fontSize: 18
           }}
         >
-          {bgmMuted ? '🔇' : '🎵'}
+          {isMuted ? '🔇' : '🎵'}
         </button>
       )}
 
